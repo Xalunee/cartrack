@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  car Car?
+
+  @@map("users")
+}
+
+model Car {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  brand          String
+  model          String
+  year           Int
+  licensePlate   String?
+  currentMileage Int      @default(0)
+  lastTrackedAt  DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  maintenanceItems MaintenanceItem[]
+  mileageLogs      MileageLog[]
+  events           CarEvent[]
+
+  @@map("cars")
+}
+
+model MaintenanceItem {
+  id                 String    @id @default(cuid())
+  carId              String
+  car                Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  name               String
+  intervalKm         Int?
+  intervalDays       Int?
+  lastServiceMileage Int?
+  lastServiceDate    DateTime?
+  lastServiceCost    Float?
+  lastServiceNotes   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("maintenance_items")
+}
+
+model MileageLog {
+  id         String   @id @default(cuid())
+  carId      String
+  car        Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  mileage    Int
+  recordedAt DateTime @default(now())
+  note       String?
+
+  @@map("mileage_logs")
+}
+
+model CarEvent {
+  id          String       @id @default(cuid())
+  carId       String
+  car         Car          @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  type        CarEventType
+  title       String
+  description String?
+  cost        Float?
+  occurredAt  DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+
+  @@map("car_events")
+}
+
+enum CarEventType {
+  ACCIDENT
+  MALFUNCTION
+  FINE
+  SERVICE
+  NOTE
+}

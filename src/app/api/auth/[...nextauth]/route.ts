@@ -1,2 +1,2 @@
-// NextAuth route handler — configure in src/shared/lib/auth.ts
-export { GET, POST } from '@shared/lib/auth'
+import { handlers } from '@shared/lib/auth'
+export const { GET, POST } = handlers

@@ -1,0 +1,29 @@
+import { auth } from '@shared/lib/auth'
+import { NextResponse } from 'next/server'
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth
+  const { pathname } = req.nextUrl
+
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register')
+  const isProtected =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/maintenance') ||
+    pathname.startsWith('/mileage') ||
+    pathname.startsWith('/events') ||
+    pathname.startsWith('/settings')
+
+  if (isProtected && !isLoggedIn) {
+    return NextResponse.redirect(new URL('/login', req.nextUrl))
+  }
+
+  if (isAuthPage && isLoggedIn) {
+    return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
+  }
+
+  return NextResponse.next()
+})
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}
