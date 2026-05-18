@@ -1,4 +1,3 @@
-export type { Car } from './model/types'
-export { carApi } from './api/carApi'
-export { useCarQuery, carKeys } from './api/useCarQuery'
-export { CarCard } from './ui/CarCard'
+export * from './model/types'
+export * from './api/carApi'
+export * from './api/useCarQuery'

@@ -1,10 +1,22 @@
 export interface Car {
   id: string
-  make: string
+  userId: string
+  brand: string
   model: string
   year: number
-  vin?: string
-  mileage: number
-  createdAt: string
-  updatedAt: string
+  licensePlate: string | null
+  currentMileage: number
+  lastTrackedAt: Date
+  createdAt: Date
+  updatedAt: Date
 }
+
+export interface CreateCarDto {
+  brand: string
+  model: string
+  year: number
+  licensePlate?: string
+  currentMileage: number
+}
+
+export interface UpdateCarDto extends Partial<CreateCarDto> {}
