@@ -5,7 +5,7 @@ export function MileagePage() {
   return (
     <div className="space-y-6 p-4">
       <h1 className="text-xl font-bold">Пробег</h1>
-      <LogMileageForm carId="" />
+      <LogMileageForm />
       <MileageTracker />
     </div>
   )

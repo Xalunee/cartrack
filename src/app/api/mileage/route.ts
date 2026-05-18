@@ -1,9 +1,63 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@shared/lib/auth'
+import { db } from '@shared/lib/db'
+import { z } from 'zod'
+import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+
+const createSchema = z.object({
+  mileage: z.number().int().min(0),
+  note: z.string().optional(),
+})
 
 export async function GET() {
-  return NextResponse.json({ data: [] })
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const car = await db.car.findUnique({ where: { userId: session.user.id } })
+  if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+  const logs = await db.mileageLog.findMany({
+    where: { carId: car.id },
+    orderBy: { recordedAt: 'desc' },
+  })
+
+  const pace = calculateDrivingPace(logs)
+  return NextResponse.json({ logs, pace })
 }
 
-export async function POST() {
-  return NextResponse.json({ data: null }, { status: 201 })
+export async function POST(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await req.json()
+  const parsed = createSchema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+
+  const car = await db.car.findUnique({ where: { userId: session.user.id } })
+  if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+  if (parsed.data.mileage < car.currentMileage) {
+    return NextResponse.json(
+      { error: `Пробег не может быть меньше текущего (${car.currentMileage} км)` },
+      { status: 400 }
+    )
+  }
+
+  const [log] = await db.$transaction([
+    db.mileageLog.create({
+      data: { carId: car.id, mileage: parsed.data.mileage, note: parsed.data.note },
+    }),
+    db.car.update({
+      where: { id: car.id },
+      data: { currentMileage: parsed.data.mileage, lastTrackedAt: new Date() },
+    }),
+  ])
+
+  const allLogs = await db.mileageLog.findMany({
+    where: { carId: car.id },
+    orderBy: { recordedAt: 'desc' },
+  })
+  const pace = calculateDrivingPace(allLogs)
+
+  return NextResponse.json({ logs: allLogs, pace }, { status: 201 })
 }

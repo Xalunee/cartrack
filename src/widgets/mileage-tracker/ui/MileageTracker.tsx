@@ -2,7 +2,8 @@
 import { useMileageQuery, MileageChart, latestMileage } from '@entities/mileage-log'
 
 export function MileageTracker() {
-  const { data: logs = [], isLoading } = useMileageQuery()
+  const { data, isLoading } = useMileageQuery()
+  const logs = data?.logs ?? []
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Загрузка...</p>
 
