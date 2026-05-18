@@ -1,13 +1,19 @@
 import { apiClient } from '@shared/api/client'
-import type { MaintenanceItem } from '../model/types'
+import { MaintenanceItemWithStatus, CreateMaintenanceItemDto, UpdateMaintenanceItemDto } from '../model/types'
 
 export const maintenanceApi = {
-  list: () => apiClient<MaintenanceItem[]>('/api/maintenance'),
-  get: (id: string) => apiClient<MaintenanceItem>(`/api/maintenance/${id}`),
-  create: (body: Omit<MaintenanceItem, 'id' | 'status' | 'createdAt' | 'updatedAt'>) =>
-    apiClient<MaintenanceItem>('/api/maintenance', { method: 'POST', body: JSON.stringify(body) }),
-  update: (id: string, body: Partial<MaintenanceItem>) =>
-    apiClient<MaintenanceItem>(`/api/maintenance/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  getAll: () => apiClient<MaintenanceItemWithStatus[]>('/api/maintenance'),
+  getOne: (id: string) => apiClient<MaintenanceItemWithStatus>(`/api/maintenance/${id}`),
+  create: (data: CreateMaintenanceItemDto) =>
+    apiClient<MaintenanceItemWithStatus>('/api/maintenance', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: (id: string, data: UpdateMaintenanceItemDto) =>
+    apiClient<MaintenanceItemWithStatus>(`/api/maintenance/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
   delete: (id: string) =>
-    apiClient<{ success: boolean }>(`/api/maintenance/${id}`, { method: 'DELETE' }),
+    apiClient<{ success: true }>(`/api/maintenance/${id}`, { method: 'DELETE' }),
 }

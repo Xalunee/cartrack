@@ -1,9 +1,73 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@shared/lib/auth'
+import { db } from '@shared/lib/db'
+import { z } from 'zod'
+import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
 
-export async function GET() {
-  return NextResponse.json({ data: [] })
+const createSchema = z.object({
+  name: z.string().min(1),
+  intervalKm: z.number().int().positive().optional(),
+  intervalDays: z.number().int().positive().optional(),
+  lastServiceMileage: z.number().int().min(0).optional(),
+  lastServiceDate: z.string().datetime().optional(),
+  lastServiceCost: z.number().min(0).optional(),
+  lastServiceNotes: z.string().optional(),
+})
+
+async function getCarAndPace(userId: string) {
+  const car = await db.car.findUnique({
+    where: { userId },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+  })
+  if (!car) return null
+  const pace = calculateDrivingPace(car.mileageLogs)
+  return { car, pace }
 }
 
-export async function POST() {
-  return NextResponse.json({ data: null }, { status: 201 })
+export async function GET() {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const result = await getCarAndPace(session.user.id)
+  if (!result) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+  const { car, pace } = result
+  const items = await db.maintenanceItem.findMany({
+    where: { carId: car.id },
+    orderBy: { createdAt: 'asc' },
+  })
+
+  const withStatus = items.map((item) => ({
+    ...item,
+    resource: calculateRemainingResource(item, car.currentMileage, pace),
+  }))
+
+  const order = { critical: 0, soon: 1, ok: 2 }
+  withStatus.sort((a, b) => order[a.resource.status] - order[b.resource.status])
+
+  return NextResponse.json(withStatus)
+}
+
+export async function POST(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const result = await getCarAndPace(session.user.id)
+  if (!result) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+  const body = await req.json()
+  const parsed = createSchema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+
+  const item = await db.maintenanceItem.create({
+    data: {
+      ...parsed.data,
+      carId: result.car.id,
+      lastServiceDate: parsed.data.lastServiceDate ? new Date(parsed.data.lastServiceDate) : undefined,
+    },
+  })
+
+  const resource = calculateRemainingResource(item, result.car.currentMileage, result.pace)
+  return NextResponse.json({ ...item, resource }, { status: 201 })
 }

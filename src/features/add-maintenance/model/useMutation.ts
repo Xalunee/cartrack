@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { maintenanceApi, maintenanceKeys } from '@entities/maintenance-item'
+import { maintenanceApi, MAINTENANCE_QUERY_KEY } from '@entities/maintenance-item'
 
 export function useAddMaintenanceMutation() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: maintenanceApi.create,
-    onSuccess: () => qc.invalidateQueries({ queryKey: maintenanceKeys.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY }),
   })
 }

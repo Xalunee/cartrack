@@ -1,11 +1,10 @@
 'use client'
-import { useMaintenanceQuery } from '@entities/maintenance-item'
-import { MaintenanceCard } from '@entities/maintenance-item'
+import { useMaintenanceQuery, MaintenanceCard } from '@entities/maintenance-item'
 import { MAINTENANCE_STATUS } from '@shared/config'
 
 export function StatusOverview() {
   const { data: items = [], isLoading } = useMaintenanceQuery()
-  const critical = items.filter((i) => i.status === MAINTENANCE_STATUS.CRITICAL)
+  const critical = items.filter((i) => i.resource.status === MAINTENANCE_STATUS.CRITICAL)
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Загрузка...</p>
 
