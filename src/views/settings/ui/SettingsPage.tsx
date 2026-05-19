@@ -1,12 +1,8 @@
-import { UpdateCarForm } from '@features/update-car'
-import { ExportButton } from '@features/export-pdf'
-
 export function SettingsPage() {
   return (
-    <div className="space-y-6 p-4">
-      <h1 className="text-xl font-bold">Настройки</h1>
-      <UpdateCarForm />
-      <ExportButton />
+    <div className="max-w-2xl mx-auto px-4 py-6">
+      <h1 className="text-xl font-semibold mb-4">Настройки</h1>
+      <p className="text-sm text-muted-foreground">Настройки — в следующей версии</p>
     </div>
   )
 }
