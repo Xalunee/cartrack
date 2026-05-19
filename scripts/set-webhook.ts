@@ -36,6 +36,10 @@ async function setWebhook() {
   const data = await res.json()
   console.log('Webhook set:', data)
   console.log('URL:', webhookUrl)
+
+  if (!res.ok || !data.ok) {
+    process.exit(1)
+  }
 }
 
 setWebhook()
