@@ -1,3 +1,4 @@
+import { MaintenanceItem } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
@@ -38,7 +39,7 @@ export async function GET() {
     orderBy: { createdAt: 'asc' },
   })
 
-  const withStatus = items.map((item) => ({
+  const withStatus = items.map((item: MaintenanceItem) => ({
     ...item,
     resource: calculateRemainingResource(item, car.currentMileage, pace),
   }))
