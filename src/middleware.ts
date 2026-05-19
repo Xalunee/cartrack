@@ -14,7 +14,8 @@ export default auth((req) => {
     pathname.startsWith('/maintenance') ||
     pathname.startsWith('/mileage') ||
     pathname.startsWith('/events') ||
-    pathname.startsWith('/settings')
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/onboarding')
 
   if (isProtected && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', req.nextUrl))
