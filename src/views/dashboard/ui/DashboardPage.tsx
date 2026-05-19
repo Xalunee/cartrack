@@ -1,50 +1,72 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useCarQuery } from '@entities/car'
 import { StatusOverview } from '@widgets/status-overview'
 import { MileageTracker } from '@widgets/mileage-tracker'
 import { SpendingChart } from '@widgets/spending-chart'
 import { MaintenanceDialog } from '@features/add-maintenance'
 import { LogMileageDialog } from '@features/log-mileage'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Car, Plus } from 'lucide-react'
 
 export function DashboardPage() {
-  const router = useRouter()
-  const { data: car, isLoading, isError } = useCarQuery()
+  const { data: car, isLoading } = useCarQuery()
 
-  useEffect(() => {
-    if (!isLoading && !car && !isError) {
-      router.push('/onboarding')
-    }
-  }, [isLoading, car, isError, router])
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
+        ))}
+      </div>
+    )
+  }
+
+  if (!car) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
+        <Card className="w-full max-w-sm text-center">
+          <CardContent className="pt-8 pb-8 space-y-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Car className="h-6 w-6 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold">Добавьте свой автомобиль</h2>
+              <p className="text-sm text-muted-foreground">
+                Чтобы начать отслеживать обслуживание, добавьте свою машину
+              </p>
+            </div>
+            <Link href="/onboarding" className={buttonVariants({ className: 'w-full' })}>
+              Добавить машину
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">
-            {isLoading ? '...' : car ? `${car.brand} ${car.model}` : 'CarTrack'}
+            {car.brand} {car.model}
           </h1>
-          {car && (
-            <p className="text-sm text-muted-foreground">
-              {car.year} · {car.currentMileage.toLocaleString('ru')} км
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground">
+            {car.year} · {car.currentMileage.toLocaleString('ru')} км
+          </p>
         </div>
         <div className="flex gap-2">
-          {car && (
-            <LogMileageDialog
-              currentMileage={car.currentMileage}
-              trigger={
-                <Button size="sm" variant="outline">
-                  Пробег
-                </Button>
-              }
-            />
-          )}
+          <LogMileageDialog
+            currentMileage={car.currentMileage}
+            trigger={
+              <Button size="sm" variant="outline">
+                Пробег
+              </Button>
+            }
+          />
           <MaintenanceDialog trigger={
             <Button size="sm">
               <Plus className="h-4 w-4 mr-1" /> Позиция
