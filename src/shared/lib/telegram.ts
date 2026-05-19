@@ -6,3 +6,10 @@ if (!token) {
 }
 
 export const bot = new Bot(token)
+
+let initPromise: Promise<void> | null = null
+
+export function ensureBotInitialized() {
+  initPromise ??= bot.init()
+  return initPromise
+}

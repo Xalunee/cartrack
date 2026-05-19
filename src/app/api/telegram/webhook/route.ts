@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { bot } from '@shared/lib/telegram'
+import { bot, ensureBotInitialized } from '@shared/lib/telegram'
 import { db } from '@shared/lib/db'
 
 function verifySecret(req: Request): boolean {
@@ -137,6 +137,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
+    await ensureBotInitialized()
     await bot.handleUpdate(body)
     return NextResponse.json({ ok: true })
   } catch (error) {
