@@ -10,36 +10,54 @@ function verifySecret(req: Request): boolean {
 bot.command('start', async (ctx) => {
   await ctx.reply(
     'Привет! Я бот CarTrack 🚗\n\n' +
-    'Я буду напоминать тебе вносить пробег.\n\n' +
-    'Чтобы привязать аккаунт, отправь свой email командой:\n' +
-    '/link твой@email.com\n\n' +
-    'После привязки можешь вводить пробег прямо здесь — просто отправь число.'
+    'Я буду напоминать тебе вносить пробег и показывать статус обслуживания.\n\n' +
+    'Чтобы привязать аккаунт:\n' +
+    '1. Зайди на сайт → Настройки → Telegram\n' +
+    '2. Нажми "Получить код привязки"\n' +
+    '3. Отправь мне: /link ТВОЙ_КОД\n\n' +
+    'После привязки можешь вводить пробег — просто отправь число.'
   )
 })
 
 bot.command('link', async (ctx) => {
   const chatId = String(ctx.chat.id)
-  const email = ctx.match?.trim()
+  const code = ctx.match?.trim()
 
-  if (!email) {
-    await ctx.reply('Укажи email: /link твой@email.com')
+  if (!code || !/^\d{6}$/.test(code)) {
+    await ctx.reply(
+      'Отправьте 6-значный код привязки:\n' +
+      '/link 123456\n\n' +
+      'Код можно получить на сайте в разделе Настройки → Telegram.'
+    )
     return
   }
 
-  const user = await db.user.findUnique({ where: { email } })
+  const user = await db.user.findFirst({
+    where: {
+      telegramLinkCode: code,
+      telegramLinkExpires: { gt: new Date() },
+    },
+  })
+
   if (!user) {
-    await ctx.reply('Пользователь с таким email не найден. Сначала зарегистрируйся на сайте.')
+    await ctx.reply('❌ Код неверный или истёк. Получите новый код в настройках на сайте.')
     return
   }
 
   await db.user.update({
     where: { id: user.id },
-    data: { telegramChatId: chatId },
+    data: {
+      telegramChatId: chatId,
+      telegramLinkCode: null,
+      telegramLinkExpires: null,
+    },
   })
 
   await ctx.reply(
-    `✅ Аккаунт ${email} привязан! Теперь я буду напоминать тебе вносить пробег.\n\n` +
-    `Чтобы внести пробег — просто отправь число (например: 87650)`
+    `✅ Аккаунт ${user.email} привязан!\n\n` +
+    'Теперь я буду напоминать тебе вносить пробег.\n' +
+    'Чтобы внести пробег — просто отправь число.\n' +
+    'Чтобы посмотреть статус — /status'
   )
 })
 
@@ -58,7 +76,7 @@ bot.command('status', async (ctx) => {
   })
 
   if (!user || !user.car) {
-    await ctx.reply('Аккаунт не привязан или машина не добавлена. Используй /link email')
+    await ctx.reply('Аккаунт не привязан или машина не добавлена. Получи код в настройках на сайте и отправь /link код')
     return
   }
 
@@ -97,7 +115,7 @@ bot.on('message:text', async (ctx) => {
   })
 
   if (!user || !user.car) {
-    await ctx.reply('Сначала привяжи аккаунт: /link твой@email.com')
+    await ctx.reply('Сначала привяжи аккаунт: получи код в настройках на сайте и отправь /link код')
     return
   }
 
