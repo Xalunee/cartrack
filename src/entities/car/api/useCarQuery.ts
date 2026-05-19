@@ -8,6 +8,10 @@ export function useCarQuery() {
   return useQuery({
     queryKey: CAR_QUERY_KEY,
     queryFn: carApi.get,
+    retry: (failureCount, error) => {
+      if (error instanceof Error && error.message.includes('404')) return false
+      return failureCount < 2
+    },
   })
 }
 

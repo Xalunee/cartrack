@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useCarQuery } from '@entities/car'
 import { StatusOverview } from '@widgets/status-overview'
 import { MileageTracker } from '@widgets/mileage-tracker'
@@ -10,7 +12,14 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 
 export function DashboardPage() {
-  const { data: car, isLoading } = useCarQuery()
+  const router = useRouter()
+  const { data: car, isLoading, isError } = useCarQuery()
+
+  useEffect(() => {
+    if (!isLoading && !car && !isError) {
+      router.push('/onboarding')
+    }
+  }, [isLoading, car, isError, router])
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
