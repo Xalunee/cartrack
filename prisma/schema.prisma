@@ -12,6 +12,8 @@ model User {
   name                 String?
   password             String
   telegramChatId       String?  @unique
+  telegramLinkCode     String?  @unique
+  telegramLinkExpires  DateTime?
   mileageTrackInterval Int      @default(7)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
