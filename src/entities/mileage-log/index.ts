@@ -1,5 +1,5 @@
 export * from './model/types'
 export * from './api/mileageApi'
-export * from './api/useMileageQuery'
+export { MILEAGE_QUERY_KEY, useMileageQuery, useLogMileageMutation, useDeleteMileageLogMutation } from './api/useMileageQuery'
 export { latestMileage } from './model/calculations'
 export { MileageChart } from './ui/MileageChart'

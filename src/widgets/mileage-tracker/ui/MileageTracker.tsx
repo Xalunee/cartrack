@@ -97,6 +97,24 @@ export function MileageTracker() {
             Добавьте ещё пробег для графика
           </p>
         )}
+        {data?.logs && data.logs.length > 0 && (
+          <div className="mt-4 space-y-1">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">История</p>
+            {data.logs.slice(0, 5).map((log) => (
+              <div key={log.id} className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
+                <div>
+                  <span className="text-sm">{log.mileage.toLocaleString('ru')} км</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    {format(new Date(log.recordedAt), 'd MMM', { locale: ru })}
+                  </span>
+                  {log.note && (
+                    <span className="text-xs text-muted-foreground ml-1">· {log.note}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

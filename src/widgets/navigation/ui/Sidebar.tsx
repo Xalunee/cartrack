@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
+import { ThemeToggle } from '@shared/ui'
 
 const links = [
   { href: '/dashboard', label: 'Главная', icon: LayoutDashboard },
@@ -39,6 +40,10 @@ export function Sidebar() {
           </Link>
         )
       })}
+      <div className="mt-auto pb-2 px-3 flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">Тема</span>
+        <ThemeToggle />
+      </div>
     </aside>
   )
 }

@@ -8,3 +8,4 @@ export { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 export { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 export { StatusBadge } from './StatusBadge'
 export { ResourceBar } from './ResourceBar'
+export { ThemeToggle } from './ThemeToggle'
