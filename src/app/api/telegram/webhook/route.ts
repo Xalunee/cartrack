@@ -111,7 +111,11 @@ bot.on('message:text', async (ctx) => {
 
   const user = await db.user.findFirst({
     where: { telegramChatId: chatId },
-    include: { car: true },
+    include: {
+      car: {
+        include: { maintenanceItems: true },
+      },
+    },
   })
 
   if (!user || !user.car) {
@@ -123,6 +127,8 @@ bot.on('message:text', async (ctx) => {
     await ctx.reply(`Пробег не может быть меньше текущего (${user.car.currentMileage.toLocaleString('ru')} км)`)
     return
   }
+
+  const diff = mileage - user.car.currentMileage
 
   await db.$transaction([
     db.mileageLog.create({
@@ -141,11 +147,21 @@ bot.on('message:text', async (ctx) => {
     }),
   ])
 
-  const diff = mileage - user.car.currentMileage
-  await ctx.reply(
-    `✅ Пробег обновлён: ${mileage.toLocaleString('ru')} км\n` +
-    (diff > 0 ? `+${diff.toLocaleString('ru')} км с прошлого раза` : '')
-  )
+  const alerts = user.car.maintenanceItems
+    .map((item) => {
+      if (!item.intervalKm || item.lastServiceMileage === null) return null
+      const remaining = item.intervalKm - (mileage - item.lastServiceMileage)
+      if (remaining <= 0) return `🔴 ${item.name} — просрочено на ${Math.abs(remaining).toLocaleString('ru')} км`
+      if (remaining < item.intervalKm * 0.3) return `🟡 ${item.name} — осталось ${remaining.toLocaleString('ru')} км`
+      return null
+    })
+    .filter(Boolean)
+
+  let message = `✅ Пробег обновлён: ${mileage.toLocaleString('ru')} км`
+  if (diff > 0) message += `\n+${diff.toLocaleString('ru')} км с прошлого раза`
+  if (alerts.length > 0) message += `\n\n⚠️ Требует внимания:\n${alerts.join('\n')}`
+
+  await ctx.reply(message)
 })
 
 export async function POST(req: Request) {
