@@ -1,3 +1,6 @@
+import { config } from 'dotenv'
+config({ path: '.env.local' })
+
 const token = process.env.TELEGRAM_BOT_TOKEN
 
 if (!token) {
