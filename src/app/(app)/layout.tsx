@@ -1,10 +1,15 @@
-import { Sidebar, BottomNav } from '@widgets/navigation'
+import { Sidebar, BottomNav, Header } from '@widgets/navigation'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <main className="flex-1 pb-20 md:pb-0">
+          {children}
+        </main>
+      </div>
       <BottomNav />
     </div>
   )

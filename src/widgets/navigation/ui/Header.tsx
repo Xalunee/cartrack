@@ -1,9 +1,12 @@
-import { APP_CONFIG } from '@shared/config'
+'use client'
+
+import { ThemeToggle } from '@shared/ui'
 
 export function Header() {
   return (
-    <header className="border-b px-4 py-3">
-      <h1 className="text-lg font-semibold">{APP_CONFIG.name}</h1>
+    <header className="flex items-center justify-between px-4 h-14 border-b md:hidden">
+      <span className="text-base font-semibold tracking-tight">CarTrack</span>
+      <ThemeToggle />
     </header>
   )
 }

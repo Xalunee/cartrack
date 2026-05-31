@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings } from 'lucide-react'
+import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 import { ThemeToggle } from '@shared/ui'
+import { signOut } from 'next-auth/react'
 
 const links = [
   { href: '/dashboard', label: 'Главная', icon: LayoutDashboard },
@@ -40,7 +41,14 @@ export function Sidebar() {
           </Link>
         )
       })}
-      <div className="mt-auto pb-2 px-3 flex items-center justify-between">
+      <button
+        onClick={() => signOut({ callbackUrl: '/login' })}
+        className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors w-full mt-auto"
+      >
+        <LogOut className="h-4 w-4" />
+        Выйти
+      </button>
+      <div className="pb-2 px-3 flex items-center justify-between">
         <span className="text-xs text-muted-foreground">Тема</span>
         <ThemeToggle />
       </div>
