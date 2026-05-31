@@ -15,6 +15,29 @@ const updateSchema = z.object({
   lastServiceNotes: z.string().optional(),
 })
 
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id } = await params
+  const car = await db.car.findUnique({
+    where: { userId: session.user.id },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+  })
+  if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+  const item = await db.maintenanceItem.findFirst({ where: { id, carId: car.id } })
+  if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+
+  const pace = calculateDrivingPace(car.mileageLogs)
+  const resource = calculateRemainingResource(item, car.currentMileage, pace)
+
+  return NextResponse.json({ ...item, resource })
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

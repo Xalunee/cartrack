@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Wrench } from 'lucide-react'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import Link from 'next/link'
 
 export function StatusOverview() {
   const { data: items, isLoading } = useMaintenanceQuery()
@@ -43,7 +44,8 @@ export function StatusOverview() {
   return (
     <div className="space-y-3">
       {items.map((item) => (
-        <Card key={item.id} className="overflow-hidden">
+        <Link key={item.id} href={`/maintenance/${item.id}`}>
+        <Card className="overflow-hidden hover:border-primary/30 transition-colors cursor-pointer">
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex-1 min-w-0">
@@ -84,6 +86,7 @@ export function StatusOverview() {
             )}
           </CardContent>
         </Card>
+        </Link>
       ))}
     </div>
   )
