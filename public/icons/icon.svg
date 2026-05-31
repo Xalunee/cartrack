@@ -1,6 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Dark rounded background -->
   <rect width="512" height="512" rx="108" fill="#0a0a0a"/>
-  <text x="256" y="200" text-anchor="middle" font-family="system-ui" font-weight="700" font-size="120" fill="white">C</text>
-  <text x="256" y="340" text-anchor="middle" font-family="system-ui" font-weight="400" font-size="64" fill="#999">track</text>
-  <circle cx="256" cy="410" r="12" fill="#22c55e"/>
+
+  <!-- Speedometer arc (220° sweep, from ~-200deg to ~20deg) -->
+  <!-- Center: 256,290 | Radius: 148 -->
+  <!-- Arc from 200deg to 340deg clockwise = the gauge range -->
+  <path
+    d="M 108 290
+       A 148 148 0 1 1 404 290"
+    fill="none"
+    stroke="#2a2a2a"
+    stroke-width="28"
+    stroke-linecap="round"
+  />
+  <!-- Active arc portion (~60% filled) in white -->
+  <path
+    d="M 108 290
+       A 148 148 0 0 1 350 156"
+    fill="none"
+    stroke="white"
+    stroke-width="28"
+    stroke-linecap="round"
+  />
+
+  <!-- Tick marks at bottom left, center, bottom right -->
+  <line x1="120" y1="268" x2="140" y2="255" stroke="#555" stroke-width="6" stroke-linecap="round"/>
+  <line x1="256" y1="144" x2="256" y2="166" stroke="#555" stroke-width="6" stroke-linecap="round"/>
+  <line x1="392" y1="268" x2="372" y2="255" stroke="#555" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Needle: pivots at center 256,290, points toward ~60% position -->
+  <line x1="256" y1="290" x2="338" y2="172" stroke="white" stroke-width="10" stroke-linecap="round"/>
+  <!-- Needle pivot dot -->
+  <circle cx="256" cy="290" r="16" fill="white"/>
+  <circle cx="256" cy="290" r="8" fill="#0a0a0a"/>
+
+  <!-- "CT" monogram below center -->
+  <text
+    x="256" y="390"
+    text-anchor="middle"
+    font-family="ui-monospace, monospace"
+    font-weight="700"
+    font-size="72"
+    letter-spacing="4"
+    fill="white"
+  >CT</text>
 </svg>
