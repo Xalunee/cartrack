@@ -3,6 +3,6 @@ import type { CarEvent } from '../model/types'
 
 export const eventApi = {
   list: () => apiClient<CarEvent[]>('/api/events'),
-  create: (body: Omit<CarEvent, 'id' | 'createdAt'>) =>
+  create: (body: Omit<CarEvent, 'id' | 'createdAt' | 'carId'>) =>
     apiClient<CarEvent>('/api/events', { method: 'POST', body: JSON.stringify(body) }),
 }

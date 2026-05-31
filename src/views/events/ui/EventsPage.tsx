@@ -1,3 +1,4 @@
+import { EventLog } from '@widgets/event-log'
 import { AddEventDialog } from '@features/add-event'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -11,7 +12,7 @@ export function EventsPage() {
           <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Добавить</Button>
         } />
       </div>
-      <p className="text-sm text-muted-foreground">Журнал событий — в следующей версии</p>
+      <EventLog />
     </div>
   )
 }
