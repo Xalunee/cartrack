@@ -351,12 +351,18 @@ function verifySecret(req: Request): boolean {
   return secret === process.env.TELEGRAM_WEBHOOK_SECRET
 }
 
+let botInitialized = false
+
 export async function POST(req: Request) {
   if (!verifySecret(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
+    if (!botInitialized) {
+      await bot.init()
+      botInitialized = true
+    }
     const body = await req.json()
     await bot.handleUpdate(body)
     return NextResponse.json({ ok: true })
