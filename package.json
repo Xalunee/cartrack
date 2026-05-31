@@ -8,7 +8,8 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "eslint",
-    "set-webhook": "tsx scripts/set-webhook.ts"
+    "set-webhook": "tsx scripts/set-webhook.ts",
+    "setup-bot": "tsx scripts/setup-bot.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
