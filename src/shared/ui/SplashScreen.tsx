@@ -1,20 +1,31 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { cn } from '@shared/lib/utils'
 
 export function SplashScreen() {
-  const [visible, setVisible] = useState(true)
+  const [visible, setVisible] = useState(false)
   const [fading, setFading] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setFading(true)
-      setTimeout(() => setVisible(false), 400)
-    }, 800)
+    const isMobile = window.innerWidth < 768
+    const isLanding = pathname === '/'
+    const isAuthPage = pathname === '/login' || pathname === '/register'
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
 
-    return () => clearTimeout(timer)
-  }, [])
+    if (!isLanding && !isAuthPage && (isMobile || isStandalone)) {
+      setVisible(true)
+      setFading(false)
+      const timer = setTimeout(() => {
+        setFading(true)
+        setTimeout(() => setVisible(false), 400)
+      }, 800)
+
+      return () => clearTimeout(timer)
+    }
+  }, [pathname])
 
   if (!visible) return null
 
