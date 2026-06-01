@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { useQueryClient } from '@tanstack/react-query'
 import { useCarQuery } from '@entities/car'
 import { StatusOverview } from '@widgets/status-overview'
 import { MileageTracker } from '@widgets/mileage-tracker'
@@ -9,17 +11,37 @@ import { MaintenanceDialog } from '@features/add-maintenance'
 import { LogMileageDialog } from '@features/log-mileage'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Car, Plus } from 'lucide-react'
+import { cn } from '@shared/lib/utils'
+import { Car, Plus, RefreshCw } from 'lucide-react'
 
 export function DashboardPage() {
   const { data: car, isLoading } = useCarQuery()
+  const queryClient = useQueryClient()
+  const [refreshing, setRefreshing] = useState(false)
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    await queryClient.invalidateQueries()
+    setTimeout(() => setRefreshing(false), 500)
+  }
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
-        ))}
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="h-6 w-40 skeleton mb-2" />
+            <div className="h-4 w-24 skeleton" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="h-48 skeleton rounded-xl" />
+          <div className="h-48 skeleton rounded-xl" />
+        </div>
+        <div className="space-y-3">
+          <div className="h-24 skeleton rounded-xl" />
+          <div className="h-24 skeleton rounded-xl" />
+        </div>
       </div>
     )
   }
@@ -59,6 +81,15 @@ export function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleRefresh}
+            className="h-8 w-8 p-0"
+            aria-label="Обновить данные"
+          >
+            <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
+          </Button>
           <LogMileageDialog
             currentMileage={car.currentMileage}
             trigger={

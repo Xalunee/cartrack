@@ -21,9 +21,13 @@ export default function SettingsPage() {
   const [linkCode, setLinkCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [isPending, setIsPending] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    apiClient<UserInfo>('/api/user').then(setUser).catch(console.error)
+    apiClient<UserInfo>('/api/user')
+      .then(setUser)
+      .catch(console.error)
+      .finally(() => setLoading(false))
   }, [])
 
   async function generateCode() {
@@ -59,6 +63,16 @@ export default function SettingsPage() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+        <div className="h-7 w-32 skeleton" />
+        <div className="h-40 skeleton rounded-xl" />
+        <div className="h-48 skeleton rounded-xl" />
+      </div>
+    )
   }
 
   return (
