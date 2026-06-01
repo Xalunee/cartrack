@@ -18,10 +18,17 @@ const typeConfig: Record<CarEvent['type'], { label: string; icon: typeof AlertTr
   NOTE: { label: 'Заметка', icon: FileText, className: 'bg-gray-100 text-gray-700' },
 }
 
-export function EventLog() {
+interface EventLogProps {
+  filter?: CarEvent['type']
+}
+
+export function EventLog({ filter }: EventLogProps) {
   const { data: events, isLoading } = useEventsQuery()
   const deleteMutation = useDeleteEventMutation()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const filteredEvents = filter
+    ? events?.filter((event) => event.type === filter)
+    : events
 
   function handleDelete(id: string) {
     if (deletingId === id) {
@@ -44,7 +51,7 @@ export function EventLog() {
     )
   }
 
-  if (!events?.length) {
+  if (!filteredEvents?.length) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-10 gap-3">
@@ -59,7 +66,7 @@ export function EventLog() {
 
   return (
     <div className="space-y-3 stagger-children">
-      {events.map((event) => {
+      {filteredEvents.map((event) => {
         const config = typeConfig[event.type]
         const Icon = config.icon
         return (
