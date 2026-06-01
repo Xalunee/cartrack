@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { useMileageQuery } from '@entities/mileage-log'
 import { useCarQuery } from '@entities/car'
 import { LogMileageDialog } from '@features/log-mileage'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { cn } from '@shared/lib/utils'
 import { TrendingUp, Plus } from 'lucide-react'
 import {
   LineChart,
@@ -20,6 +22,7 @@ import { ru } from 'date-fns/locale'
 export function MileageTracker() {
   const { data: car } = useCarQuery()
   const { data, isLoading } = useMileageQuery()
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const chartData = data?.logs
     .slice()
@@ -104,7 +107,22 @@ export function MileageTracker() {
                   dataKey="mileage"
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
-                  dot={{ r: 4, fill: 'hsl(var(--primary))' }}
+                  dot={(props: { cx?: number; cy?: number; index?: number }) => {
+                    const { cx, cy, index } = props
+                    const isActive = index === activeIndex
+                    return (
+                      <circle
+                        key={index}
+                        cx={cx}
+                        cy={cy}
+                        r={isActive ? 7 : 4}
+                        fill="hsl(var(--primary))"
+                        stroke={isActive ? 'hsl(var(--background))' : 'none'}
+                        strokeWidth={isActive ? 3 : 0}
+                        className="transition-all duration-200"
+                      />
+                    )
+                  }}
                   activeDot={{ r: 6, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
                 />
               </LineChart>
@@ -119,19 +137,32 @@ export function MileageTracker() {
         {data?.logs && data.logs.length > 0 && (
           <div className="mt-4 space-y-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">История</p>
-            {data.logs.slice(0, 5).map((log) => (
-              <div key={log.id} className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
-                <div>
-                  <span className="text-sm">{log.mileage.toLocaleString('ru')} км</span>
-                  <span className="text-xs text-muted-foreground ml-2">
-                    {format(new Date(log.recordedAt), 'd MMM', { locale: ru })}
-                  </span>
-                  {log.note && (
-                    <span className="text-xs text-muted-foreground ml-1">· {log.note}</span>
+            {data.logs.slice(0, 5).map((log) => {
+              const chartIndex = chartData
+                ? chartData.findIndex((d) => d.mileage === log.mileage)
+                : -1
+
+              return (
+                <div
+                  key={log.id}
+                  className={cn(
+                    'flex items-center justify-between py-1.5 border-b border-border/50 last:border-0 cursor-pointer rounded px-1 -mx-1 transition-colors',
+                    activeIndex === chartIndex && 'bg-primary/10'
                   )}
+                  onClick={() => setActiveIndex(chartIndex === activeIndex ? null : chartIndex)}
+                >
+                  <div>
+                    <span className="text-sm">{log.mileage.toLocaleString('ru')} км</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {format(new Date(log.recordedAt), 'd MMM', { locale: ru })}
+                    </span>
+                    {log.note && (
+                      <span className="text-xs text-muted-foreground ml-1">· {log.note}</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </CardContent>
