@@ -32,10 +32,18 @@ const features = [
   'Экспорт при продаже',
 ]
 
+const painPoints = [
+  'Когда я менял масло?',
+  'Где тот чек с СТО?',
+  'Сколько потратил на машину?',
+  'Пора менять фильтры?',
+  'Что было на прошлом ТО?',
+]
+
 function LandingHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-stone-200/70 bg-[#f7f3ec]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-8 lg:px-10">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-stone-950">
           <span className="size-2.5 rounded-full bg-stone-950" />
           CarTrack
@@ -50,7 +58,7 @@ function LandingHeader() {
         </nav>
 
         <Link href="/register">
-          <Button className="h-11 rounded-full bg-stone-950 px-5 text-sm text-white shadow-[0_12px_30px_rgba(28,25,23,0.18)] hover:bg-stone-800">
+          <Button className="h-10 rounded-full bg-stone-950 px-4 text-sm text-white shadow-[0_12px_30px_rgba(28,25,23,0.18)] hover:bg-stone-800 sm:h-11 sm:px-5">
             Начать бесплатно
           </Button>
         </Link>
@@ -61,13 +69,13 @@ function LandingHeader() {
 
 function AppPreview() {
   return (
-    <div className="relative mx-auto flex min-h-[520px] w-full max-w-[520px] items-center justify-center lg:mx-0">
-      <div className="absolute inset-x-6 top-10 h-[410px] rounded-[2rem] bg-stone-200/60 blur-sm" />
+    <div className="relative mx-auto flex min-h-[400px] w-full max-w-[500px] max-h-[400px] items-center justify-center sm:min-h-[470px] sm:max-h-[480px] lg:mx-0">
+      <div className="absolute inset-x-8 top-8 h-[320px] rounded-[2rem] bg-stone-200/60 blur-sm sm:h-[380px]" />
 
-      <div className="absolute left-1 top-24 z-10 hidden w-56 rounded-3xl border border-white/80 bg-white/80 p-5 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:block">
+      <div className="absolute left-1 top-20 z-10 hidden w-52 rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:block">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-stone-400">Расходы за год</p>
         <p className="mt-2 text-xl font-semibold text-stone-950">42 800 ₽</p>
-        <div className="mt-5 flex h-12 items-end gap-2">
+        <div className="mt-4 flex h-10 items-end gap-2">
           {[28, 36, 42, 35, 48, 54, 50, 64, 60, 72].map((height, index) => (
             <span
               key={index}
@@ -78,21 +86,21 @@ function AppPreview() {
         </div>
       </div>
 
-      <div className="relative z-20 w-[min(82vw,282px)] rounded-[2.2rem] border border-stone-200 bg-white p-3 shadow-[0_32px_90px_rgba(68,64,60,0.18)]">
+      <div className="relative z-20 w-[min(76vw,250px)] rounded-[2rem] border border-stone-200 bg-white p-2.5 shadow-[0_32px_90px_rgba(68,64,60,0.18)] sm:w-[min(72vw,270px)]">
         <div className="absolute left-1/2 top-3 h-5 w-20 -translate-x-1/2 rounded-full bg-stone-950" />
-        <div className="overflow-hidden rounded-[1.7rem] bg-[#fbfaf7] px-5 pb-5 pt-9">
+        <div className="max-h-[380px] overflow-hidden rounded-[1.55rem] bg-[#fbfaf7] px-4 pb-4 pt-8 sm:max-h-[455px] sm:px-5 sm:pb-5 sm:pt-9">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium text-stone-400">Skoda Octavia</p>
-              <h2 className="mt-1 text-xl font-semibold text-stone-950">2019 · 1.4 TSI</h2>
+              <h2 className="mt-1 text-lg font-semibold text-stone-950 sm:text-xl">2019 · 1.4 TSI</h2>
             </div>
             <div className="rounded-full bg-stone-100 px-2 py-1 text-xs text-stone-500">•••</div>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-7 sm:mt-9">
             <p className="text-xs uppercase tracking-[0.22em] text-stone-400">Текущий пробег</p>
             <div className="mt-1 flex items-end gap-2">
-              <span className="text-4xl font-semibold tracking-tight text-stone-950">87 420</span>
+              <span className="text-3xl font-semibold tracking-tight text-stone-950 sm:text-4xl">87 420</span>
               <span className="pb-1 text-sm text-stone-400">км</span>
             </div>
             <div className="mt-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
@@ -100,18 +108,18 @@ function AppPreview() {
             </div>
           </div>
 
-          <div className="mt-8 flex items-center justify-between border-t border-stone-200 pt-4">
+          <div className="mt-6 flex items-center justify-between border-t border-stone-200 pt-4 sm:mt-8">
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-stone-400">
               Обслуживание
             </p>
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-stone-400">4 пункта</p>
           </div>
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-3 space-y-2 sm:mt-4 sm:space-y-3">
             {maintenanceItems.map((item) => (
-              <div key={item.title} className="rounded-2xl border border-stone-200/70 bg-white/70 p-3">
+              <div key={item.title} className="rounded-2xl border border-stone-200/70 bg-white/70 p-2.5 sm:p-3">
                 <div className="flex items-center justify-between gap-3">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-stone-950">{item.title}</p>
                     <p className="mt-0.5 text-xs text-stone-400">{item.meta}</p>
                   </div>
@@ -133,9 +141,9 @@ function AppPreview() {
         </div>
       </div>
 
-      <div className="absolute bottom-20 right-0 z-30 w-48 rounded-3xl border border-white/80 bg-white/85 p-5 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:right-2">
+      <div className="absolute bottom-8 right-1 z-30 w-44 rounded-3xl border border-white/80 bg-white/85 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:bottom-16 sm:right-2 sm:w-48 sm:p-5">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-stone-400">След. замена масла</p>
-        <p className="mt-2 text-2xl font-semibold text-stone-950">~15 авг</p>
+        <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">~15 авг</p>
         <p className="mt-1 text-xs text-stone-500">прогноз по темпу езды</p>
       </div>
     </div>
@@ -148,13 +156,13 @@ export function LandingPage() {
       <LandingHeader />
 
       <main>
-        <section className="mx-auto grid max-w-7xl gap-12 px-5 pb-12 pt-16 sm:px-8 md:pt-24 lg:grid-cols-[1fr_0.92fr] lg:items-center lg:px-10 lg:pb-20">
+        <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_0.92fr] lg:items-center lg:px-10 lg:py-24">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center rounded-full border border-blue-500/70 bg-blue-50/70 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-blue-700 shadow-sm">
+            <div className="inline-flex max-w-full items-center rounded-full border border-blue-500/70 bg-blue-50/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-blue-700 shadow-sm sm:px-4 sm:tracking-[0.32em]">
               Трекер автомобиля · 2026
             </div>
 
-            <h1 className="mt-7 max-w-2xl text-5xl font-semibold leading-[0.92] tracking-tight text-stone-950 sm:text-7xl lg:text-8xl">
+            <h1 className="mt-7 max-w-2xl text-4xl font-semibold leading-[0.98] tracking-tight text-stone-950 sm:text-5xl md:text-6xl">
               Знай свою машину. Всегда.
             </h1>
             <p className="mt-7 max-w-xl text-base leading-8 text-stone-600 sm:text-lg">
@@ -163,20 +171,20 @@ export function LandingPage() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/register">
-                <Button className="h-14 rounded-full bg-stone-950 px-7 text-base text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] hover:bg-stone-800">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button className="h-14 w-full rounded-full bg-stone-950 px-7 text-base text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] hover:bg-stone-800 sm:w-auto">
                   Завести машину в журнал
                 </Button>
               </Link>
               <Link
                 href="/dashboard"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full px-5 text-base font-medium text-stone-950 transition hover:bg-white/60"
+                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white/55 px-5 text-base font-medium text-stone-950 transition hover:bg-white/80 sm:w-auto sm:bg-transparent"
               >
                 Посмотреть демо <ArrowRight className="size-4" />
               </Link>
             </div>
 
-            <div className="mt-8 flex items-center gap-4">
+            <div className="mt-8 flex items-center gap-4 sm:flex-nowrap">
               <div className="flex -space-x-2">
                 {['#e7a96d', '#8fb6dd', '#9fc68f', '#c99ab5'].map((color) => (
                   <span key={color} className="size-8 rounded-full border-2 border-[#f7f3ec]" style={{ backgroundColor: color }} />
@@ -190,21 +198,21 @@ export function LandingPage() {
         </section>
 
         <section className="border-y border-stone-200/80">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 px-5 sm:px-8 lg:grid-cols-4 lg:px-10">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-6 sm:px-8 lg:grid-cols-4 lg:px-10">
             {stats.map((stat) => (
-              <div key={stat.label} className="border-stone-200/80 py-8 odd:border-r lg:border-r lg:last:border-r-0 lg:py-10">
-                <p className="text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">{stat.value}</p>
+              <div key={stat.label} className="rounded-3xl bg-white/35 p-5">
+                <p className="text-3xl font-semibold tracking-tight text-stone-950 sm:text-4xl">{stat.value}</p>
                 <p className="mt-2 text-sm text-stone-500">{stat.label}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section id="features" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
+        <section id="features" className="mx-auto max-w-7xl px-4 py-20 sm:px-8 sm:py-28 lg:px-10">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-400">Возможности</p>
-              <h2 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+              <h2 className="mt-4 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl">
                 Всё важное про машину в одном спокойном месте.
               </h2>
             </div>
@@ -217,11 +225,11 @@ export function LandingPage() {
             {features.map((feature, index) => (
               <div
                 key={feature}
-                className="group rounded-[1.75rem] border border-white/80 bg-white/55 p-7 shadow-[0_16px_45px_rgba(87,83,78,0.08)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/75 hover:shadow-[0_24px_60px_rgba(87,83,78,0.12)]"
+                className="group flex min-h-[170px] flex-col justify-between rounded-[1.75rem] border border-white/80 bg-white/55 p-6 shadow-[0_16px_45px_rgba(87,83,78,0.08)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/75 hover:shadow-[0_24px_60px_rgba(87,83,78,0.12)] sm:p-7"
               >
                 <p className="text-sm font-semibold text-stone-400">{String(index + 1).padStart(2, '0')}</p>
-                <div className="mt-10 flex items-end justify-between gap-4">
-                  <h3 className="text-2xl font-semibold tracking-tight text-stone-950">{feature}</h3>
+                <div className="flex items-end justify-between gap-4">
+                  <h3 className="text-xl font-semibold tracking-tight text-stone-950 sm:text-2xl">{feature}</h3>
                   <CircleCheck className="size-6 text-stone-300 transition group-hover:text-stone-950" />
                 </div>
               </div>
@@ -229,40 +237,44 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto max-w-7xl px-5 pb-20 sm:px-8 lg:px-10 lg:pb-28">
+        <section id="how-it-works" className="mx-auto max-w-7xl px-4 pb-20 sm:px-8 sm:pb-28 lg:px-10">
           <div className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
-            <div className="rounded-[2rem] border border-white/80 bg-white/60 p-8 shadow-[0_22px_70px_rgba(87,83,78,0.1)] backdrop-blur-xl sm:p-10">
+            <div className="rounded-[2rem] border border-white/80 bg-white/60 p-6 shadow-[0_22px_70px_rgba(87,83,78,0.1)] backdrop-blur-xl sm:p-10">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-400">Звучит знакомо?</p>
-              <h2 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">CarTrack помнит за вас</h2>
+              <h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">CarTrack помнит за вас</h2>
             </div>
-            <div className="rounded-[2rem] border border-stone-200/80 bg-[#efe8dd]/55 p-8 sm:p-10">
-              <p className="text-3xl font-semibold leading-tight tracking-tight text-stone-900 sm:text-5xl">
-                Когда я менял масло? Где тот чек с СТО? Сколько потратил на машину? Пора менять фильтры? Что было на прошлом ТО?
-              </p>
+            <div className="rounded-[2rem] border border-stone-200/80 bg-[#efe8dd]/55 p-6 sm:p-10">
+              <div className="flex flex-wrap gap-3">
+                {painPoints.map((point) => (
+                  <span key={point} className="rounded-full border border-stone-300/70 bg-white/65 px-4 py-2 text-sm font-medium text-stone-800 shadow-sm sm:text-base">
+                    {point}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="pricing" className="px-5 pb-20 sm:px-8 lg:px-10 lg:pb-28">
-          <div className="mx-auto max-w-5xl rounded-[2.3rem] border border-white/80 bg-white/65 p-8 text-center shadow-[0_28px_90px_rgba(87,83,78,0.12)] backdrop-blur-xl sm:p-12 lg:p-16">
+        <section id="pricing" className="px-4 pb-20 sm:px-8 sm:pb-28 lg:px-10">
+          <div className="mx-auto max-w-5xl rounded-[2rem] border border-white/80 bg-white/65 p-6 text-center shadow-[0_28px_90px_rgba(87,83,78,0.12)] backdrop-blur-xl sm:rounded-[2.3rem] sm:p-12 lg:p-16">
             <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-stone-950 text-white">
               <Gauge className="size-6" />
             </div>
-            <h2 className="mx-auto mt-7 max-w-2xl text-4xl font-semibold tracking-tight sm:text-6xl">
+            <h2 className="mx-auto mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
               Начни следить за машиной сегодня
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-stone-600 sm:text-lg">
               Бесплатно для одной машины навсегда. Без карты, без рекламы, без рассылок «вам срочно нужно ТО».
             </p>
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/register">
-                <Button className="h-14 rounded-full bg-stone-950 px-8 text-base text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] hover:bg-stone-800">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button className="h-14 w-full rounded-full bg-stone-950 px-8 text-base text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] hover:bg-stone-800 sm:w-auto">
                   Завести журнал
                 </Button>
               </Link>
               <Link
                 href="#"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-stone-200 bg-white/70 px-7 text-base font-medium text-stone-950 shadow-sm transition hover:bg-white"
+                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border border-stone-200 bg-white/70 px-7 text-base font-medium text-stone-950 shadow-sm transition hover:bg-white sm:w-auto"
               >
                 <Wrench className="size-4" />
                 Открыть Telegram-бота
@@ -272,8 +284,8 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer id="about" className="border-t border-stone-200/80 px-5 py-8 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 text-sm text-stone-500 sm:flex-row">
+      <footer id="about" className="border-t border-stone-200/80 px-4 py-8 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 text-center text-sm text-stone-500 sm:flex-row sm:text-left">
           <p className="font-medium text-stone-950">CarTrack © 2026</p>
           <p>Сделано для тех, кто любит свою машину.</p>
         </div>
