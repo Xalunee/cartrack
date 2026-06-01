@@ -28,6 +28,7 @@ export function MileageTracker() {
     .map((log) => ({
       date: format(new Date(log.recordedAt), 'd MMM', { locale: ru }),
       mileage: log.mileage,
+      note: log.note || null,
     }))
 
   return (
@@ -69,26 +70,42 @@ export function MileageTracker() {
         {chartData && chartData.length >= 2 && (
           <div className="select-none">
             <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={chartData} style={{ cursor: 'default' }}>
+              <LineChart
+                data={chartData}
+                margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                style={{ cursor: 'default' }}
+              >
                 <XAxis
                   dataKey="date"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis hide domain={['auto', 'auto']} />
+                <YAxis
+                  hide
+                  domain={['dataMin - 100', 'dataMax + 100']}
+                />
                 <Tooltip
-                  formatter={(value) => [`${Number(value).toLocaleString('ru')} км`, 'Пробег']}
-                  labelStyle={{ fontSize: 12 }}
-                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null
+                    const data = payload[0].payload
+                    return (
+                      <div className="bg-popover text-popover-foreground border rounded-lg px-3 py-2 text-xs shadow-md">
+                        <p className="font-medium">{data.mileage?.toLocaleString('ru')} км</p>
+                        <p className="text-muted-foreground">{label}</p>
+                        {data.note && <p className="text-muted-foreground mt-0.5">{data.note}</p>}
+                        {!data.note && <p className="text-muted-foreground mt-0.5 italic">Без метки</p>}
+                      </div>
+                    )
+                  }}
                 />
                 <Line
                   type="monotone"
                   dataKey="mileage"
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
-                  dot={{ r: 3 }}
-                  activeDot={{ r: 5 }}
+                  dot={{ r: 4, fill: 'hsl(var(--primary))' }}
+                  activeDot={{ r: 6, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
                 />
               </LineChart>
             </ResponsiveContainer>
