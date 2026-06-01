@@ -103,10 +103,10 @@ function LandingHeader() {
 
 function AppPreview() {
   return (
-    <div className="relative z-0 mx-auto flex min-h-[410px] w-full max-w-[500px] max-h-[420px] items-center justify-center sm:min-h-[490px] sm:max-h-[500px] lg:mx-0">
+    <div className="relative z-0 mx-auto flex min-h-[410px] w-full max-w-[500px] max-h-[420px] items-center justify-center overflow-visible sm:min-h-[490px] sm:max-h-[500px] lg:mx-0">
       <div className="absolute inset-x-8 top-8 h-[320px] rounded-[2rem] bg-stone-200/60 blur-sm sm:h-[380px]" />
 
-      <div className="absolute left-3 top-20 z-10 hidden w-52 overflow-hidden rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:block">
+      <div className="absolute left-5 top-20 z-20 hidden w-52 overflow-hidden rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:block md:left-3">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-stone-400">Расходы за год</p>
         <p className="mt-2 text-xl font-semibold text-stone-950">42 800 ₽</p>
         <div className="mt-4 flex h-10 items-end gap-2">
@@ -120,7 +120,7 @@ function AppPreview() {
         </div>
       </div>
 
-      <div className="relative z-20 w-[min(76vw,250px)] rounded-[2rem] border border-stone-200 bg-white p-2.5 shadow-[0_32px_90px_rgba(68,64,60,0.18)] sm:w-[min(72vw,270px)]">
+      <div className="relative z-10 w-[min(76vw,250px)] rounded-[2rem] border border-stone-200 bg-white p-2.5 shadow-[0_32px_90px_rgba(68,64,60,0.18)] sm:w-[min(72vw,270px)]">
         <div className="absolute left-1/2 top-3 h-5 w-20 -translate-x-1/2 rounded-full bg-stone-950" />
         <div className="max-h-[390px] overflow-hidden rounded-[1.55rem] bg-[#fbfaf7] px-4 pb-4 pt-8 sm:max-h-[470px] sm:px-5 sm:pb-5 sm:pt-9">
           <div className="flex items-start justify-between">
@@ -175,7 +175,7 @@ function AppPreview() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 right-1 z-10 w-44 rounded-3xl border border-white/80 bg-white/85 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:bottom-16 sm:right-2 sm:w-48 sm:p-5">
+      <div className="absolute bottom-8 right-5 z-20 w-44 rounded-3xl border border-white/80 bg-white/85 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:bottom-16 sm:right-4 sm:w-48 sm:p-5">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-stone-400">След. замена масла</p>
         <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">~15 авг</p>
         <p className="mt-1 text-xs text-stone-500">прогноз по темпу езды</p>
@@ -272,20 +272,18 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto max-w-7xl px-4 pb-16 sm:px-8 lg:px-10">
-          <div className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
-            <div className="rounded-[2rem] border border-white/80 bg-white/60 p-6 shadow-[0_22px_70px_rgba(87,83,78,0.1)] backdrop-blur-xl sm:p-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-400">Звучит знакомо?</p>
-              <h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">CarTrack помнит за вас</h2>
-            </div>
-            <div className="rounded-[2rem] border border-stone-200/80 bg-[#efe8dd]/55 p-6 sm:p-10">
-              <div className="flex flex-wrap gap-3">
-                {painPoints.map((point) => (
-                  <span key={point} className="rounded-full border border-stone-300/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm sm:text-base">
-                    {point}
-                  </span>
-                ))}
-              </div>
+        <section id="how-it-works" className="mx-auto max-w-5xl px-4 pb-16 sm:px-8 lg:px-10">
+          <div className="rounded-[2rem] border border-white/80 bg-white/60 p-6 text-center shadow-[0_22px_70px_rgba(87,83,78,0.1)] backdrop-blur-xl sm:p-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-400">Звучит знакомо?</p>
+            <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-tight text-stone-950">
+              CarTrack помнит за вас
+            </h2>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              {painPoints.map((point) => (
+                <span key={point} className="rounded-full border border-stone-300/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm sm:text-base">
+                  {point}
+                </span>
+              ))}
             </div>
           </div>
         </section>
