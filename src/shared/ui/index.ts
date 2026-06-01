@@ -9,3 +9,4 @@ export { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 export { StatusBadge } from './StatusBadge'
 export { ResourceBar } from './ResourceBar'
 export { ThemeToggle } from './ThemeToggle'
+export { InstallBanner } from './InstallBanner'

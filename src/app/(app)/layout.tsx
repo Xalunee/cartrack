@@ -1,8 +1,10 @@
+import { InstallBanner } from '@shared/ui/InstallBanner'
 import { Sidebar, BottomNav, Header } from '@widgets/navigation'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
+      <InstallBanner />
       {/* Gradient mesh background */}
       <div className="fixed inset-0 z-0 pointer-events-none gradient-mesh" />
       <div className="relative z-10 flex min-h-screen">

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { MessageCircle, Copy, Check, Unlink, LogOut } from 'lucide-react'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
 
@@ -22,12 +22,19 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false)
   const [isPending, setIsPending] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [isStandalone, setIsStandalone] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
     apiClient<UserInfo>('/api/user')
       .then(setUser)
       .catch(console.error)
       .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent))
   }, [])
 
   async function generateCode() {
@@ -153,6 +160,30 @@ export default function SettingsPage() {
           )}
         </CardContent>
       </Card>
+
+      {!isStandalone && (
+        <Card className="glass card-hover">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Установить приложение
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isIOS ? (
+              <p className="text-sm text-muted-foreground">
+                Нажмите <Share className="inline h-4 w-4 mx-0.5" /> внизу экрана в Safari, затем «На экран Домой».
+                CarTrack появится как обычное приложение на главном экране.
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Нажмите ⋮ в браузере, затем «Установить приложение».
+                CarTrack появится на главном экране.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Separator />
 
