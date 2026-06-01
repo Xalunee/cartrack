@@ -62,10 +62,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
       <h1 className="text-xl font-semibold">Настройки</h1>
 
-      <Card>
+      <Card className="glass card-hover">
         <CardHeader>
           <CardTitle className="text-base">Аккаунт</CardTitle>
         </CardHeader>
@@ -81,7 +81,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass card-hover">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />

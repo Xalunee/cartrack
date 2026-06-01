@@ -53,8 +53,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <Card className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center px-4 page-enter">
+      <Card className="w-full max-w-sm glass">
         <CardHeader>
           <CardTitle className="text-center">CarTrack</CardTitle>
         </CardHeader>

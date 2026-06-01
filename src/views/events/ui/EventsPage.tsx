@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 
 export function EventsPage() {
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4 page-enter">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">События</h1>
         <AddEventDialog trigger={

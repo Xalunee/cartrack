@@ -67,8 +67,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <Card className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center px-4 page-enter">
+      <Card className="w-full max-w-sm glass">
         <CardHeader>
           <CardTitle className="text-center">CarTrack</CardTitle>
           <p className="text-sm text-muted-foreground text-center">Создайте аккаунт</p>

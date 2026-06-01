@@ -38,24 +38,24 @@ export default function MaintenanceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-        <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        <div className="h-40 bg-muted animate-pulse rounded-xl" />
-        <div className="h-60 bg-muted animate-pulse rounded-xl" />
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4 page-enter">
+        <div className="h-8 w-48 skeleton" />
+        <div className="h-40 rounded-xl skeleton" />
+        <div className="h-60 rounded-xl skeleton" />
       </div>
     )
   }
 
   if (!item) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 page-enter">
         <p className="text-muted-foreground">Позиция не найдена</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => router.back()}>
@@ -68,7 +68,7 @@ export default function MaintenanceDetailPage() {
       </div>
 
       {/* Resource card */}
-      <Card>
+      <Card className="glass">
         <CardContent className="p-5">
           <div className="flex items-end justify-between mb-3">
             <div>
@@ -103,7 +103,7 @@ export default function MaintenanceDetailPage() {
       </Card>
 
       {/* Details */}
-      <Card>
+      <Card className="card-hover">
         <CardHeader>
           <CardTitle className="text-base">Параметры</CardTitle>
         </CardHeader>

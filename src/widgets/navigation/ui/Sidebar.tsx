@@ -19,7 +19,7 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex flex-col w-56 border-r h-screen sticky top-0 p-4 gap-1">
+    <aside className="hidden md:flex flex-col w-56 border-r h-screen sticky top-0 p-4 gap-1 glass">
       <div className="mb-6 px-3">
         <span className="text-lg font-semibold tracking-tight">CarTrack</span>
       </div>
