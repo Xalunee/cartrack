@@ -1,10 +1,11 @@
 'use client'
 
 import { useEventsQuery, useDeleteEventMutation, CarEvent } from '@entities/event'
+import { AddEventDialog } from '@features/add-event'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Trash2, AlertTriangle, Wrench, Receipt, FileText, Car } from 'lucide-react'
+import { Trash2, AlertTriangle, Wrench, Receipt, FileText, Car, Pencil } from 'lucide-react'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { cn } from '@shared/lib/utils'
@@ -101,15 +102,25 @@ export function EventLog({ filter }: EventLogProps) {
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn('h-7 w-7 p-0 flex-shrink-0', deletingId === event.id && 'text-destructive')}
-                  onClick={() => handleDelete(event.id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <AddEventDialog
+                    event={event}
+                    trigger={
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn('h-7 w-7 p-0', deletingId === event.id && 'text-destructive')}
+                    onClick={() => handleDelete(event.id)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

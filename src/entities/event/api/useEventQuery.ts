@@ -11,6 +11,28 @@ export function useEventsQuery() {
   })
 }
 
+export interface UpdateEventDto {
+  type?: 'ACCIDENT' | 'MALFUNCTION' | 'FINE' | 'SERVICE' | 'NOTE'
+  title?: string
+  description?: string
+  cost?: number
+  occurredAt?: string
+}
+
+export function useUpdateEventMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateEventDto }) =>
+      apiClient<CarEvent>(`/api/events/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: EVENT_QUERY_KEY })
+    },
+  })
+}
+
 export function useDeleteEventMutation() {
   const queryClient = useQueryClient()
   return useMutation({

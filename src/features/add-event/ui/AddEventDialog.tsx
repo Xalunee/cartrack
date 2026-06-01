@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { apiClient } from '@shared/api/client'
+import { CarEvent, useUpdateEventMutation } from '@entities/event'
 import {
   addEventSchema,
   type AddEventFormValues,
@@ -31,50 +32,68 @@ import {
 
 const EVENT_QUERY_KEY = ['events'] as const
 
-export function AddEventDialog({ trigger }: { trigger?: ReactNode }) {
+interface AddEventDialogProps {
+  trigger?: ReactNode
+  event?: CarEvent
+}
+
+export function AddEventDialog({ trigger, event }: AddEventDialogProps) {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
+  const updateMutation = useUpdateEventMutation()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isEdit = !!event
 
   const form = useForm<AddEventFormValues>({
     resolver: zodResolver(addEventSchema),
     defaultValues: {
-      type: 'NOTE',
-      title: '',
-      description: '',
-      occurredAt: new Date().toISOString().split('T')[0],
+      type: event?.type ?? 'NOTE',
+      title: event?.title ?? '',
+      description: event?.description ?? '',
+      cost: event?.cost ?? undefined,
+      occurredAt: event?.occurredAt
+        ? new Date(event.occurredAt).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
     },
   })
 
   useEffect(() => {
     if (open) {
       form.reset({
-        type: 'NOTE',
-        title: '',
-        description: '',
-        cost: undefined,
-        occurredAt: new Date().toISOString().split('T')[0],
+        type: event?.type ?? 'NOTE',
+        title: event?.title ?? '',
+        description: event?.description ?? '',
+        cost: event?.cost ?? undefined,
+        occurredAt: event?.occurredAt
+          ? new Date(event.occurredAt).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0],
       })
     }
-  }, [open, form])
+  }, [open, event, form])
 
   async function onSubmit(values: AddEventFormValues) {
     setIsPending(true)
     setError(null)
     try {
-      await apiClient('/api/events', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...values,
-          occurredAt: values.occurredAt
-            ? new Date(values.occurredAt).toISOString()
-            : undefined,
-        }),
-      })
-      queryClient.invalidateQueries({ queryKey: EVENT_QUERY_KEY })
+      const payload = {
+        ...values,
+        occurredAt: values.occurredAt
+          ? new Date(values.occurredAt).toISOString()
+          : undefined,
+      }
+
+      if (isEdit && event) {
+        await updateMutation.mutateAsync({ id: event.id, data: payload })
+      } else {
+        await apiClient('/api/events', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        })
+        queryClient.invalidateQueries({ queryKey: EVENT_QUERY_KEY })
+      }
       setOpen(false)
-      form.reset()
+      if (!isEdit) form.reset()
     } catch (eventError: unknown) {
       setError(
         eventError instanceof Error ? eventError.message : 'Ошибка сохранения'
@@ -91,7 +110,7 @@ export function AddEventDialog({ trigger }: { trigger?: ReactNode }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Новое событие</DialogTitle>
+          <DialogTitle>{isEdit ? 'Редактировать событие' : 'Новое событие'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -193,7 +212,7 @@ export function AddEventDialog({ trigger }: { trigger?: ReactNode }) {
                 Отмена
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? 'Сохранение...' : 'Добавить'}
+                {isPending ? 'Сохранение...' : isEdit ? 'Сохранить' : 'Добавить'}
               </Button>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
