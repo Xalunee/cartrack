@@ -31,7 +31,7 @@ export function MileageTracker() {
     }))
 
   return (
-    <Card>
+    <Card className="glass card-hover">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
@@ -65,7 +65,7 @@ export function MileageTracker() {
             )}
           </div>
         )}
-        {isLoading && <div className="h-32 bg-muted animate-pulse rounded-lg" />}
+        {isLoading && <div className="h-32 skeleton" />}
         {chartData && chartData.length >= 2 && (
           <ResponsiveContainer width="100%" height={120}>
             <LineChart data={chartData}>

@@ -36,9 +36,9 @@ export function EventLog() {
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 stagger-children">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />
+          <div key={i} className="h-20 rounded-xl skeleton" />
         ))}
       </div>
     )
@@ -58,12 +58,12 @@ export function EventLog() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 stagger-children">
       {events.map((event) => {
         const config = typeConfig[event.type]
         const Icon = config.icon
         return (
-          <Card key={event.id} className="overflow-hidden">
+          <Card key={event.id} className="overflow-hidden card-hover">
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-3 flex-1 min-w-0">

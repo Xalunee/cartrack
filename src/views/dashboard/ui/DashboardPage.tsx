@@ -48,8 +48,8 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-start justify-between">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+      <div className="flex items-start justify-between animate-fade-in">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">
             {car.brand} {car.model}
@@ -75,12 +75,12 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 animate-fade-in-delay-1">
         <MileageTracker />
         <SpendingChart />
       </div>
 
-      <div>
+      <div className="animate-fade-in-delay-2">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Обслуживание

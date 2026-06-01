@@ -28,7 +28,7 @@ export function SpendingChart() {
     }))
 
   return (
-    <Card>
+    <Card className="glass card-hover">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">

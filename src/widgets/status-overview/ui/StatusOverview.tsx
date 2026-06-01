@@ -15,9 +15,9 @@ export function StatusOverview() {
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 stagger-children">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
+          <div key={i} className="h-24 rounded-xl skeleton" />
         ))}
       </div>
     )
@@ -42,10 +42,10 @@ export function StatusOverview() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 stagger-children">
       {items.map((item) => (
         <Link key={item.id} href={`/maintenance/${item.id}`}>
-        <Card className="overflow-hidden hover:border-primary/30 transition-colors cursor-pointer">
+        <Card className="overflow-hidden card-hover hover:border-primary/30 cursor-pointer">
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex-1 min-w-0">
