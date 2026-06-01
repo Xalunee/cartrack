@@ -67,30 +67,32 @@ export function MileageTracker() {
         )}
         {isLoading && <div className="h-32 skeleton" />}
         {chartData && chartData.length >= 2 && (
-          <ResponsiveContainer width="100%" height={120}>
-            <LineChart data={chartData}>
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis hide domain={['auto', 'auto']} />
-              <Tooltip
-                formatter={(value) => [`${Number(value).toLocaleString('ru')} км`, 'Пробег']}
-                labelStyle={{ fontSize: 12 }}
-                contentStyle={{ fontSize: 12, borderRadius: 8 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="mileage"
-                stroke="hsl(var(--primary))"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="select-none">
+            <ResponsiveContainer width="100%" height={120}>
+              <LineChart data={chartData} style={{ cursor: 'default' }}>
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis hide domain={['auto', 'auto']} />
+                <Tooltip
+                  formatter={(value) => [`${Number(value).toLocaleString('ru')} км`, 'Пробег']}
+                  labelStyle={{ fontSize: 12 }}
+                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="mileage"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
         {chartData && chartData.length < 2 && (
           <p className="text-xs text-muted-foreground text-center py-4">

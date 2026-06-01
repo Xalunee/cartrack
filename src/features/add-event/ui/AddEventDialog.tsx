@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -46,6 +46,18 @@ export function AddEventDialog({ trigger }: { trigger?: ReactNode }) {
       occurredAt: new Date().toISOString().split('T')[0],
     },
   })
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        type: 'NOTE',
+        title: '',
+        description: '',
+        cost: undefined,
+        occurredAt: new Date().toISOString().split('T')[0],
+      })
+    }
+  }, [open, form])
 
   async function onSubmit(values: AddEventFormValues) {
     setIsPending(true)
