@@ -1,5 +1,15 @@
 import Link from 'next/link'
-import { ArrowRight, CircleCheck, Gauge, Wrench } from 'lucide-react'
+import {
+  ArrowRight,
+  BarChart2,
+  Calendar,
+  FileDown,
+  FileText,
+  MessageCircle,
+  ShieldCheck,
+  TrendingUp,
+  Wrench,
+} from 'lucide-react'
 import { Button } from '@shared/ui'
 
 const navigation = [
@@ -17,19 +27,43 @@ const maintenanceItems = [
 ]
 
 const stats = [
-  { value: '64 265', label: 'км на одометре' },
-  { value: '9', label: 'замен в истории' },
-  { value: '31 463 ₽', label: 'потрачено за год' },
+  { value: '87 420', label: 'км на одометре' },
+  { value: '12', label: 'замен в истории' },
+  { value: '42 800 ₽', label: 'потрачено за год' },
   { value: '3 нед.', label: 'до следующей замены' },
 ]
 
 const features = [
-  'Трекинг пробега',
-  'История обслуживания',
-  'Умный прогноз',
-  'Учёт расходов',
-  'Журнал событий',
-  'Экспорт при продаже',
+  {
+    title: 'Трекинг пробега',
+    description: 'Вводи раз в неделю. Telegram-бот напомнит и примет данные.',
+    icon: TrendingUp,
+  },
+  {
+    title: 'История обслуживания',
+    description: 'Дата, пробег, стоимость каждой замены в одном месте.',
+    icon: Wrench,
+  },
+  {
+    title: 'Умный прогноз',
+    description: 'Считает по твоему темпу езды, показывает дату следующей замены.',
+    icon: Calendar,
+  },
+  {
+    title: 'Учёт расходов',
+    description: 'Графики по месяцам и категориям: запчасти, ТО, ремонт.',
+    icon: BarChart2,
+  },
+  {
+    title: 'Журнал событий',
+    description: 'Аварии, неисправности, штрафы, СТО — вся история рядом.',
+    icon: FileText,
+  },
+  {
+    title: 'Экспорт при продаже',
+    description: 'PDF с полной историей в один клик. Покупатели любят такие машины.',
+    icon: FileDown,
+  },
 ]
 
 const painPoints = [
@@ -42,7 +76,7 @@ const painPoints = [
 
 function LandingHeader() {
   return (
-    <header className="sticky top-0 z-30 border-b border-stone-200/70 bg-[#f7f3ec]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-stone-200/70 bg-[#f7f3ec]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-8 lg:px-10">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-stone-950">
           <span className="size-2.5 rounded-full bg-stone-950" />
@@ -69,10 +103,10 @@ function LandingHeader() {
 
 function AppPreview() {
   return (
-    <div className="relative mx-auto flex min-h-[400px] w-full max-w-[500px] max-h-[400px] items-center justify-center sm:min-h-[470px] sm:max-h-[480px] lg:mx-0">
+    <div className="relative z-0 mx-auto flex min-h-[410px] w-full max-w-[500px] max-h-[420px] items-center justify-center sm:min-h-[490px] sm:max-h-[500px] lg:mx-0">
       <div className="absolute inset-x-8 top-8 h-[320px] rounded-[2rem] bg-stone-200/60 blur-sm sm:h-[380px]" />
 
-      <div className="absolute left-1 top-20 z-10 hidden w-52 rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:block">
+      <div className="absolute left-3 top-20 z-10 hidden w-52 overflow-hidden rounded-3xl border border-white/80 bg-white/80 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:block">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-stone-400">Расходы за год</p>
         <p className="mt-2 text-xl font-semibold text-stone-950">42 800 ₽</p>
         <div className="mt-4 flex h-10 items-end gap-2">
@@ -88,7 +122,7 @@ function AppPreview() {
 
       <div className="relative z-20 w-[min(76vw,250px)] rounded-[2rem] border border-stone-200 bg-white p-2.5 shadow-[0_32px_90px_rgba(68,64,60,0.18)] sm:w-[min(72vw,270px)]">
         <div className="absolute left-1/2 top-3 h-5 w-20 -translate-x-1/2 rounded-full bg-stone-950" />
-        <div className="max-h-[380px] overflow-hidden rounded-[1.55rem] bg-[#fbfaf7] px-4 pb-4 pt-8 sm:max-h-[455px] sm:px-5 sm:pb-5 sm:pt-9">
+        <div className="max-h-[390px] overflow-hidden rounded-[1.55rem] bg-[#fbfaf7] px-4 pb-4 pt-8 sm:max-h-[470px] sm:px-5 sm:pb-5 sm:pt-9">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium text-stone-400">Skoda Octavia</p>
@@ -141,7 +175,7 @@ function AppPreview() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 right-1 z-30 w-44 rounded-3xl border border-white/80 bg-white/85 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:bottom-16 sm:right-2 sm:w-48 sm:p-5">
+      <div className="absolute bottom-8 right-1 z-10 w-44 rounded-3xl border border-white/80 bg-white/85 p-4 shadow-[0_24px_70px_rgba(87,83,78,0.16)] backdrop-blur-xl sm:bottom-16 sm:right-2 sm:w-48 sm:p-5">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-stone-400">След. замена масла</p>
         <p className="mt-2 text-xl font-semibold text-stone-950 sm:text-2xl">~15 авг</p>
         <p className="mt-1 text-xs text-stone-500">прогноз по темпу езды</p>
@@ -156,7 +190,7 @@ export function LandingPage() {
       <LandingHeader />
 
       <main>
-        <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_0.92fr] lg:items-center lg:px-10 lg:py-24">
+        <section className="relative z-0 mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_0.92fr] lg:items-center lg:px-10 lg:py-24">
           <div className="max-w-3xl">
             <div className="inline-flex max-w-full items-center rounded-full border border-blue-500/70 bg-blue-50/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-blue-700 shadow-sm sm:px-4 sm:tracking-[0.32em]">
               Трекер автомобиля · 2026
@@ -177,20 +211,15 @@ export function LandingPage() {
                 </Button>
               </Link>
               <Link
-                href="/dashboard"
+                href="#features"
                 className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white/55 px-5 text-base font-medium text-stone-950 transition hover:bg-white/80 sm:w-auto sm:bg-transparent"
               >
-                Посмотреть демо <ArrowRight className="size-4" />
+                Посмотреть возможности <ArrowRight className="size-4" />
               </Link>
             </div>
 
-            <div className="mt-8 flex items-center gap-4 sm:flex-nowrap">
-              <div className="flex -space-x-2">
-                {['#e7a96d', '#8fb6dd', '#9fc68f', '#c99ab5'].map((color) => (
-                  <span key={color} className="size-8 rounded-full border-2 border-[#f7f3ec]" style={{ backgroundColor: color }} />
-                ))}
-              </div>
-              <p className="text-sm text-stone-500">Уже используют <span className="font-semibold text-stone-950">240+</span> автовладельцев</p>
+            <div className="mt-8 inline-flex rounded-full border border-stone-200/80 bg-white/45 px-4 py-2 text-sm font-medium text-stone-600">
+              Бесплатно для одной машины · Без рекламы
             </div>
           </div>
 
@@ -222,31 +251,37 @@ export function LandingPage() {
           </div>
 
           <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <div
-                key={feature}
-                className="group flex min-h-[170px] flex-col justify-between rounded-[1.75rem] border border-white/80 bg-white/55 p-6 shadow-[0_16px_45px_rgba(87,83,78,0.08)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/75 hover:shadow-[0_24px_60px_rgba(87,83,78,0.12)] sm:p-7"
-              >
-                <p className="text-sm font-semibold text-stone-400">{String(index + 1).padStart(2, '0')}</p>
-                <div className="flex items-end justify-between gap-4">
-                  <h3 className="text-xl font-semibold tracking-tight text-stone-950 sm:text-2xl">{feature}</h3>
-                  <CircleCheck className="size-6 text-stone-300 transition group-hover:text-stone-950" />
+            {features.map((feature, index) => {
+              const Icon = feature.icon
+              return (
+                <div
+                  key={feature.title}
+                  className="group rounded-[1.5rem] border border-white/80 bg-white/55 p-6 shadow-[0_16px_45px_rgba(87,83,78,0.08)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/75 hover:shadow-[0_24px_60px_rgba(87,83,78,0.12)]"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex size-10 items-center justify-center rounded-2xl bg-stone-950 text-white">
+                      <Icon className="size-5" />
+                    </div>
+                    <p className="text-sm font-semibold text-stone-400">{String(index + 1).padStart(2, '0')}</p>
+                  </div>
+                  <h3 className="mt-5 text-xl font-semibold tracking-tight text-stone-950">{feature.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-stone-600">{feature.description}</p>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto max-w-7xl px-4 pb-20 sm:px-8 sm:pb-28 lg:px-10">
+        <section id="how-it-works" className="mx-auto max-w-7xl px-4 pb-16 sm:px-8 lg:px-10">
           <div className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="rounded-[2rem] border border-white/80 bg-white/60 p-6 shadow-[0_22px_70px_rgba(87,83,78,0.1)] backdrop-blur-xl sm:p-10">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-400">Звучит знакомо?</p>
-              <h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">CarTrack помнит за вас</h2>
+              <h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">CarTrack помнит за вас</h2>
             </div>
             <div className="rounded-[2rem] border border-stone-200/80 bg-[#efe8dd]/55 p-6 sm:p-10">
               <div className="flex flex-wrap gap-3">
                 {painPoints.map((point) => (
-                  <span key={point} className="rounded-full border border-stone-300/70 bg-white/65 px-4 py-2 text-sm font-medium text-stone-800 shadow-sm sm:text-base">
+                  <span key={point} className="rounded-full border border-stone-300/70 bg-white/70 px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm sm:text-base">
                     {point}
                   </span>
                 ))}
@@ -255,10 +290,10 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="px-4 pb-20 sm:px-8 sm:pb-28 lg:px-10">
+        <section id="pricing" className="px-4 pb-20 sm:px-8 sm:pb-24 lg:px-10">
           <div className="mx-auto max-w-5xl rounded-[2rem] border border-white/80 bg-white/65 p-6 text-center shadow-[0_28px_90px_rgba(87,83,78,0.12)] backdrop-blur-xl sm:rounded-[2.3rem] sm:p-12 lg:p-16">
             <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-stone-950 text-white">
-              <Gauge className="size-6" />
+              <ShieldCheck className="size-6" />
             </div>
             <h2 className="mx-auto mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
               Начни следить за машиной сегодня
@@ -273,10 +308,10 @@ export function LandingPage() {
                 </Button>
               </Link>
               <Link
-                href="#"
+                href="https://t.me/cartrack_official_bot"
                 className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border border-stone-200 bg-white/70 px-7 text-base font-medium text-stone-950 shadow-sm transition hover:bg-white sm:w-auto"
               >
-                <Wrench className="size-4" />
+                <MessageCircle className="size-4" />
                 Открыть Telegram-бота
               </Link>
             </div>
