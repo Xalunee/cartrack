@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Bot, InlineKeyboard } from 'grammy'
+import { Bot, InlineKeyboard, Keyboard } from 'grammy'
 import { db } from '@shared/lib/db'
 
 const token = process.env.TELEGRAM_BOT_TOKEN
@@ -23,6 +23,16 @@ function mainMenu() {
     .text('📊 Статус машины', 'action:status')
     .row()
     .text('⚙️ Настройки', 'action:settings')
+}
+
+function mainReplyKeyboard() {
+  return new Keyboard()
+    .text('📏 Внести пробег')
+    .text('📊 Статус')
+    .row()
+    .text('⚙️ Настройки')
+    .resized()
+    .persistent()
 }
 
 // --- Helper: format maintenance status ---
@@ -50,7 +60,7 @@ bot.command('start', async (ctx) => {
   if (user) {
     await ctx.reply(
       `С возвращением, ${user.name ?? user.email}! 🚗`,
-      { reply_markup: mainMenu() }
+      { reply_markup: mainReplyKeyboard() }
     )
   } else {
     await ctx.reply(
@@ -123,8 +133,8 @@ bot.command('link', async (ctx) => {
 
   await ctx.reply(
     `✅ Аккаунт ${user.email} привязан!\n\n` +
-    'Теперь ты можешь вносить пробег и проверять статус прямо здесь.',
-    { reply_markup: mainMenu() }
+    'Теперь ты можешь вносить пробег и проверять статус.',
+    { reply_markup: mainReplyKeyboard() }
   )
 })
 
@@ -247,6 +257,64 @@ bot.callbackQuery('action:menu', async (ctx) => {
   )
 })
 
+bot.hears('📏 Внести пробег', async (ctx) => {
+  const chatId = String(ctx.chat.id)
+  const user = await getUserByChatId(chatId)
+
+  if (!user || !user.car) {
+    await ctx.reply('Сначала привяжи аккаунт. Нажми /start')
+    return
+  }
+
+  await ctx.reply(
+    `📏 Текущий пробег: ${user.car.currentMileage.toLocaleString('ru')} км\n\n` +
+    'Отправь новый пробег числом:'
+  )
+})
+
+bot.hears('📊 Статус', async (ctx) => {
+  const chatId = String(ctx.chat.id)
+  const user = await getUserByChatId(chatId)
+
+  if (!user || !user.car) {
+    await ctx.reply('Сначала привяжи аккаунт. Нажми /start')
+    return
+  }
+
+  const car = user.car
+  const statusText = formatMaintenanceStatus(car.maintenanceItems, car.currentMileage)
+
+  await ctx.reply(
+    `🚗 ${car.brand} ${car.model} ${car.year}\n` +
+    `📏 Пробег: ${car.currentMileage.toLocaleString('ru')} км\n\n` +
+    `Обслуживание:\n${statusText}`
+  )
+})
+
+bot.hears('⚙️ Настройки', async (ctx) => {
+  const chatId = String(ctx.chat.id)
+  const user = await getUserByChatId(chatId)
+
+  if (!user) {
+    await ctx.reply('Сначала привяжи аккаунт. Нажми /start')
+    return
+  }
+
+  await ctx.reply(
+    `⚙️ Настройки\n\n` +
+    `👤 ${user.name ?? 'Без имени'}\n` +
+    `📧 ${user.email}\n` +
+    `🔔 Напоминания: каждые ${user.mileageTrackInterval} дн.\n\n` +
+    'Для полных настроек зайди на сайт.',
+    {
+      reply_markup: new InlineKeyboard()
+        .url('🌐 Открыть сайт', (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings')
+        .row()
+        .text('❌ Отвязать Telegram', 'action:unlink_confirm')
+    }
+  )
+})
+
 // --- Handle plain number as mileage input ---
 bot.on('message:text', async (ctx) => {
   const chatId = String(ctx.chat.id)
@@ -342,7 +410,8 @@ bot.callbackQuery(/^confirm:mileage:(\d+)$/, async (ctx) => {
   if (diff > 0) message += `\n+${diff.toLocaleString('ru')} км`
   if (alerts.length > 0) message += `\n\n⚠️ Требует внимания:\n${alerts.join('\n')}`
 
-  await ctx.editMessageText(message, { reply_markup: mainMenu() })
+  await ctx.editMessageText('✅ Пробег сохранён!')
+  await ctx.reply(message, { reply_markup: mainReplyKeyboard() })
 })
 
 // --- Webhook handler ---
