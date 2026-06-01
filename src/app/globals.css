@@ -131,17 +131,48 @@
 
 /* === Glass card effect === */
 .glass {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 8px 32px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 
 .dark .glass {
-  background: rgba(30, 30, 30, 0.6);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: rgba(30, 30, 30, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* === Gradient mesh background === */
+.gradient-mesh {
+  background:
+    radial-gradient(circle at -10% -20%, rgb(191 219 254 / 0.3) 0 18%, transparent 42%),
+    radial-gradient(circle at 105% 10%, rgb(221 214 254 / 0.25) 0 16%, transparent 38%),
+    radial-gradient(ellipse at 20% 110%, rgb(254 205 211 / 0.2) 0 20%, transparent 45%),
+    radial-gradient(ellipse at 90% 75%, rgb(253 230 138 / 0.2) 0 14%, transparent 36%);
+}
+
+.dark .gradient-mesh {
+  background:
+    radial-gradient(circle at -10% -20%, rgb(30 58 138 / 0.2) 0 18%, transparent 42%),
+    radial-gradient(circle at 105% 10%, rgb(76 29 149 / 0.15) 0 16%, transparent 38%),
+    radial-gradient(ellipse at 20% 110%, rgb(136 19 55 / 0.1) 0 20%, transparent 45%),
+    radial-gradient(ellipse at 90% 75%, rgb(120 53 15 / 0.1) 0 14%, transparent 36%);
+}
+
+.gradient-mesh-auth {
+  background:
+    radial-gradient(circle at -10% -20%, rgb(191 219 254 / 0.3) 0 18%, transparent 42%),
+    radial-gradient(circle at 105% 30%, rgb(221 214 254 / 0.25) 0 16%, transparent 38%),
+    radial-gradient(ellipse at 30% 110%, rgb(254 205 211 / 0.2) 0 18%, transparent 42%);
+}
+
+.dark .gradient-mesh-auth {
+  background:
+    radial-gradient(circle at -10% -20%, rgb(30 58 138 / 0.2) 0 18%, transparent 42%),
+    radial-gradient(circle at 105% 30%, rgb(76 29 149 / 0.15) 0 16%, transparent 38%),
+    radial-gradient(ellipse at 30% 110%, rgb(136 19 55 / 0.1) 0 18%, transparent 42%);
 }
 
 /* === Fade-in animation === */
