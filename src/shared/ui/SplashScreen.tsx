@@ -10,14 +10,18 @@ export function SplashScreen() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768
+    const alreadyShown = sessionStorage.getItem('cartrack-splash-shown')
+    if (alreadyShown) return
+
     const isLanding = pathname === '/'
     const isAuthPage = pathname === '/login' || pathname === '/register'
+    const isMobile = window.innerWidth < 768
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
 
     if (!isLanding && !isAuthPage && (isMobile || isStandalone)) {
       setVisible(true)
-      setFading(false)
+      sessionStorage.setItem('cartrack-splash-shown', '1')
+
       const timer = setTimeout(() => {
         setFading(true)
         setTimeout(() => setVisible(false), 400)
@@ -25,7 +29,7 @@ export function SplashScreen() {
 
       return () => clearTimeout(timer)
     }
-  }, [pathname])
+  }, [])
 
   if (!visible) return null
 

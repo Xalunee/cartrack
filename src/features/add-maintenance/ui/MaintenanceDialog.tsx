@@ -110,7 +110,7 @@ export function MaintenanceDialog({ item, trigger }: MaintenanceDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mx-4">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Редактировать' : 'Добавить позицию обслуживания'}
@@ -228,7 +228,12 @@ export function MaintenanceDialog({ item, trigger }: MaintenanceDialogProps) {
                   <FormItem>
                     <FormLabel>Дата</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} value={field.value ?? ''} />
+                      <Input
+                        type="date"
+                        className="w-full min-w-0 text-sm"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

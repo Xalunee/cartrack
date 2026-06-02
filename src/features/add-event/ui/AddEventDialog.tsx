@@ -108,7 +108,7 @@ export function AddEventDialog({ trigger, event }: AddEventDialogProps) {
       <DialogTrigger asChild>
         {trigger ?? <Button variant="default">Добавить событие</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mx-4">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Редактировать событие' : 'Новое событие'}</DialogTitle>
         </DialogHeader>
@@ -200,7 +200,12 @@ export function AddEventDialog({ trigger, event }: AddEventDialogProps) {
                   <FormItem>
                     <FormLabel>Дата</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} value={field.value ?? ''} />
+                      <Input
+                        type="date"
+                        className="w-full min-w-0 text-sm"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

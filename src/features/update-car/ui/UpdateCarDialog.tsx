@@ -67,7 +67,7 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
       <DialogTrigger asChild>
         {trigger ?? <Button variant="outline">Редактировать</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mx-4">
         <DialogHeader>
           <DialogTitle>Данные автомобиля</DialogTitle>
         </DialogHeader>

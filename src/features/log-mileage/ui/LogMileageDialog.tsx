@@ -55,7 +55,7 @@ export function LogMileageDialog({
       <DialogTrigger asChild>
         {trigger ?? <Button variant="default">Обновить пробег</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mx-4">
         <DialogHeader>
           <DialogTitle>Обновить пробег</DialogTitle>
         </DialogHeader>
