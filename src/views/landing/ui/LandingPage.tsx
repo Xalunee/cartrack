@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Wrench,
 } from 'lucide-react'
-import { Button } from '@shared/ui'
+import { Aurora, BlurText, MagneticButton } from '@shared/ui'
 
 const navigation = [
   { label: 'Возможности', href: '#features' },
@@ -76,7 +76,7 @@ const painPoints = [
 
 function LandingHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-200/70 bg-[#f7f3ec]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-black/5 bg-[#f7f3ec]/60 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-8 lg:px-10">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-stone-950">
           <span className="size-2.5 rounded-full bg-stone-950" />
@@ -91,11 +91,11 @@ function LandingHeader() {
           ))}
         </nav>
 
-        <Link href="/register">
-          <Button className="h-10 rounded-full bg-stone-950 px-4 text-sm text-white shadow-[0_12px_30px_rgba(28,25,23,0.18)] hover:bg-stone-800 sm:h-11 sm:px-5">
+        <MagneticButton as="a" href="/register">
+          <span className="inline-flex h-10 items-center justify-center rounded-full bg-stone-950 px-4 text-sm font-medium text-white shadow-[0_12px_30px_rgba(28,25,23,0.18)] transition hover:bg-stone-800 sm:h-11 sm:px-5">
             Начать бесплатно
-          </Button>
-        </Link>
+          </span>
+        </MagneticButton>
       </div>
     </header>
   )
@@ -186,7 +186,13 @@ function AppPreview() {
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#f7f3ec] text-stone-950">
+    <div className="relative isolate min-h-screen bg-[#f7f3ec] text-stone-950">
+      <Aurora
+        colorStart="#a78bfa"
+        colorEnd="#3b82f6"
+        speed={10}
+        className="fixed inset-0 -z-10"
+      />
       <LandingHeader />
 
       <main>
@@ -197,7 +203,9 @@ export function LandingPage() {
             </div>
 
             <h1 className="mt-7 max-w-2xl text-4xl font-semibold leading-[0.98] tracking-tight text-stone-950 sm:text-5xl md:text-6xl">
-              Знай свою машину. Всегда.
+              <BlurText text="Знай свою машину." as="span" />
+              <br />
+              <BlurText text="Всегда." as="span" delay={400} />
             </h1>
             <p className="mt-7 max-w-xl text-base leading-8 text-stone-600 sm:text-lg">
               Спокойный журнал для пробега, обслуживания и расходов. Без таблиц в Excel, без чеков в
@@ -205,17 +213,18 @@ export function LandingPage() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/register" className="w-full sm:w-auto">
-                <Button className="h-14 w-full rounded-full bg-stone-950 px-7 text-base text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] hover:bg-stone-800 sm:w-auto">
+              <MagneticButton as="a" href="/register" className="w-full sm:w-auto">
+                <span className="inline-flex h-14 w-full items-center justify-center rounded-full bg-stone-950 px-7 text-base font-medium text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] transition hover:bg-stone-800 sm:w-auto">
                   Завести машину в журнал
-                </Button>
-              </Link>
-              <Link
+                </span>
+              </MagneticButton>
+              <MagneticButton
+                as="a"
                 href="#features"
                 className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white/55 px-5 text-base font-medium text-stone-950 transition hover:bg-white/80 sm:w-auto sm:bg-transparent"
               >
                 Посмотреть возможности <ArrowRight className="size-4" />
-              </Link>
+              </MagneticButton>
             </div>
 
             <div className="mt-8 inline-flex rounded-full border border-stone-200/80 bg-white/45 px-4 py-2 text-sm font-medium text-stone-600">
@@ -300,18 +309,19 @@ export function LandingPage() {
               Бесплатно для одной машины навсегда. Без карты, без рекламы, без рассылок «вам срочно нужно ТО».
             </p>
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/register" className="w-full sm:w-auto">
-                <Button className="h-14 w-full rounded-full bg-stone-950 px-8 text-base text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] hover:bg-stone-800 sm:w-auto">
+              <MagneticButton as="a" href="/register" className="w-full sm:w-auto">
+                <span className="inline-flex h-14 w-full items-center justify-center rounded-full bg-stone-950 px-8 text-base font-medium text-white shadow-[0_18px_38px_rgba(28,25,23,0.2)] transition hover:bg-stone-800 sm:w-auto">
                   Завести журнал
-                </Button>
-              </Link>
-              <Link
+                </span>
+              </MagneticButton>
+              <MagneticButton
+                as="a"
                 href="https://t.me/cartrack_official_bot"
                 className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border border-stone-200 bg-white/70 px-7 text-base font-medium text-stone-950 shadow-sm transition hover:bg-white sm:w-auto"
               >
                 <MessageCircle className="size-4" />
                 Открыть Telegram-бота
-              </Link>
+              </MagneticButton>
             </div>
           </div>
         </section>
