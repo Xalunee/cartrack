@@ -80,7 +80,7 @@ function AuroraBackdrop() {
         <div
           className="absolute left-[-10%] top-[-20%] h-[60%] w-[60%] rounded-full opacity-40"
           style={{
-            background: 'radial-gradient(circle, #1a8a4a 0%, transparent 70%)',
+            background: 'radial-gradient(circle, #1e40af 0%, transparent 70%)',
             filter: 'blur(80px)',
             animation: 'aurora1 8s ease-in-out infinite alternate',
           }}
@@ -99,6 +99,14 @@ function AuroraBackdrop() {
             background: 'radial-gradient(circle, #2563eb 0%, transparent 70%)',
             filter: 'blur(100px)',
             animation: 'aurora3 12s ease-in-out infinite alternate',
+          }}
+        />
+        <div
+          className="absolute bottom-[5%] right-[18%] h-[35%] w-[35%] rounded-full opacity-20"
+          style={{
+            background: 'radial-gradient(circle, #4338ca 0%, transparent 70%)',
+            filter: 'blur(90px)',
+            animation: 'aurora4 14s ease-in-out infinite alternate',
           }}
         />
         <div
@@ -122,6 +130,10 @@ function AuroraBackdrop() {
           0% { transform: translate(0, 0) scale(1); }
           100% { transform: translate(5%, -8%) scale(1.2); }
         }
+        @keyframes aurora4 {
+          0% { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(-6%, 6%) scale(1.12); }
+        }
       `}</style>
     </>
   )
@@ -129,15 +141,15 @@ function AuroraBackdrop() {
 
 function LandingHeader() {
   return (
-    <nav className="fixed left-3 right-3 top-3 z-50 mx-auto flex w-auto max-w-5xl items-center gap-1 rounded-full border border-white/10 bg-white/[0.08] px-2 py-1.5 shadow-lg shadow-black/20 backdrop-blur-xl md:left-1/2 md:right-auto md:top-4 md:w-full md:-translate-x-1/2">
-      <Link href="/" className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white">
+    <nav className="fixed left-4 right-4 top-4 z-50 flex items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-xl md:left-1/2 md:right-auto md:w-full md:max-w-5xl md:-translate-x-1/2">
+      <Link href="/" className="flex items-center gap-2 px-2">
         <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white">
           <span className="text-xs font-bold text-black">CT</span>
         </div>
-        CarTrack
+        <span className="text-sm font-medium text-white">CarTrack</span>
       </Link>
 
-      <div className="hidden items-center gap-0.5 md:flex">
+      <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
         {navigation.map((item) => (
           <Link
             key={item.href}
@@ -152,7 +164,7 @@ function LandingHeader() {
       <MagneticButton
         as="a"
         href="/register"
-        className="ml-1 rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black transition-colors hover:bg-white/90"
+        className="rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black transition-colors hover:bg-white/90"
       >
         Начать
       </MagneticButton>
@@ -163,7 +175,7 @@ function LandingHeader() {
 function AppPreview() {
   return (
     <div className="relative z-0 mx-auto flex max-h-[420px] min-h-[410px] w-full max-w-[500px] items-center justify-center overflow-visible sm:max-h-[500px] sm:min-h-[490px] lg:mx-0">
-      <div className="absolute inset-x-8 top-8 h-[320px] rounded-[2rem] bg-emerald-500/10 blur-2xl sm:h-[380px]" />
+      <div className="absolute inset-x-8 top-8 h-[320px] rounded-[2rem] bg-blue-500/10 blur-2xl sm:h-[380px]" />
 
       <div className="absolute left-5 top-20 z-20 hidden w-52 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.08] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:block md:left-3">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-white/35">Расходы за год</p>
@@ -180,7 +192,7 @@ function AppPreview() {
       </div>
 
       <div className="relative z-10 w-[min(76vw,250px)] rounded-[2rem] border border-white/10 bg-white/[0.05] p-2.5 shadow-[0_32px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:w-[min(72vw,270px)]">
-        <div className="absolute left-1/2 top-3 h-4 w-16 -translate-x-1/2 rounded-full bg-white/20" />
+        <div className="absolute left-1/2 top-2 h-4 w-[60px] -translate-x-1/2 rounded-full bg-black/80" />
         <div className="max-h-[390px] overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-4 pt-8 sm:max-h-[470px] sm:px-5 sm:pb-5 sm:pt-9">
           <div className="flex items-start justify-between">
             <div>
