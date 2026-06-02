@@ -141,7 +141,7 @@ function AuroraBackdrop() {
 
 function LandingHeader() {
   return (
-    <nav className="fixed left-4 right-4 top-4 z-50 flex items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-xl md:left-1/2 md:right-auto md:w-full md:max-w-5xl md:-translate-x-1/2">
+    <nav className="fixed left-4 right-4 top-4 z-50 flex items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-xl md:left-1/2 md:right-auto md:w-[calc(100%-2rem)] md:max-w-7xl md:-translate-x-1/2">
       <Link href="/" className="flex items-center gap-2 px-2">
         <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white">
           <span className="text-xs font-bold text-black">CT</span>
@@ -191,9 +191,9 @@ function AppPreview() {
         </div>
       </div>
 
-      <div className="relative z-10 w-[min(76vw,250px)] rounded-[2rem] border border-white/10 bg-white/[0.05] p-2.5 shadow-[0_32px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:w-[min(72vw,270px)]">
-        <div className="absolute left-1/2 top-2 h-4 w-[60px] -translate-x-1/2 rounded-full bg-black/80" />
-        <div className="max-h-[390px] overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-4 pt-8 sm:max-h-[470px] sm:px-5 sm:pb-5 sm:pt-9">
+      <div className="relative z-10 w-[min(76vw,250px)] rounded-[2rem] border border-white/10 bg-white/[0.05] p-2.5 pt-5 shadow-[0_32px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:w-[min(72vw,270px)]">
+        <div className="mx-auto h-4 w-[60px] rounded-full bg-black/80" />
+        <div className="mt-2 max-h-[390px] overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-3 pt-5 sm:max-h-[470px] sm:px-5 sm:pb-4 sm:pt-6">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium text-white/35">Skoda Octavia</p>
@@ -243,6 +243,30 @@ function AppPreview() {
               </div>
             ))}
           </div>
+
+          <div className="mt-3 flex items-center justify-around border-t border-white/10 py-2">
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="h-4 w-4 rounded bg-white/20" />
+              <span className="text-[8px] text-white/40">Главная</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="h-4 w-4 rounded bg-white/10" />
+              <span className="text-[8px] text-white/30">Сервис</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="h-4 w-4 rounded bg-white/10" />
+              <span className="text-[8px] text-white/30">Пробег</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="h-4 w-4 rounded bg-white/10" />
+              <span className="text-[8px] text-white/30">События</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="h-4 w-4 rounded bg-white/10" />
+              <span className="text-[8px] text-white/30">Настройки</span>
+            </div>
+          </div>
+          <div className="mx-auto mb-1 mt-2 h-1 w-24 rounded-full bg-white/20" />
         </div>
       </div>
 
