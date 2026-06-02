@@ -5,7 +5,10 @@ import {
   Calendar,
   FileDown,
   FileText,
+  AlertTriangle,
+  LayoutDashboard,
   MessageCircle,
+  Settings,
   ShieldCheck,
   TrendingUp,
   Wrench,
@@ -141,34 +144,36 @@ function AuroraBackdrop() {
 
 function LandingHeader() {
   return (
-    <nav className="fixed left-4 right-4 top-4 z-50 flex items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-xl md:left-1/2 md:right-auto md:w-[calc(100%-2rem)] md:max-w-7xl md:-translate-x-1/2">
-      <Link href="/" className="flex items-center gap-2 px-2">
-        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white">
-          <span className="text-xs font-bold text-black">CT</span>
+    <div className="fixed left-0 right-0 top-4 z-50 px-4 sm:px-8 lg:px-10">
+      <nav className="relative mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-xl">
+        <Link href="/" className="flex items-center gap-2 px-2">
+          <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white">
+            <span className="text-xs font-bold text-black">CT</span>
+          </div>
+          <span className="text-sm font-medium text-white">CarTrack</span>
+        </Link>
+
+        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
+          {navigation.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-full px-3 py-1.5 text-[13px] text-white/60 transition-colors hover:bg-white/[0.05] hover:text-white"
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
-        <span className="text-sm font-medium text-white">CarTrack</span>
-      </Link>
 
-      <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
-        {navigation.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="rounded-full px-3 py-1.5 text-[13px] text-white/60 transition-colors hover:bg-white/[0.05] hover:text-white"
-          >
-            {item.label}
-          </Link>
-        ))}
-      </div>
-
-      <MagneticButton
-        as="a"
-        href="/register"
-        className="rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black transition-colors hover:bg-white/90"
-      >
-        Начать
-      </MagneticButton>
-    </nav>
+        <MagneticButton
+          as="a"
+          href="/register"
+          className="rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black transition-colors hover:bg-white/90"
+        >
+          Начать
+        </MagneticButton>
+      </nav>
+    </div>
   )
 }
 
@@ -193,7 +198,7 @@ function AppPreview() {
 
       <div className="relative z-10 w-[min(76vw,250px)] rounded-[2rem] border border-white/10 bg-white/[0.05] p-2.5 pt-5 shadow-[0_32px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:w-[min(72vw,270px)]">
         <div className="mx-auto h-4 w-[60px] rounded-full bg-black/80" />
-        <div className="mt-2 max-h-[390px] overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-3 pt-5 sm:max-h-[470px] sm:px-5 sm:pb-4 sm:pt-6">
+        <div className="mt-2 flex max-h-[390px] flex-col overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-3 pt-5 sm:max-h-[470px] sm:px-5 sm:pb-4 sm:pt-6">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium text-white/35">Skoda Octavia</p>
@@ -244,29 +249,29 @@ function AppPreview() {
             ))}
           </div>
 
-          <div className="mt-3 flex items-center justify-around border-t border-white/10 py-2">
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="h-4 w-4 rounded bg-white/20" />
-              <span className="text-[8px] text-white/40">Главная</span>
+          <div className="mt-auto flex items-center justify-around border-t border-white/10 py-2.5">
+            <div className="flex flex-col items-center gap-1">
+              <LayoutDashboard className="h-4 w-4 text-white/60" />
+              <span className="text-[7px] text-white/60">Главная</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="h-4 w-4 rounded bg-white/10" />
-              <span className="text-[8px] text-white/30">Сервис</span>
+            <div className="flex flex-col items-center gap-1">
+              <Wrench className="h-4 w-4 text-white/30" />
+              <span className="text-[7px] text-white/30">Сервис</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="h-4 w-4 rounded bg-white/10" />
-              <span className="text-[8px] text-white/30">Пробег</span>
+            <div className="flex flex-col items-center gap-1">
+              <TrendingUp className="h-4 w-4 text-white/30" />
+              <span className="text-[7px] text-white/30">Пробег</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="h-4 w-4 rounded bg-white/10" />
-              <span className="text-[8px] text-white/30">События</span>
+            <div className="flex flex-col items-center gap-1">
+              <AlertTriangle className="h-4 w-4 text-white/30" />
+              <span className="text-[7px] text-white/30">События</span>
             </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <div className="h-4 w-4 rounded bg-white/10" />
-              <span className="text-[8px] text-white/30">Настройки</span>
+            <div className="flex flex-col items-center gap-1">
+              <Settings className="h-4 w-4 text-white/30" />
+              <span className="text-[7px] text-white/30">Настройки</span>
             </div>
           </div>
-          <div className="mx-auto mb-1 mt-2 h-1 w-24 rounded-full bg-white/20" />
+          <div className="mx-auto mb-1 mt-1.5 h-1 w-20 rounded-full bg-white/20" />
         </div>
       </div>
 
