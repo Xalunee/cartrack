@@ -129,9 +129,11 @@ function AuroraBackdrop() {
 
 function LandingHeader() {
   return (
-    <nav className="fixed left-1/2 top-4 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-white/[0.08] px-2 py-1.5 shadow-lg shadow-black/20 backdrop-blur-xl">
+    <nav className="fixed left-3 right-3 top-3 z-50 mx-auto flex w-auto max-w-5xl items-center gap-1 rounded-full border border-white/10 bg-white/[0.08] px-2 py-1.5 shadow-lg shadow-black/20 backdrop-blur-xl md:left-1/2 md:right-auto md:top-4 md:w-full md:-translate-x-1/2">
       <Link href="/" className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white">
-        <span className="h-2 w-2 rounded-full bg-blue-500" />
+        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white">
+          <span className="text-xs font-bold text-black">CT</span>
+        </div>
         CarTrack
       </Link>
 
@@ -178,7 +180,7 @@ function AppPreview() {
       </div>
 
       <div className="relative z-10 w-[min(76vw,250px)] rounded-[2rem] border border-white/10 bg-white/[0.05] p-2.5 shadow-[0_32px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:w-[min(72vw,270px)]">
-        <div className="absolute left-1/2 top-3 h-5 w-20 -translate-x-1/2 rounded-full bg-white/20" />
+        <div className="absolute left-1/2 top-3 h-4 w-16 -translate-x-1/2 rounded-full bg-white/20" />
         <div className="max-h-[390px] overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-4 pt-8 sm:max-h-[470px] sm:px-5 sm:pb-5 sm:pt-9">
           <div className="flex items-start justify-between">
             <div>
@@ -406,7 +408,7 @@ export function LandingPage() {
                 <p className="mb-3 text-xs uppercase tracking-wider text-white/30">Поддержка</p>
                 <div className="flex flex-col gap-2">
                   <a href="https://t.me/cartrack_official_bot" className="text-sm text-white/60 transition-colors hover:text-white">Telegram-бот</a>
-                  <a href="mailto:support@cartrack.app" className="text-sm text-white/60 transition-colors hover:text-white">Email</a>
+                  <a href="mailto:xalune.work@gmail.com" className="text-sm text-white/60 transition-colors hover:text-white">xalune.work@gmail.com</a>
                 </div>
               </div>
             </div>
