@@ -53,6 +53,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
 
+  // Never intercept auth routes — CSRF tokens and session cookies must flow freely
+  if (url.pathname.startsWith('/api/auth')) return
+
   // API requests: network first, cache fallback
   if (CACHEABLE_API.some((path) => url.pathname.startsWith(path))) {
     event.respondWith(
@@ -87,11 +90,13 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Cache the page
-          const clone = response.clone()
-          caches.open(STATIC_CACHE).then((cache) => {
-            cache.put(event.request, clone)
-          })
+          // Only cache GET navigations — POST (form submits) cannot be cached
+          if (event.request.method === 'GET') {
+            const clone = response.clone()
+            caches.open(STATIC_CACHE).then((cache) => {
+              cache.put(event.request, clone)
+            })
+          }
           return response
         })
         .catch(() => {
