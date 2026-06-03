@@ -1,6 +1,6 @@
-const CACHE_NAME = 'cartrack-v2'
-const STATIC_CACHE = 'cartrack-static-v2'
-const API_CACHE = 'cartrack-api-v1'
+const CACHE_NAME = 'cartrack-v3'
+const STATIC_CACHE = 'cartrack-static-v3'
+const API_CACHE = 'cartrack-api-v2'
 
 // Static assets to precache
 const PRECACHE_URLS = [
