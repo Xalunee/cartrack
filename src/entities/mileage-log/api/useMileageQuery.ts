@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@shared/api/client'
 import { mileageApi } from './mileageApi'
-import { CreateMileageLogDto } from '../model/types'
+import { CreateMileageLogDto, UpdateMileageLogDto } from '../model/types'
 import { MAINTENANCE_QUERY_KEY } from '@entities/maintenance-item'
 import { CAR_QUERY_KEY } from '@entities/car'
 
@@ -26,11 +25,23 @@ export function useLogMileageMutation() {
   })
 }
 
+export function useUpdateMileageLogMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateMileageLogDto }) =>
+      mileageApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MILEAGE_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: CAR_QUERY_KEY })
+    },
+  })
+}
+
 export function useDeleteMileageLogMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) =>
-      apiClient<{ success: true }>(`/api/mileage/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => mileageApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MILEAGE_QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY })

@@ -17,3 +17,9 @@ export interface CreateMileageLogDto {
   mileage: number
   note?: string
 }
+
+export interface UpdateMileageLogDto {
+  mileage?: number
+  note?: string | null
+  recordedAt?: string
+}

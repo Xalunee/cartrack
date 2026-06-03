@@ -6,6 +6,7 @@ export const logMileageSchema = z.object({
     .int()
     .min(0, 'Пробег не может быть отрицательным'),
   note: z.string().optional(),
+  recordedAt: z.string().optional(),
 })
 
 export type LogMileageFormValues = z.infer<typeof logMileageSchema>

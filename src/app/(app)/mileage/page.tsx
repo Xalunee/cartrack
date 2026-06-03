@@ -1,11 +1,29 @@
 'use client'
 
+import { useState } from 'react'
 import { useCarQuery } from '@entities/car'
-import { useMileageQuery } from '@entities/mileage-log'
+import { useMileageQuery, useDeleteMileageLogMutation, type MileageLog } from '@entities/mileage-log'
 import { LogMileageDialog } from '@features/log-mileage'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, TrendingUp, Calendar, Route, Clock } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
+import { Plus, TrendingUp, Calendar, Route, Clock, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
@@ -15,6 +33,9 @@ import { ru } from 'date-fns/locale'
 export default function MileagePage() {
   const { data: car } = useCarQuery()
   const { data, isLoading } = useMileageQuery()
+  const deleteMutation = useDeleteMileageLogMutation()
+  const [editingLog, setEditingLog] = useState<MileageLog | null>(null)
+  const [deletingLog, setDeletingLog] = useState<MileageLog | null>(null)
 
   const chartData = data?.logs
     ?.slice()
@@ -161,19 +182,37 @@ export default function MileagePage() {
               const diff = prev ? log.mileage - prev.mileage : null
               return (
                 <Card key={log.id} className="card-hover">
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <div>
+                  <CardContent className="p-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{log.mileage.toLocaleString('ru')} км</p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(log.recordedAt), 'd MMMM yyyy, HH:mm', { locale: ru })}
                         {log.note && <span> · {log.note}</span>}
                       </p>
                     </div>
-                    {diff !== null && diff > 0 && (
-                      <span className="text-xs font-medium text-muted-foreground">
-                        +{diff.toLocaleString('ru')} км
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {diff !== null && diff > 0 && (
+                        <span className="text-xs font-medium text-muted-foreground">
+                          +{diff.toLocaleString('ru')} км
+                        </span>
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditingLog(log)}>
+                            <Pencil className="h-3.5 w-3.5" />
+                            Редактировать
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem variant="destructive" onClick={() => setDeletingLog(log)}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Удалить
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </CardContent>
                 </Card>
               )
@@ -187,6 +226,46 @@ export default function MileagePage() {
           </Card>
         )}
       </div>
+      {editingLog && car && (
+        <LogMileageDialog
+          key={editingLog.id}
+          currentMileage={car.currentMileage}
+          editLog={editingLog}
+          onClose={() => setEditingLog(null)}
+        />
+      )}
+
+      <AlertDialog open={!!deletingLog} onOpenChange={(v) => { if (!v) setDeletingLog(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить запись?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Запись{' '}
+              <span className="font-semibold">
+                {deletingLog?.mileage.toLocaleString('ru')} км
+              </span>{' '}
+              от{' '}
+              {deletingLog && format(new Date(deletingLog.recordedAt), 'd MMMM yyyy', { locale: ru })}{' '}
+              будет удалена. Это действие нельзя отменить.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (deletingLog) {
+                  deleteMutation.mutate(deletingLog.id, {
+                    onSuccess: () => setDeletingLog(null),
+                  })
+                }
+              }}
+            >
+              {deleteMutation.isPending ? 'Удаление...' : 'Удалить'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
