@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -17,6 +18,7 @@ interface UserInfo {
 }
 
 export default function SettingsPage() {
+  const router = useRouter()
   const [user, setUser] = useState<UserInfo | null>(null)
   const [linkCode, setLinkCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -190,7 +192,7 @@ export default function SettingsPage() {
       <Button
         variant="outline"
         className="w-full"
-        onClick={() => signOut({ callbackUrl: '/login' })}
+        onClick={async () => { await signOut({ redirect: false }); router.push('/login') }}
       >
         <LogOut className="h-4 w-4 mr-2" />
         Выйти

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 import { ThemeToggle } from '@shared/ui'
@@ -17,6 +17,12 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  async function handleLogout() {
+    await signOut({ redirect: false })
+    router.push('/login')
+  }
 
   return (
     <aside className="hidden md:flex flex-col w-56 border-r h-screen sticky top-0 p-4 gap-1 glass">
@@ -42,7 +48,7 @@ export function Sidebar() {
         )
       })}
       <button
-        onClick={() => signOut({ callbackUrl: '/login' })}
+        onClick={handleLogout}
         className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors w-full mt-auto"
       >
         <LogOut className="h-4 w-4" />
