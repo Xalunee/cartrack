@@ -38,7 +38,7 @@ export default function MaintenanceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4 page-enter">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-4 page-enter">
         <div className="h-8 w-48 skeleton" />
         <div className="h-40 rounded-xl skeleton" />
         <div className="h-60 rounded-xl skeleton" />
@@ -48,14 +48,14 @@ export default function MaintenanceDetailPage() {
 
   if (!item) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 page-enter">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 page-enter">
         <p className="text-muted-foreground">Позиция не найдена</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+    <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => router.back()}>

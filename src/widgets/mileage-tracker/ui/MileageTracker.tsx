@@ -102,9 +102,10 @@ export function MileageTracker() {
                 >
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
                     tickLine={false}
                     axisLine={false}
+                    padding={{ left: 16, right: 16 }}
                   />
                   <YAxis
                     hide

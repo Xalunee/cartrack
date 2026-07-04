@@ -59,7 +59,7 @@ export function Sidebar() {
           Выйти
         </button>
         <div className="pt-1 px-3 flex items-center justify-between">
-          <span className="text-[11px] text-muted-foreground">Тема</span>
+          <span className="text-[13px] text-muted-foreground">Тема</span>
           <ThemeToggle />
         </div>
       </div>

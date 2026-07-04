@@ -113,11 +113,11 @@ export function DashboardPage() {
 
       <div className="animate-fade-in-delay-2">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground">
             Обслуживание
           </h2>
           <MaintenanceDialog trigger={
-            <Button variant="ghost" size="sm">
+            <Button variant="outline" size="sm">
               <Plus className="h-3.5 w-3.5 mr-1" /> Добавить
             </Button>
           } />

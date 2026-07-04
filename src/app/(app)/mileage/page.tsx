@@ -55,7 +55,7 @@ export default function MileagePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-6 page-enter">
         <div className="h-7 w-32 skeleton" />
         <div className="h-64 skeleton rounded-xl" />
         <div className="grid grid-cols-2 gap-3">
@@ -67,7 +67,7 @@ export default function MileagePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+    <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Пробег</h1>
@@ -126,7 +126,7 @@ export default function MileagePage() {
           <CardContent className="select-none">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} tickLine={false} axisLine={false} />
                 <YAxis hide domain={['dataMin - 200', 'dataMax + 200']} />
                 <Tooltip
                   content={({ active, payload }) => {

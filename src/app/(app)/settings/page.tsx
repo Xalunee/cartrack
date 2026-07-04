@@ -76,7 +76,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
         <div className="h-7 w-32 skeleton" />
         <div className="h-40 skeleton rounded-xl" />
         <div className="h-48 skeleton rounded-xl" />
@@ -85,7 +85,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+    <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       <div className="mb-5">
         <h1 className="text-lg font-semibold tracking-tight">Настройки</h1>
       </div>

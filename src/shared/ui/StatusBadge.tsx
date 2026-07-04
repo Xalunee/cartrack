@@ -7,9 +7,9 @@ interface StatusBadgeProps {
 }
 
 const config: Record<MaintenanceStatus, { label: string; style: React.CSSProperties }> = {
-  ok: { label: 'OK', style: { color: 'hsl(var(--status-ok))', backgroundColor: 'hsl(var(--status-ok-bg))' } },
-  soon: { label: 'Скоро', style: { color: 'hsl(var(--status-soon))', backgroundColor: 'hsl(var(--status-soon-bg))' } },
-  critical: { label: 'Критично', style: { color: 'hsl(var(--status-critical))', backgroundColor: 'hsl(var(--status-critical-bg))' } },
+  ok: { label: 'OK', style: { color: 'white', backgroundColor: 'hsl(var(--status-ok))' } },
+  soon: { label: 'Скоро', style: { color: 'white', backgroundColor: 'hsl(var(--status-soon))' } },
+  critical: { label: 'Критично', style: { color: 'white', backgroundColor: 'hsl(var(--status-critical))' } },
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {

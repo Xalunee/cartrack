@@ -46,7 +46,7 @@ export function StatusOverview() {
       {items.map((item) => (
         <Link key={item.id} href={`/maintenance/${item.id}`} className="block">
           <Card
-            className="overflow-hidden card-hover cursor-pointer border-l-2"
+            className="overflow-hidden card-hover cursor-pointer border-l-2 py-0"
             style={{ borderLeftColor: `hsl(var(--status-${item.resource.status}))` }}
           >
             <CardContent className="p-3">

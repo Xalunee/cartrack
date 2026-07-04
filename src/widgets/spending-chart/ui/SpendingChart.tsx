@@ -43,11 +43,11 @@ export function SpendingChart() {
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
         {chartData && chartData.length >= 2 ? (
-          <ResponsiveContainer width="100%" height={160} className="flex-1">
+          <ResponsiveContainer width="100%" height="100%" minHeight={180} className="flex-1">
             <BarChart data={chartData} barSize={28}>
               <XAxis
                 dataKey="name"
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
                 tickLine={false}
                 axisLine={false}
               />
@@ -68,7 +68,7 @@ export function SpendingChart() {
                 {chartData.map((_, index) => (
                   <Cell
                     key={index}
-                    fill={index === 0 ? 'hsl(var(--chart-line))' : 'hsl(var(--muted-foreground) / 0.25)'}
+                    fill={index === 0 ? 'hsl(var(--chart-line))' : 'color-mix(in srgb, var(--muted-foreground) 35%, transparent)'}
                   />
                 ))}
               </Bar>
@@ -76,7 +76,7 @@ export function SpendingChart() {
           </ResponsiveContainer>
         ) : null}
         {topItems && topItems.length > 0 ? (
-          <div className="mt-3 space-y-1.5">
+          <div className="mt-2 space-y-1.5">
             {topItems.map((item) => (
               <div key={item.id} className="flex items-center justify-between gap-2 text-xs">
                 <span className="text-muted-foreground truncate">{item.name}</span>

@@ -20,7 +20,7 @@ export default function MaintenancePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-6 page-enter">
         <div className="h-7 w-40 skeleton" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[1, 2, 3, 4].map((i) => <div key={i} className="h-24 skeleton rounded-xl" />)}
@@ -33,7 +33,7 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+    <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Обслуживание</h1>
