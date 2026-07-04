@@ -4,8 +4,13 @@ import { ThemeToggle } from '@shared/ui'
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between px-4 h-14 border-b md:hidden sticky top-0 z-50 bg-background/80 backdrop-filter backdrop-blur-lg">
-      <span className="text-base font-semibold tracking-tight">CarTrack</span>
+    <header className="flex items-center justify-between px-4 h-12 border-b border-border md:hidden sticky top-0 z-50 bg-background">
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-6 rounded-md bg-foreground flex items-center justify-center">
+          <span className="text-background font-bold text-[10px]">CT</span>
+        </div>
+        <span className="text-sm font-semibold tracking-tight">CarTrack</span>
+      </div>
       <ThemeToggle />
     </header>
   )

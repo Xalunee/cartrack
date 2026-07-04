@@ -25,9 +25,12 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden md:flex flex-col w-56 border-r h-screen sticky top-0 p-4 gap-1 glass">
-      <div className="mb-6 px-3">
-        <span className="text-lg font-semibold tracking-tight">CarTrack</span>
+    <aside className="hidden md:flex flex-col w-48 border-r border-border bg-background h-screen sticky top-0 p-3 gap-0.5">
+      <div className="flex items-center gap-2 px-3 py-4 mb-2">
+        <div className="h-6 w-6 rounded-md bg-foreground flex items-center justify-center">
+          <span className="text-background font-bold text-[10px]">CT</span>
+        </div>
+        <span className="text-sm font-semibold tracking-tight">CarTrack</span>
       </div>
       {links.map(({ href, label, icon: Icon }) => {
         const active = pathname === href
@@ -36,10 +39,10 @@ export function Sidebar() {
             key={href}
             href={href}
             className={cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+              'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] transition-colors',
               active
-                ? 'bg-primary/10 text-primary font-medium'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                ? 'bg-accent text-foreground font-medium'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
             )}
           >
             <Icon className="h-4 w-4" />
@@ -47,16 +50,18 @@ export function Sidebar() {
           </Link>
         )
       })}
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors w-full mt-auto"
-      >
-        <LogOut className="h-4 w-4" />
-        Выйти
-      </button>
-      <div className="pb-2 px-3 flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Тема</span>
-        <ThemeToggle />
+      <div className="mt-auto border-t border-border pt-2">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors w-full"
+        >
+          <LogOut className="h-4 w-4" />
+          Выйти
+        </button>
+        <div className="pt-1 px-3 flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground">Тема</span>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   )
