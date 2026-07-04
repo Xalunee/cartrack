@@ -55,8 +55,8 @@ export function EventLog({ filter }: EventLogProps) {
   if (!filteredEvents?.length) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-10 gap-3">
-          <FileText className="h-8 w-8 text-muted-foreground" />
+        <CardContent className="flex flex-col items-center justify-center py-8 gap-2">
+          <FileText className="h-6 w-6 text-muted-foreground" />
           <p className="text-sm text-muted-foreground text-center">
             Нет событий. Добавьте первое.
           </p>
@@ -66,13 +66,13 @@ export function EventLog({ filter }: EventLogProps) {
   }
 
   return (
-    <div className="space-y-3 stagger-children">
+    <div className="space-y-2 stagger-children">
       {filteredEvents.map((event) => {
         const config = typeConfig[event.type]
         const Icon = config.icon
         return (
           <Card key={event.id} className="overflow-hidden card-hover">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <div className={cn('p-2 rounded-lg flex-shrink-0', config.className.split(' ')[0])}>

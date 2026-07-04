@@ -55,44 +55,44 @@ export default function MaintenanceDetailPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-5">
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-xl font-semibold">{item.name}</h1>
+          <h1 className="text-lg font-semibold tracking-tight">{item.name}</h1>
         </div>
         <StatusBadge status={item.resource.status} />
       </div>
 
       {/* Resource card */}
-      <Card className="glass">
-        <CardContent className="p-5">
+      <Card>
+        <CardContent className="p-4">
           <div className="flex items-end justify-between mb-3">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Износ ресурса</p>
-              <p className="text-3xl font-semibold">{item.resource.usedPercent}%</p>
+              <p className="text-xs text-muted-foreground mb-1">Износ ресурса</p>
+              <p className="text-3xl font-bold tracking-tight tabular-nums">{item.resource.usedPercent}%</p>
             </div>
             {item.resource.forecastDate && (
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">След. замена</p>
-                <p className="text-lg font-medium">
+                <p className="text-xs text-muted-foreground">След. замена</p>
+                <p className="text-sm font-medium">
                   ~{format(new Date(item.resource.forecastDate), 'd MMM yyyy', { locale: ru })}
                 </p>
               </div>
             )}
           </div>
-          <ResourceBar usedPercent={item.resource.usedPercent} status={item.resource.status} className="h-2" />
+          <ResourceBar usedPercent={item.resource.usedPercent} status={item.resource.status} className="h-1.5" />
           <div className="flex gap-4 mt-3">
             {item.resource.remainingKm !== null && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground tabular-nums">
                 Осталось: {item.resource.remainingKm.toLocaleString('ru')} км
               </p>
             )}
             {item.resource.remainingDays !== null && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {item.resource.remainingDays > 0
                   ? `${item.resource.remainingDays} дн.`
                   : 'просрочено'}
@@ -122,7 +122,7 @@ export default function MaintenanceDetailPage() {
           )}
 
           <Separator />
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Последняя замена</p>
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Последняя замена</p>
 
           {item.lastServiceDate && (
             <div className="flex items-center gap-3">

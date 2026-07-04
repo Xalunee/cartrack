@@ -6,7 +6,7 @@ import { MaintenanceDialog } from '@features/add-maintenance'
 import { StatusOverview } from '@widgets/status-overview'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, Wrench, AlertTriangle, DollarSign, CheckCircle } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 export default function MaintenancePage() {
   const { data: car } = useCarQuery()
@@ -33,12 +33,12 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
-      <div className="flex items-center justify-between">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-semibold">Обслуживание</h1>
+          <h1 className="text-lg font-semibold tracking-tight">Обслуживание</h1>
           {car && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground tabular-nums">
               {car.brand} {car.model} · {car.currentMileage.toLocaleString('ru')} км
             </p>
           )}
@@ -49,24 +49,16 @@ export default function MaintenancePage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Wrench className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Всего</span>
-            </div>
-            <p className="text-lg font-semibold">{totalItems}</p>
-            <p className="text-[10px] text-muted-foreground">позиций</p>
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{totalItems}</p>
+            <p className="text-[11px] text-muted-foreground">Всего позиций</p>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
-              <span className="text-xs text-muted-foreground">Внимание</span>
-            </div>
-            <p className="text-lg font-semibold">{criticalCount + soonCount}</p>
-            <p className="text-[10px] text-muted-foreground">
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{criticalCount + soonCount}</p>
+            <p className="text-[11px] text-muted-foreground">
               {criticalCount > 0 && `${criticalCount} крит.`}
               {criticalCount > 0 && soonCount > 0 && ' + '}
               {soonCount > 0 && `${soonCount} скоро`}
@@ -74,34 +66,24 @@ export default function MaintenancePage() {
             </p>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-              <span className="text-xs text-muted-foreground">В норме</span>
-            </div>
-            <p className="text-lg font-semibold">{okCount}</p>
-            <p className="text-[10px] text-muted-foreground">позиций</p>
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{okCount}</p>
+            <p className="text-[11px] text-muted-foreground">В норме</p>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Потрачено</span>
-            </div>
-            <p className="text-lg font-semibold">{totalSpent.toLocaleString('ru')}</p>
-            <p className="text-[10px] text-muted-foreground">₽</p>
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{totalSpent.toLocaleString('ru')} ₽</p>
+            <p className="text-[11px] text-muted-foreground">Потрачено</p>
           </CardContent>
         </Card>
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Позиции · {totalItems}
-          </h2>
-        </div>
+        <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
+          Позиции · {totalItems}
+        </h2>
         <StatusOverview />
       </div>
     </div>

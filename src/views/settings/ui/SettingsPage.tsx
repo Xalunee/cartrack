@@ -94,8 +94,10 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-      <h1 className="text-xl font-semibold">Настройки</h1>
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      <div className="mb-5">
+        <h1 className="text-lg font-semibold tracking-tight">Настройки</h1>
+      </div>
 
       {/* Profile */}
       <Card>
@@ -134,7 +136,7 @@ export function SettingsPage() {
                   {updateMutation.isPending ? 'Сохранение...' : 'Сохранить'}
                 </Button>
                 {profileSaved && (
-                  <span className="flex items-center gap-1 text-sm text-green-600">
+                  <span className="flex items-center gap-1 text-sm" style={{ color: 'hsl(var(--status-ok))' }}>
                     <CheckCircle2 className="h-4 w-4" />
                     Сохранено
                   </span>
@@ -209,7 +211,7 @@ export function SettingsPage() {
                   {updateMutation.isPending ? 'Обновление...' : 'Обновить пароль'}
                 </Button>
                 {passwordSaved && (
-                  <span className="flex items-center gap-1 text-sm text-green-600">
+                  <span className="flex items-center gap-1 text-sm" style={{ color: 'hsl(var(--status-ok))' }}>
                     <CheckCircle2 className="h-4 w-4" />
                     Пароль изменён
                   </span>

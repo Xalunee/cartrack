@@ -51,8 +51,8 @@ export function DashboardPage() {
       <div className="max-w-2xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-sm text-center">
           <CardContent className="pt-8 pb-8 space-y-4">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Car className="h-6 w-6 text-primary" />
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+              <Car className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="space-y-1">
               <h2 className="text-lg font-semibold">Добавьте свой автомобиль</h2>
@@ -70,13 +70,13 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
-      <div className="flex items-start justify-between animate-fade-in">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+      <div className="flex items-center justify-between mb-5 animate-fade-in">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-lg font-semibold tracking-tight">
             {car.brand} {car.model}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-[13px] text-muted-foreground tabular-nums">
             {car.year} · {car.currentMileage.toLocaleString('ru')} км
           </p>
         </div>
@@ -106,14 +106,14 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 animate-fade-in-delay-1">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 items-stretch animate-fade-in-delay-1">
         <MileageTracker />
         <SpendingChart />
       </div>
 
       <div className="animate-fade-in-delay-2">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
             Обслуживание
           </h2>
           <MaintenanceDialog trigger={

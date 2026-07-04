@@ -23,9 +23,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Plus, TrendingUp, Calendar, Route, Clock, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { format, formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -67,12 +67,12 @@ export default function MileagePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
-      <div className="flex items-center justify-between">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-semibold">Пробег</h1>
+          <h1 className="text-lg font-semibold tracking-tight">Пробег</h1>
           {car && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground tabular-nums">
               {car.brand} {car.model} · {car.currentMileage.toLocaleString('ru')} км
             </p>
           )}
@@ -90,59 +90,43 @@ export default function MileagePage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Route className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Текущий</span>
-            </div>
-            <p className="text-lg font-semibold">{car?.currentMileage.toLocaleString('ru') ?? '—'}</p>
-            <p className="text-[10px] text-muted-foreground">км</p>
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{car?.currentMileage.toLocaleString('ru') ?? '—'}</p>
+            <p className="text-[11px] text-muted-foreground">Текущий, км</p>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Темп</span>
-            </div>
-            <p className="text-lg font-semibold">{data?.pace ? `~${Math.round(data.pace.kmPerWeek)}` : '—'}</p>
-            <p className="text-[10px] text-muted-foreground">км/неделю</p>
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{data?.pace ? `~${Math.round(data.pace.kmPerWeek)}` : '—'}</p>
+            <p className="text-[11px] text-muted-foreground">Темп, км/неделю</p>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Записей</span>
-            </div>
-            <p className="text-lg font-semibold">{totalLogs}</p>
-            <p className="text-[10px] text-muted-foreground">всего</p>
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold tabular-nums">{totalLogs}</p>
+            <p className="text-[11px] text-muted-foreground">Записей всего</p>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Последний</span>
-            </div>
-            <p className="text-lg font-semibold">
+        <Card>
+          <CardContent className="p-3">
+            <p className="text-xl font-semibold">
               {lastLog ? formatDistanceToNow(new Date(lastLog.recordedAt), { locale: ru, addSuffix: true }) : '—'}
             </p>
+            <p className="text-[11px] text-muted-foreground">Последний</p>
           </CardContent>
         </Card>
       </div>
 
       {chartData && chartData.length >= 2 && (
-        <Card className="glass">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Динамика пробега</CardTitle>
           </CardHeader>
           <CardContent className="select-none">
-            <ResponsiveContainer width="100%" height={240}>
-              <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} />
                 <YAxis hide domain={['dataMin - 200', 'dataMax + 200']} />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -160,10 +144,10 @@ export default function MileagePage() {
                 <Line
                   type="monotone"
                   dataKey="mileage"
-                  stroke="hsl(var(--primary))"
+                  stroke="hsl(var(--chart-line))"
                   strokeWidth={2}
-                  dot={{ r: 3, fill: 'hsl(var(--primary))' }}
-                  activeDot={{ r: 6, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
+                  dot={{ r: 3, fill: 'hsl(var(--chart-line))', strokeWidth: 0 }}
+                  activeDot={{ r: 5, strokeWidth: 2, stroke: 'hsl(var(--card))' }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -172,7 +156,7 @@ export default function MileagePage() {
       )}
 
       <div>
-        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+        <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
           История · {totalLogs} записей
         </h2>
         {logs.length > 0 ? (
@@ -184,7 +168,7 @@ export default function MileagePage() {
                 <Card key={log.id} className="card-hover">
                   <CardContent className="p-3 flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{log.mileage.toLocaleString('ru')} км</p>
+                      <p className="text-sm font-medium tabular-nums">{log.mileage.toLocaleString('ru')} км</p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(log.recordedAt), 'd MMMM yyyy, HH:mm', { locale: ru })}
                         {log.note && <span> · {log.note}</span>}
@@ -192,7 +176,7 @@ export default function MileagePage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {diff !== null && diff > 0 && (
-                        <span className="text-xs font-medium text-muted-foreground">
+                        <span className="text-xs font-medium text-muted-foreground tabular-nums">
                           +{diff.toLocaleString('ru')} км
                         </span>
                       )}
@@ -220,7 +204,7 @@ export default function MileagePage() {
           </div>
         ) : (
           <Card>
-            <CardContent className="py-10 text-center">
+            <CardContent className="py-8 text-center">
               <p className="text-sm text-muted-foreground">Нет записей пробега</p>
             </CardContent>
           </Card>

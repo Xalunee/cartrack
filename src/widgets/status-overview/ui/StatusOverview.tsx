@@ -26,8 +26,8 @@ export function StatusOverview() {
   if (!items?.length) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-10 gap-3">
-          <Wrench className="h-8 w-8 text-muted-foreground" />
+        <CardContent className="flex flex-col items-center justify-center py-8 gap-2">
+          <Wrench className="h-6 w-6 text-muted-foreground" />
           <p className="text-sm text-muted-foreground text-center">
             Нет позиций обслуживания. Добавьте первую.
           </p>

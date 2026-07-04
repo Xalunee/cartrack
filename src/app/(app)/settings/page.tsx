@@ -76,7 +76,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
         <div className="h-7 w-32 skeleton" />
         <div className="h-40 skeleton rounded-xl" />
         <div className="h-48 skeleton rounded-xl" />
@@ -85,10 +85,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
-      <h1 className="text-xl font-semibold">Настройки</h1>
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+      <div className="mb-5">
+        <h1 className="text-lg font-semibold tracking-tight">Настройки</h1>
+      </div>
 
-      <Card className="glass card-hover">
+      <Card>
         <CardHeader>
           <CardTitle className="text-base">Аккаунт</CardTitle>
         </CardHeader>
@@ -104,7 +106,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="glass card-hover">
+      <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
@@ -115,7 +117,7 @@ export default function SettingsPage() {
           {user?.telegramChatId ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500" />
+                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: 'hsl(var(--status-ok))' }} />
                 <span className="text-sm">Telegram привязан</span>
               </div>
               <Button
@@ -164,7 +166,7 @@ export default function SettingsPage() {
       </Card>
 
       {!isStandalone && (
-        <Card className="glass card-hover">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Download className="h-4 w-4" />
