@@ -57,7 +57,7 @@ export function MileageTracker() {
 
   return (
     <>
-      <Card className="glass card-hover">
+      <Card>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
@@ -80,12 +80,12 @@ export function MileageTracker() {
         <CardContent>
           {car && (
             <div className="mb-4">
-              <p className="text-3xl font-semibold tracking-tight">
+              <p className="text-4xl font-bold tracking-tight tabular-nums">
                 {car.currentMileage.toLocaleString('ru')}
-                <span className="text-base font-normal text-muted-foreground ml-1">км</span>
+                <span className="text-sm font-normal text-muted-foreground ml-1.5">км</span>
               </p>
               {data?.pace && (
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   ~{Math.round(data.pace.kmPerWeek)} км/неделю
                 </p>
               )}
@@ -94,15 +94,15 @@ export function MileageTracker() {
           {isLoading && <div className="h-32 skeleton" />}
           {chartData && chartData.length >= 2 && (
             <div className="select-none">
-              <ResponsiveContainer width="100%" height={120}>
+              <ResponsiveContainer width="100%" height={140}>
                 <LineChart
                   data={chartData}
-                  margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+                  margin={{ top: 8, right: 8, bottom: 0, left: 8 }}
                   style={{ cursor: 'default' }}
                 >
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                     tickLine={false}
                     axisLine={false}
                   />
@@ -127,7 +127,7 @@ export function MileageTracker() {
                   <Line
                     type="monotone"
                     dataKey="mileage"
-                    stroke="hsl(var(--primary))"
+                    stroke="hsl(var(--chart-line))"
                     strokeWidth={2}
                     dot={(props: { cx?: number; cy?: number; index?: number }) => {
                       const { cx, cy, index } = props
@@ -137,15 +137,15 @@ export function MileageTracker() {
                           key={index}
                           cx={cx}
                           cy={cy}
-                          r={isActive ? 7 : 4}
-                          fill="hsl(var(--primary))"
-                          stroke={isActive ? 'hsl(var(--background))' : 'none'}
-                          strokeWidth={isActive ? 3 : 0}
+                          r={isActive ? 6 : 3}
+                          fill="hsl(var(--chart-line))"
+                          stroke={isActive ? 'hsl(var(--card))' : 'none'}
+                          strokeWidth={isActive ? 2 : 0}
                           className="transition-all duration-200"
                         />
                       )
                     }}
-                    activeDot={{ r: 6, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
+                    activeDot={{ r: 5, strokeWidth: 2, stroke: 'hsl(var(--card))' }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -157,8 +157,8 @@ export function MileageTracker() {
             </p>
           )}
           {data?.logs && data.logs.length > 0 && (
-            <div className="mt-4 space-y-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">История</p>
+            <div className="mt-4">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">История</p>
               {data.logs.slice(0, 5).map((log) => {
                 const chartIndex = chartData
                   ? chartData.findIndex((d) => d.mileage === log.mileage)
@@ -168,15 +168,15 @@ export function MileageTracker() {
                   <div
                     key={log.id}
                     className={cn(
-                      'flex items-center justify-between py-1.5 border-b border-border/50 last:border-0 rounded px-1 -mx-1 transition-colors',
-                      activeIndex === chartIndex && 'bg-primary/10'
+                      'flex items-center justify-between py-2 border-b border-border last:border-0 rounded px-1 -mx-1 transition-colors',
+                      activeIndex === chartIndex && 'bg-accent'
                     )}
                   >
                     <div
                       className="flex-1 cursor-pointer min-w-0"
                       onClick={() => setActiveIndex(chartIndex === activeIndex ? null : chartIndex)}
                     >
-                      <span className="text-sm">{log.mileage.toLocaleString('ru')} км</span>
+                      <span className="text-[13px] tabular-nums">{log.mileage.toLocaleString('ru')} км</span>
                       <span className="text-xs text-muted-foreground ml-2">
                         {format(new Date(log.recordedAt), 'd MMM', { locale: ru })}
                       </span>
