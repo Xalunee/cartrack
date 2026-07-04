@@ -27,7 +27,7 @@ export function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 page-enter">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-6 page-enter">
         <div className="flex items-start justify-between">
           <div>
             <div className="h-6 w-40 skeleton mb-2" />
@@ -48,7 +48,7 @@ export function DashboardPage() {
 
   if (!car) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
+      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-sm text-center">
           <CardContent className="pt-8 pb-8 space-y-4">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -70,7 +70,7 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 page-enter">
+    <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       <div className="flex items-center justify-between mb-5 animate-fade-in">
         <div>
           <h1 className="text-lg font-semibold tracking-tight">

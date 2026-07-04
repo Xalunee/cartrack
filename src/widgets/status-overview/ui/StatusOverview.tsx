@@ -45,9 +45,12 @@ export function StatusOverview() {
     <div className="space-y-2 stagger-children">
       {items.map((item) => (
         <Link key={item.id} href={`/maintenance/${item.id}`} className="block">
-          <Card className="overflow-hidden card-hover cursor-pointer">
-            <CardContent className="p-3.5">
-              <div className="flex items-start justify-between gap-2 mb-2">
+          <Card
+            className="overflow-hidden card-hover cursor-pointer border-l-2"
+            style={{ borderLeftColor: `hsl(var(--status-${item.resource.status}))` }}
+          >
+            <CardContent className="p-3">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">{item.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">

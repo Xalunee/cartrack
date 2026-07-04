@@ -145,7 +145,7 @@ function AuroraBackdrop() {
 function LandingHeader() {
   return (
     <div className="fixed left-0 right-0 top-4 z-50 px-4 sm:px-8 lg:px-10">
-      <nav className="relative mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-white/[0.08] px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-xl">
+      <nav className="relative mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-black/60 px-3 py-2 shadow-lg shadow-black/40 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2 px-2">
           <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white">
             <span className="text-xs font-bold text-black">CT</span>
@@ -183,7 +183,7 @@ function AppPreview() {
       <div className="absolute inset-x-8 top-8 h-[320px] rounded-[2rem] bg-blue-500/10 blur-2xl sm:h-[380px]" />
 
       <div className="absolute left-5 top-20 z-20 hidden w-52 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.08] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:block md:left-3">
-        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-white/35">Расходы за год</p>
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-white/60">Расходы за год</p>
         <p className="mt-2 text-xl font-semibold text-white">42 800 ₽</p>
         <div className="mt-4 flex h-10 items-end gap-2">
           {[28, 36, 42, 35, 48, 54, 50, 64, 60, 72].map((height, index) => (
@@ -201,17 +201,17 @@ function AppPreview() {
         <div className="mt-2 flex max-h-[390px] flex-col overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-black/30 px-4 pb-3 pt-5 sm:max-h-[470px] sm:px-5 sm:pb-4 sm:pt-6">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-medium text-white/35">Skoda Octavia</p>
+              <p className="text-xs font-medium text-white/60">Skoda Octavia</p>
               <h2 className="mt-1 text-lg font-semibold text-white sm:text-xl">2019 · 1.4 TSI</h2>
             </div>
-            <div className="rounded-full bg-white/[0.06] px-2 py-1 text-xs text-white/40">•••</div>
+            <div className="rounded-full bg-white/[0.06] px-2 py-1 text-xs text-white/65">•••</div>
           </div>
 
           <div className="mt-7 sm:mt-9">
-            <p className="text-xs uppercase tracking-[0.22em] text-white/35">Текущий пробег</p>
+            <p className="text-xs uppercase tracking-[0.22em] text-white/60">Текущий пробег</p>
             <div className="mt-1 flex items-end gap-2">
               <span className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">87 420</span>
-              <span className="pb-1 text-sm text-white/40">км</span>
+              <span className="pb-1 text-sm text-white/65">км</span>
             </div>
             <div className="mt-3 inline-flex rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
               +248 км за неделю
@@ -219,10 +219,10 @@ function AppPreview() {
           </div>
 
           <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4 sm:mt-8">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-white/35">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-white/60">
               Обслуживание
             </p>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-white/35">4 пункта</p>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-white/60">4 пункта</p>
           </div>
 
           <div className="mt-3 space-y-2 sm:mt-4 sm:space-y-3">
@@ -231,7 +231,7 @@ function AppPreview() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-white">{item.title}</p>
-                    <p className="mt-0.5 text-xs text-white/40">{item.meta}</p>
+                    <p className="mt-0.5 text-xs text-white/65">{item.meta}</p>
                   </div>
                   <span
                     className={
@@ -255,20 +255,20 @@ function AppPreview() {
               <span className="text-[7px] text-white/60">Главная</span>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <Wrench className="h-4 w-4 text-white/30" />
-              <span className="text-[7px] text-white/30">Сервис</span>
+              <Wrench className="h-4 w-4 text-white/55" />
+              <span className="text-[7px] text-white/55">Сервис</span>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <TrendingUp className="h-4 w-4 text-white/30" />
-              <span className="text-[7px] text-white/30">Пробег</span>
+              <TrendingUp className="h-4 w-4 text-white/55" />
+              <span className="text-[7px] text-white/55">Пробег</span>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <AlertTriangle className="h-4 w-4 text-white/30" />
-              <span className="text-[7px] text-white/30">События</span>
+              <AlertTriangle className="h-4 w-4 text-white/55" />
+              <span className="text-[7px] text-white/55">События</span>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <Settings className="h-4 w-4 text-white/30" />
-              <span className="text-[7px] text-white/30">Настройки</span>
+              <Settings className="h-4 w-4 text-white/55" />
+              <span className="text-[7px] text-white/55">Настройки</span>
             </div>
           </div>
           <div className="mx-auto mb-1 mt-1.5 h-1 w-20 rounded-full bg-white/20" />
@@ -276,9 +276,9 @@ function AppPreview() {
       </div>
 
       <div className="absolute bottom-8 right-5 z-20 w-44 rounded-3xl border border-white/10 bg-white/[0.08] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:bottom-16 sm:right-4 sm:w-48 sm:p-5">
-        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/35">След. замена масла</p>
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/60">След. замена масла</p>
         <p className="mt-2 text-xl font-semibold text-white sm:text-2xl">~15 авг</p>
-        <p className="mt-1 text-xs text-white/50">прогноз по темпу езды</p>
+        <p className="mt-1 text-xs text-white/70">прогноз по темпу езды</p>
       </div>
     </div>
   )
@@ -322,7 +322,7 @@ export function LandingPage() {
               </MagneticButton>
             </div>
 
-            <div className="mt-8 inline-flex rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-white/50">
+            <div className="mt-8 inline-flex rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-white/70">
               Бесплатно для одной машины · Без рекламы
             </div>
           </div>
@@ -335,7 +335,7 @@ export function LandingPage() {
             {stats.map((stat) => (
               <div key={stat.label} className="rounded-3xl border border-white/[0.08] bg-white/[0.04] p-5 backdrop-blur-xl">
                 <p className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">{stat.value}</p>
-                <p className="mt-2 text-sm text-white/40">{stat.label}</p>
+                <p className="mt-2 text-sm text-white/65">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -344,7 +344,7 @@ export function LandingPage() {
         <section id="features" className="mx-auto max-w-7xl px-4 py-20 sm:px-8 sm:py-28 lg:px-10">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/35">Возможности</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">Возможности</p>
               <h2 className="mt-4 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
                 Всё важное про машину в одном спокойном месте.
               </h2>
@@ -366,10 +366,10 @@ export function LandingPage() {
                     <div className="flex size-10 items-center justify-center rounded-2xl bg-white/10 text-white">
                       <Icon className="size-5" />
                     </div>
-                    <p className="text-sm font-semibold text-white/30">{String(index + 1).padStart(2, '0')}</p>
+                    <p className="text-sm font-semibold text-white/55">{String(index + 1).padStart(2, '0')}</p>
                   </div>
                   <h3 className="mt-5 text-xl font-semibold tracking-tight text-white">{feature.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/50">{feature.description}</p>
+                  <p className="mt-3 text-sm leading-6 text-white/70">{feature.description}</p>
                 </div>
               )
             })}
@@ -378,7 +378,7 @@ export function LandingPage() {
 
         <section id="how" className="mx-auto max-w-5xl px-4 pb-16 sm:px-8 lg:px-10">
           <div className="rounded-[2rem] border border-white/[0.08] bg-white/[0.03] p-6 text-center shadow-[0_22px_70px_rgba(0,0,0,0.18)] backdrop-blur-xl sm:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/35">Звучит знакомо?</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">Звучит знакомо?</p>
             <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-tight text-white">
               CarTrack помнит за вас
             </h2>
@@ -430,14 +430,14 @@ export function LandingPage() {
                 <span className="h-2 w-2 rounded-full bg-blue-500" />
                 <span className="font-medium text-white">CarTrack</span>
               </div>
-              <p className="max-w-xs text-sm text-white/40">
+              <p className="max-w-xs text-sm text-white/65">
                 Трекер обслуживания автомобиля. Сделано для тех, кто любит свою машину.
               </p>
             </div>
 
             <div className="flex gap-12">
               <div>
-                <p className="mb-3 text-xs uppercase tracking-wider text-white/30">Продукт</p>
+                <p className="mb-3 text-xs uppercase tracking-wider text-white/55">Продукт</p>
                 <div className="flex flex-col gap-2">
                   <Link href="#features" className="text-sm text-white/60 transition-colors hover:text-white">Возможности</Link>
                   <Link href="/register" className="text-sm text-white/60 transition-colors hover:text-white">Регистрация</Link>
@@ -446,7 +446,7 @@ export function LandingPage() {
               </div>
 
               <div>
-                <p className="mb-3 text-xs uppercase tracking-wider text-white/30">Поддержка</p>
+                <p className="mb-3 text-xs uppercase tracking-wider text-white/55">Поддержка</p>
                 <div className="flex flex-col gap-2">
                   <a href="https://t.me/cartrack_official_bot" className="text-sm text-white/60 transition-colors hover:text-white">Telegram-бот</a>
                   <a href="mailto:xalune.work@gmail.com" className="text-sm text-white/60 transition-colors hover:text-white">xalune.work@gmail.com</a>
@@ -456,8 +456,8 @@ export function LandingPage() {
           </div>
 
           <div className="mt-10 flex items-center justify-between border-t border-white/[0.05] pt-6">
-            <span className="text-xs text-white/30">© 2026 CarTrack</span>
-            <span className="text-xs text-white/30">RU / EN</span>
+            <span className="text-xs text-white/55">© 2026 CarTrack</span>
+            <span className="text-xs text-white/55">RU / EN</span>
           </div>
         </div>
       </footer>

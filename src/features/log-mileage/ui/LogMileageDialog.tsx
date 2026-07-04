@@ -120,7 +120,7 @@ export function LogMileageDialog({
   }
 
   const dialogContent = (
-    <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mx-4">
+    <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>{isEdit ? 'Редактировать запись' : 'Обновить пробег'}</DialogTitle>
       </DialogHeader>

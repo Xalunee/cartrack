@@ -108,7 +108,7 @@ export function AddEventDialog({ trigger, event }: AddEventDialogProps) {
       <DialogTrigger asChild>
         {trigger ?? <Button variant="default">Добавить событие</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto mx-4">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Редактировать событие' : 'Новое событие'}</DialogTitle>
         </DialogHeader>

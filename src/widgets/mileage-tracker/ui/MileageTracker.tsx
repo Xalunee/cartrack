@@ -93,7 +93,7 @@ export function MileageTracker() {
           )}
           {isLoading && <div className="h-32 skeleton" />}
           {chartData && chartData.length >= 2 && (
-            <div className="select-none">
+            <div className="select-none outline-none [-webkit-tap-highlight-color:transparent]">
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart
                   data={chartData}
@@ -159,7 +159,7 @@ export function MileageTracker() {
           {data?.logs && data.logs.length > 0 && (
             <div className="mt-4">
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">История</p>
-              {data.logs.slice(0, 5).map((log) => {
+              {data.logs.slice(0, 3).map((log) => {
                 const chartIndex = chartData
                   ? chartData.findIndex((d) => d.mileage === log.mileage)
                   : -1
