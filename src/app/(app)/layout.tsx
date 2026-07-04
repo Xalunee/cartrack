@@ -3,11 +3,9 @@ import { Sidebar, BottomNav, Header } from '@widgets/navigation'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-background">
       <InstallBanner />
-      {/* Gradient mesh background */}
-      <div className="fixed inset-0 z-0 pointer-events-none gradient-mesh" />
-      <div className="relative z-10 flex min-h-screen">
+      <div className="relative flex min-h-screen">
         <Sidebar />
         <div className="flex-1 flex flex-col">
           <Header />
