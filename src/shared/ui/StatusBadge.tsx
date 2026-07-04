@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge'
 import { MaintenanceStatus } from '@shared/types'
 import { cn } from '@shared/lib/utils'
 
@@ -7,17 +6,20 @@ interface StatusBadgeProps {
   className?: string
 }
 
-const config: Record<MaintenanceStatus, { label: string; className: string }> = {
-  ok: { label: 'OK', className: 'bg-green-100 text-green-700 hover:bg-green-100' },
-  soon: { label: 'Скоро', className: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100' },
-  critical: { label: 'Критично', className: 'bg-red-100 text-red-700 hover:bg-red-100' },
+const config: Record<MaintenanceStatus, { label: string; style: React.CSSProperties }> = {
+  ok: { label: 'OK', style: { color: 'hsl(var(--status-ok))', backgroundColor: 'hsl(var(--status-ok-bg))' } },
+  soon: { label: 'Скоро', style: { color: 'hsl(var(--status-soon))', backgroundColor: 'hsl(var(--status-soon-bg))' } },
+  critical: { label: 'Критично', style: { color: 'hsl(var(--status-critical))', backgroundColor: 'hsl(var(--status-critical-bg))' } },
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const { label, className: statusClass } = config[status]
+  const { label, style } = config[status]
   return (
-    <Badge className={cn(statusClass, className)}>
+    <span
+      className={cn('inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium', className)}
+      style={style}
+    >
       {label}
-    </Badge>
+    </span>
   )
 }

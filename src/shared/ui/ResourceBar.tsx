@@ -8,17 +8,17 @@ interface ResourceBarProps {
 }
 
 const colorMap: Record<MaintenanceStatus, string> = {
-  ok: 'bg-green-500',
-  soon: 'bg-yellow-500',
-  critical: 'bg-red-500',
+  ok: 'hsl(var(--status-ok))',
+  soon: 'hsl(var(--status-soon))',
+  critical: 'hsl(var(--status-critical))',
 }
 
 export function ResourceBar({ usedPercent, status, className }: ResourceBarProps) {
   return (
-    <div className={cn('h-1.5 w-full rounded-full bg-muted overflow-hidden', className)}>
+    <div className={cn('h-1 w-full rounded-full bg-muted overflow-hidden', className)}>
       <div
-        className={cn('h-full rounded-full transition-all', colorMap[status])}
-        style={{ width: `${Math.min(usedPercent, 100)}%` }}
+        className="h-full rounded-full transition-all"
+        style={{ width: `${Math.min(usedPercent, 100)}%`, backgroundColor: colorMap[status] }}
       />
     </div>
   )
