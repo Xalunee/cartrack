@@ -4,17 +4,29 @@ import { db } from '@shared/lib/db'
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`
 
 async function sendTelegramMessage(chatId: string, text: string) {
-  await fetch(`${TELEGRAM_API}/sendMessage`, {
+  const res = await fetch(`${TELEGRAM_API}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text }),
   })
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`Telegram sendMessage ${res.status}: ${body}`)
+  }
 }
 
 export async function GET(req: Request) {
+  if (!process.env.CRON_SECRET) {
+    console.error('[cron/notify] CRON_SECRET is not set in this environment')
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
+  }
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!process.env.TELEGRAM_BOT_TOKEN) {
+    console.error('[cron/notify] TELEGRAM_BOT_TOKEN is not set in this environment')
+    return NextResponse.json({ error: 'TELEGRAM_BOT_TOKEN not configured' }, { status: 500 })
   }
 
   const users = await db.user.findMany({
@@ -32,16 +44,24 @@ export async function GET(req: Request) {
   })
 
   let sent = 0
+  let skipped = 0
+  const errors: string[] = []
 
   for (const user of users) {
-    if (!user.telegramChatId || !user.car) continue
+    if (!user.telegramChatId || !user.car) {
+      skipped++
+      continue
+    }
 
     const car = user.car
     const daysSinceLastTrack = Math.floor(
       (Date.now() - new Date(car.lastTrackedAt).getTime()) / (1000 * 60 * 60 * 24)
     )
 
-    if (daysSinceLastTrack < user.mileageTrackInterval) continue
+    if (daysSinceLastTrack < user.mileageTrackInterval) {
+      skipped++
+      continue
+    }
 
     const criticalItems = car.maintenanceItems
       .filter((item) => {
@@ -66,9 +86,24 @@ export async function GET(req: Request) {
       message += `\n\n⚠️ Требует внимания:\n${criticalItems.join('\n')}`
     }
 
-    await sendTelegramMessage(user.telegramChatId, message)
-    sent++
+    try {
+      await sendTelegramMessage(user.telegramChatId, message)
+      sent++
+    } catch (err) {
+      errors.push(`user ${user.id}: ${err instanceof Error ? err.message : String(err)}`)
+    }
   }
 
-  return NextResponse.json({ ok: true, reminded: sent })
+  console.log(
+    `[cron/notify] candidates=${users.length} reminded=${sent} skipped=${skipped} failed=${errors.length}`
+  )
+  if (errors.length) console.error('[cron/notify] send errors:', errors)
+
+  return NextResponse.json({
+    ok: true,
+    candidates: users.length,
+    reminded: sent,
+    skipped,
+    failed: errors.length,
+  })
 }
