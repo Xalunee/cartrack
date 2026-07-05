@@ -87,7 +87,7 @@ export function StatusOverview() {
                 status={item.resource.status}
               />
               {item.resource.forecastDate && (
-                <p className="text-[11px] text-muted-foreground mt-1.5">
+                <p className="text-xs text-muted-foreground mt-1.5">
                   След. замена ~{format(new Date(item.resource.forecastDate), 'd MMM yyyy', { locale: ru })}
                 </p>
               )}

@@ -147,6 +147,25 @@
   html {
     @apply font-sans;
   }
+  /* The UI is built on a compact rem-based type scale (text-xs/text-sm)
+     that reads well on mobile but too small on large screens. Bump the
+     root size on desktop so the whole scale grows proportionally;
+     mobile keeps the 16px browser default. */
+  @media (min-width: 768px) {
+    html {
+      font-size: 112.5%;
+    }
+  }
+}
+
+/* Widgets and cards lean heavily on text-xs for readable body content
+   (list rows, subtitles, metadata). The default 0.75rem reads too small
+   on desktop even after the root bump, so lift the token a step there.
+   Unlayered + media-scoped so it wins over the theme default only ≥768px. */
+@media (min-width: 768px) {
+  :root {
+    --text-xs: 0.8125rem;
+  }
 }
 
 /* Recharts renders its SVG surface with tabIndex=0 (accessibilityLayer),

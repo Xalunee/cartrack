@@ -38,7 +38,7 @@ export default function MaintenancePage() {
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Обслуживание</h1>
           {car && (
-            <p className="text-[13px] text-muted-foreground tabular-nums">
+            <p className="text-sm text-muted-foreground tabular-nums">
               {car.brand} {car.model} · {car.currentMileage.toLocaleString('ru')} км
             </p>
           )}
@@ -52,13 +52,13 @@ export default function MaintenancePage() {
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{totalItems}</p>
-            <p className="text-[11px] text-muted-foreground">Всего позиций</p>
+            <p className="text-xs text-muted-foreground">Всего позиций</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{criticalCount + soonCount}</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {criticalCount > 0 && `${criticalCount} крит.`}
               {criticalCount > 0 && soonCount > 0 && ' + '}
               {soonCount > 0 && `${soonCount} скоро`}
@@ -69,19 +69,19 @@ export default function MaintenancePage() {
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{okCount}</p>
-            <p className="text-[11px] text-muted-foreground">В норме</p>
+            <p className="text-xs text-muted-foreground">В норме</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{totalSpent.toLocaleString('ru')} ₽</p>
-            <p className="text-[11px] text-muted-foreground">Потрачено</p>
+            <p className="text-xs text-muted-foreground">Потрачено</p>
           </CardContent>
         </Card>
       </div>
 
       <div>
-        <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
+        <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
           Позиции · {totalItems}
         </h2>
         <StatusOverview />

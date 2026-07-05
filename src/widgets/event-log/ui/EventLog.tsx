@@ -81,7 +81,7 @@ export function EventLog({ filter }: EventLogProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <p className="font-medium text-sm truncate">{event.title}</p>
-                      <Badge className={cn('text-[10px] flex-shrink-0', config.className)}>
+                      <Badge className={cn('text-xs flex-shrink-0', config.className)}>
                         {config.label}
                       </Badge>
                     </div>

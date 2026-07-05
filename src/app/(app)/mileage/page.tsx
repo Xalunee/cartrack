@@ -72,7 +72,7 @@ export default function MileagePage() {
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Пробег</h1>
           {car && (
-            <p className="text-[13px] text-muted-foreground tabular-nums">
+            <p className="text-sm text-muted-foreground tabular-nums">
               {car.brand} {car.model} · {car.currentMileage.toLocaleString('ru')} км
             </p>
           )}
@@ -93,19 +93,19 @@ export default function MileagePage() {
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{car?.currentMileage.toLocaleString('ru') ?? '—'}</p>
-            <p className="text-[11px] text-muted-foreground">Текущий, км</p>
+            <p className="text-xs text-muted-foreground">Текущий, км</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{data?.pace ? `~${Math.round(data.pace.kmPerWeek)}` : '—'}</p>
-            <p className="text-[11px] text-muted-foreground">Темп, км/неделю</p>
+            <p className="text-xs text-muted-foreground">Темп, км/неделю</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3">
             <p className="text-xl font-semibold tabular-nums">{totalLogs}</p>
-            <p className="text-[11px] text-muted-foreground">Записей всего</p>
+            <p className="text-xs text-muted-foreground">Записей всего</p>
           </CardContent>
         </Card>
         <Card>
@@ -113,7 +113,7 @@ export default function MileagePage() {
             <p className="text-xl font-semibold">
               {lastLog ? formatDistanceToNow(new Date(lastLog.recordedAt), { locale: ru, addSuffix: true }) : '—'}
             </p>
-            <p className="text-[11px] text-muted-foreground">Последний</p>
+            <p className="text-xs text-muted-foreground">Последний</p>
           </CardContent>
         </Card>
       </div>
@@ -162,7 +162,7 @@ export default function MileagePage() {
       )}
 
       <div>
-        <h2 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
+        <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
           История · {totalLogs} записей
         </h2>
         {logs.length > 0 ? (

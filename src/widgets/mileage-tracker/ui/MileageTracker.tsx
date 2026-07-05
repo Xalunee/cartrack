@@ -159,7 +159,7 @@ export function MileageTracker() {
           )}
           {data?.logs && data.logs.length > 0 && (
             <div className="mt-4">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">История</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">История</p>
               {data.logs.slice(0, 3).map((log) => {
                 const chartIndex = chartData
                   ? chartData.findIndex((d) => d.mileage === log.mileage)
@@ -177,7 +177,7 @@ export function MileageTracker() {
                       className="flex-1 cursor-pointer min-w-0"
                       onClick={() => setActiveIndex(chartIndex === activeIndex ? null : chartIndex)}
                     >
-                      <span className="text-[13px] tabular-nums">{log.mileage.toLocaleString('ru')} км</span>
+                      <span className="text-sm tabular-nums">{log.mileage.toLocaleString('ru')} км</span>
                       <span className="text-xs text-muted-foreground ml-2">
                         {format(new Date(log.recordedAt), 'd MMM', { locale: ru })}
                       </span>

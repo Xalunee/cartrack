@@ -124,7 +124,7 @@ export default function MaintenanceDetailPage() {
           )}
 
           <Separator />
-          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Последняя замена</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Последняя замена</p>
 
           {item.lastServiceDate && (
             <div className="flex items-center gap-3">

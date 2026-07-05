@@ -76,7 +76,7 @@ export function DashboardPage() {
           <h1 className="text-lg font-semibold tracking-tight">
             {car.brand} {car.model}
           </h1>
-          <p className="text-[13px] text-muted-foreground tabular-nums">
+          <p className="text-sm text-muted-foreground tabular-nums">
             {car.year} · {car.currentMileage.toLocaleString('ru')} км
           </p>
         </div>

@@ -39,7 +39,7 @@ export function Sidebar() {
             key={href}
             href={href}
             className={cn(
-              'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] transition-colors',
+              'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors',
               active
                 ? 'bg-accent text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
@@ -53,13 +53,13 @@ export function Sidebar() {
       <div className="mt-auto border-t border-border pt-2">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors w-full"
+          className="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors w-full"
         >
           <LogOut className="h-4 w-4" />
           Выйти
         </button>
         <div className="pt-1 px-3 flex items-center justify-between">
-          <span className="text-[13px] text-muted-foreground">Тема</span>
+          <span className="text-sm text-muted-foreground">Тема</span>
           <ThemeToggle />
         </div>
       </div>
