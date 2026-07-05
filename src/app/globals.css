@@ -149,6 +149,13 @@
   }
 }
 
+/* Recharts renders its SVG surface with tabIndex=0 (accessibilityLayer),
+   which triggers a focus ring on click in every chart in the app. */
+.recharts-surface:focus,
+.recharts-wrapper:focus {
+  outline: none;
+}
+
 /* === Glass card effect === */
 .glass {
   background: rgba(255, 255, 255, 0.65);

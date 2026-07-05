@@ -126,7 +126,13 @@ export default function MileagePage() {
           <CardContent className="select-none">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} tickLine={false} axisLine={false} />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                  tickLine={false}
+                  axisLine={false}
+                  padding={{ left: 16, right: 16 }}
+                />
                 <YAxis hide domain={['dataMin - 200', 'dataMax + 200']} />
                 <Tooltip
                   content={({ active, payload }) => {

@@ -88,14 +88,16 @@ export default function MaintenanceDetailPage() {
           <div className="flex gap-4 mt-3">
             {item.resource.remainingKm !== null && (
               <p className="text-xs text-muted-foreground tabular-nums">
-                Осталось: {item.resource.remainingKm.toLocaleString('ru')} км
+                {item.resource.remainingKm > 0
+                  ? `Осталось: ${item.resource.remainingKm.toLocaleString('ru')} км`
+                  : `Просрочено на ${Math.abs(item.resource.remainingKm).toLocaleString('ru')} км`}
               </p>
             )}
             {item.resource.remainingDays !== null && (
               <p className="text-xs text-muted-foreground">
                 {item.resource.remainingDays > 0
                   ? `${item.resource.remainingDays} дн.`
-                  : 'просрочено'}
+                  : `просрочено на ${Math.abs(item.resource.remainingDays)} дн.`}
               </p>
             )}
           </div>

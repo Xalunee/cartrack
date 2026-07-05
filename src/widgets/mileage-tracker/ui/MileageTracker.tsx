@@ -120,7 +120,7 @@ export function MileageTracker() {
                           <p className="font-medium">{d.mileage?.toLocaleString('ru')} км</p>
                           <p className="text-muted-foreground">{label}</p>
                           {d.note && <p className="text-muted-foreground mt-0.5">{d.note}</p>}
-                          {!d.note && <p className="text-muted-foreground mt-0.5 italic">Без метки</p>}
+                          {!d.note && <p className="text-muted-foreground mt-0.5">Без метки</p>}
                         </div>
                       )
                     }}

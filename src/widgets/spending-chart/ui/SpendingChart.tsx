@@ -10,7 +10,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from 'recharts'
 
 export function SpendingChart() {
@@ -25,6 +24,7 @@ export function SpendingChart() {
 
   const chartData = topItems?.map((item) => ({
     name: item.name.length > 12 ? item.name.slice(0, 12) + '…' : item.name,
+    fullName: item.name,
     cost: item.lastServiceCost ?? 0,
   }))
 
@@ -43,7 +43,7 @@ export function SpendingChart() {
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
         {chartData && chartData.length >= 2 ? (
-          <ResponsiveContainer width="100%" height="100%" minHeight={180} className="flex-1">
+          <ResponsiveContainer width="100%" height="100%" minHeight={180} className="flex-1 select-none [-webkit-tap-highlight-color:transparent]">
             <BarChart data={chartData} barSize={28}>
               <XAxis
                 dataKey="name"
@@ -53,25 +53,19 @@ export function SpendingChart() {
               />
               <YAxis hide />
               <Tooltip
+                cursor={{ fill: 'color-mix(in srgb, var(--muted-foreground) 8%, transparent)' }}
                 content={({ active, payload }) => {
                   if (!active || !payload?.length) return null
                   const d = payload[0]
                   return (
                     <div className="bg-popover text-popover-foreground border rounded-lg px-3 py-2 text-xs shadow-md">
                       <p className="font-medium">{Number(d.value).toLocaleString('ru')} ₽</p>
-                      <p className="text-muted-foreground">{d.payload.name}</p>
+                      <p className="text-muted-foreground">{d.payload.fullName}</p>
                     </div>
                   )
                 }}
               />
-              <Bar dataKey="cost" radius={[4, 4, 0, 0]}>
-                {chartData.map((_, index) => (
-                  <Cell
-                    key={index}
-                    fill={index === 0 ? 'hsl(var(--chart-line))' : 'color-mix(in srgb, var(--muted-foreground) 35%, transparent)'}
-                  />
-                ))}
-              </Bar>
+              <Bar dataKey="cost" radius={[4, 4, 0, 0]} fill="hsl(var(--chart-line))" />
             </BarChart>
           </ResponsiveContainer>
         ) : null}

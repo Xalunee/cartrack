@@ -41,8 +41,6 @@ export function calculateRemainingResource(
     if (pace && remainingKm > 0) {
       const daysUntil = remainingKm / pace.kmPerDay
       forecastDate = new Date(Date.now() + daysUntil * 24 * 60 * 60 * 1000)
-    } else if (remainingKm <= 0) {
-      forecastDate = new Date() // overdue
     }
   }
 
@@ -56,8 +54,8 @@ export function calculateRemainingResource(
     const usedDays = item.intervalDays - remainingDays
     usedPercentDays = Math.min(100, (usedDays / item.intervalDays) * 100)
 
-    // Forecast: use whichever comes first
-    if (!forecastDate || nextDate < forecastDate) {
+    // Forecast: use whichever future date comes first; overdue dates aren't a forecast
+    if (nextDate > now && (!forecastDate || nextDate < forecastDate)) {
       forecastDate = nextDate
     }
   }

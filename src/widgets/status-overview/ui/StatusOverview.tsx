@@ -55,7 +55,11 @@ export function StatusOverview() {
                   <p className="font-medium text-sm truncate">{item.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
                     {item.resource.remainingKm !== null && (
-                      <span>Осталось {item.resource.remainingKm.toLocaleString('ru')} км</span>
+                      <span>
+                        {item.resource.remainingKm > 0
+                          ? `Осталось ${item.resource.remainingKm.toLocaleString('ru')} км`
+                          : `Просрочено на ${Math.abs(item.resource.remainingKm).toLocaleString('ru')} км`}
+                      </span>
                     )}
                     {item.resource.remainingKm !== null && item.resource.remainingDays !== null && (
                       <span> · </span>
@@ -64,7 +68,7 @@ export function StatusOverview() {
                       <span>
                         {item.resource.remainingDays > 0
                           ? `${item.resource.remainingDays} дн.`
-                          : 'просрочено'}
+                          : `просрочено на ${Math.abs(item.resource.remainingDays)} дн.`}
                       </span>
                     )}
                   </p>
