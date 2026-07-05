@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share } from 'lucide-react'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
 
@@ -26,6 +26,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [isStandalone, setIsStandalone] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
+  const [isSamsung, setIsSamsung] = useState(false)
 
   useEffect(() => {
     apiClient<UserInfo>('/api/user')
@@ -37,6 +38,7 @@ export default function SettingsPage() {
   useEffect(() => {
     setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent))
+    setIsSamsung(/SamsungBrowser/.test(navigator.userAgent))
   }, [])
 
   async function generateCode() {
@@ -178,6 +180,11 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">
                 Нажмите <Share className="inline h-4 w-4 mx-0.5" /> внизу экрана в Safari, затем «На экран Домой».
                 CarTrack появится как обычное приложение на главном экране.
+              </p>
+            ) : isSamsung ? (
+              <p className="text-sm text-muted-foreground">
+                Нажмите <Menu className="inline h-4 w-4 mx-0.5" /> внизу справа,
+                затем «Добавить страницу к» → «Главный экран». CarTrack появится на главном экране.
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">
