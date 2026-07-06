@@ -11,6 +11,14 @@ import {
   Wrench,
 } from 'lucide-react'
 import { MagneticButton, RotatingWord } from '@shared/ui'
+import {
+  CarIllustration,
+  WrenchIllustration,
+  ChartIllustration,
+  Underline,
+  Arrow,
+  Sparkle,
+} from '@shared/ui/illustrations'
 import { Reveal } from './Reveal'
 
 function LandingNav() {
@@ -269,15 +277,23 @@ export function LandingPage() {
       <main>
         {/* Hero */}
         <section className="mx-auto max-w-6xl px-6 pb-12 pt-16 text-center">
+          <CarIllustration className="mx-auto mb-6 h-auto w-20 text-[#191918]" />
           <h1 className="mb-5 font-serif text-4xl leading-[1.05] tracking-tight text-[#191918] md:text-7xl">
             Знай свою машину.
             <br />
             Без{' '}
-            <RotatingWord words={['таблиц', 'чеков в бардачке', 'забытых замен', 'лишних трат']} />
+            <span className="relative inline-block">
+              <RotatingWord words={['таблиц', 'чеков в бардачке', 'забытых замен', 'лишних трат']} />
+              <Sparkle className="absolute -right-5 -top-3 h-4 w-4 text-[#2383E2] md:-right-7 md:-top-4 md:h-5 md:w-5" />
+            </span>
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-[#6B6B6B]">
-            CarTrack помнит каждую замену масла и предупреждает за недели до срока — по вашему реальному
-            темпу езды.
+            CarTrack помнит каждую замену масла и предупреждает за недели до срока — по вашему{' '}
+            <span className="relative inline-block whitespace-nowrap">
+              реальному темпу езды
+              <Underline className="absolute -bottom-1 left-0 h-2 w-full text-[#2383E2]" />
+            </span>
+            .
           </p>
           <div className="mb-3 flex items-center justify-center gap-5">
             <MagneticButton
@@ -334,7 +350,8 @@ export function LandingPage() {
           <div className="grid gap-4 md:grid-cols-6">
             {/* Card A — Умный прогноз (soft blue, span 4) */}
             <Reveal className="md:col-span-4" delay={0}>
-              <div className="h-full rounded-2xl bg-[#EBF5FE] p-6">
+              <div className="relative h-full overflow-hidden rounded-2xl bg-[#EBF5FE] p-6">
+                <WrenchIllustration className="pointer-events-none absolute -right-4 -top-4 h-28 w-28 text-[#2383E2] opacity-10" />
                 <h3 className="text-lg font-semibold text-[#191918]">Умный прогноз</h3>
                 <p className="mt-1 text-sm text-[#6B6B6B]">
                   Считает по вашему темпу езды и заранее говорит, когда пора в сервис.
@@ -373,7 +390,8 @@ export function LandingPage() {
 
             {/* Card C — Учёт расходов (soft green, span 2) */}
             <Reveal className="md:col-span-2" delay={0}>
-              <div className="h-full rounded-2xl bg-[#EDF7ED] p-6">
+              <div className="relative h-full overflow-hidden rounded-2xl bg-[#EDF7ED] p-6">
+                <ChartIllustration className="pointer-events-none absolute -right-3 -top-3 h-24 w-24 text-[#2E7D32] opacity-15" />
                 <h3 className="text-lg font-semibold text-[#191918]">Учёт расходов</h3>
                 <p className="mt-1 text-sm text-[#6B6B6B]">Запчасти, ТО и ремонт — по месяцам.</p>
                 <div className="mt-5 flex h-16 items-end gap-2 rounded-lg bg-white p-4 shadow-sm">
@@ -418,7 +436,8 @@ export function LandingPage() {
 
         {/* Telegram bot */}
         <section id="telegram" className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid items-center gap-10 md:grid-cols-2">
+          <div className="relative grid items-center gap-10 md:grid-cols-2">
+            <Arrow className="absolute left-1/2 top-1/2 z-10 hidden h-16 w-20 -translate-x-1/2 -translate-y-1/2 -rotate-6 text-[#2383E2] lg:block" />
             <Reveal>
               <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
                 Telegram-бот
@@ -511,7 +530,10 @@ export function LandingPage() {
             ].map((step, i) => (
               <Reveal key={step.n} delay={i * 80}>
                 <div>
-                  <p className="font-serif text-4xl text-[#2383E2]">{step.n}</p>
+                  <p className="relative inline-block font-serif text-4xl text-[#2383E2]">
+                    {step.n}
+                    <Sparkle className="absolute -right-4 -top-1 h-3.5 w-3.5 text-[#2383E2] opacity-70" />
+                  </p>
                   <h3 className="mt-3 text-lg font-semibold text-[#191918]">{step.title}</h3>
                   <p className="mt-1 text-sm text-[#6B6B6B]">{step.text}</p>
                 </div>
@@ -523,8 +545,11 @@ export function LandingPage() {
         {/* Final CTA */}
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <Reveal>
-            <div className="rounded-2xl bg-[#FEF9E7] px-8 py-16 text-center">
-              <h2 className="mb-4 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
+            <div className="relative overflow-hidden rounded-2xl bg-[#FEF9E7] px-8 py-16 text-center">
+              <CarIllustration className="pointer-events-none absolute -left-4 bottom-2 hidden h-auto w-32 text-[#191918] opacity-15 md:block" />
+              <Sparkle className="pointer-events-none absolute right-10 top-8 h-5 w-5 text-[#B08A00] opacity-60" />
+              <Sparkle className="pointer-events-none absolute right-24 top-20 h-3.5 w-3.5 text-[#B08A00] opacity-40" />
+              <h2 className="relative mb-4 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
                 Начните следить за машиной сегодня
               </h2>
               <p className="mb-8 text-[#6B6B6B]">Бесплатно для одной машины. Без карты, без рекламы.</p>
