@@ -2,6 +2,7 @@ import Link from 'next/link'
 import {
   AlertTriangle,
   BarChart3,
+  Check,
   FileText,
   Gauge,
   LayoutDashboard,
@@ -331,6 +332,110 @@ export function LandingPage() {
                 </div>
               </div>
             </Reveal>
+          </div>
+        </section>
+
+        {/* Telegram bot */}
+        <section id="telegram" className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            <Reveal>
+              <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
+                Telegram-бот
+              </p>
+              <h2 className="mb-4 font-serif text-4xl tracking-tight text-[#191918]">
+                Вносите пробег,
+                <br />не открывая приложение
+              </h2>
+              <p className="mb-6 text-[#6B6B6B]">
+                Бот сам напомнит раз в неделю. Ответьте числом — и всё обновится: прогнозы, статусы,
+                графики.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  'Еженедельные напоминания',
+                  'Статус машины одной командой',
+                  'Защищённая привязка по коду',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#EDF7ED]">
+                      <Check className="h-3 w-3 text-[#2E7D32]" />
+                    </span>
+                    <span className="text-[15px] text-[#191918]">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+
+            {/* Chat mockup */}
+            <Reveal delay={120}>
+              <div className="rounded-2xl bg-[#EBF5FE] p-6">
+                <div className="space-y-3 rounded-xl bg-white p-4">
+                  <div className="flex items-start gap-2">
+                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#191918]">
+                      <span className="text-[9px] font-bold text-white">CT</span>
+                    </div>
+                    <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-[#F7F6F4] px-3 py-2 text-[13px] text-[#191918]">
+                      🚗 Пора внести пробег! Текущий: 87 420 км
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="rounded-2xl rounded-tr-sm bg-[#2383E2] px-3 py-2 text-[13px] font-medium text-white">
+                      87 650
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#191918]">
+                      <span className="text-[9px] font-bold text-white">CT</span>
+                    </div>
+                    <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-[#F7F6F4] px-3 py-2 text-[13px] leading-relaxed text-[#191918]">
+                      ✅ Пробег обновлён! +230 км
+                      <br />
+                      ⚠️ Замена масла — осталось 2 070 км
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section id="how" className="mx-auto max-w-6xl px-6 py-20">
+          <Reveal>
+            <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
+              Как работает
+            </p>
+            <h2 className="mb-12 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
+              Три шага — и машина под контролем
+            </h2>
+          </Reveal>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                n: '01',
+                title: 'Добавьте машину',
+                text: 'Зарегистрируйтесь и укажите марку, год и текущий пробег.',
+              },
+              {
+                n: '02',
+                title: 'Внесите обслуживание',
+                text: 'Масло, фильтры, шины — что и когда меняли или планируете.',
+              },
+              {
+                n: '03',
+                title: 'Отвечайте боту',
+                text: 'Раз в неделю присылайте пробег — остальное CarTrack считает сам.',
+              },
+            ].map((step, i) => (
+              <Reveal key={step.n} delay={i * 80}>
+                <div>
+                  <p className="font-serif text-4xl text-[#2383E2]">{step.n}</p>
+                  <h3 className="mt-3 text-lg font-semibold text-[#191918]">{step.title}</h3>
+                  <p className="mt-1 text-sm text-[#6B6B6B]">{step.text}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </section>
       </main>
