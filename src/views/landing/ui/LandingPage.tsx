@@ -438,7 +438,84 @@ export function LandingPage() {
             ))}
           </div>
         </section>
+
+        {/* Final CTA */}
+        <section className="mx-auto max-w-6xl px-6 pb-20">
+          <Reveal>
+            <div className="rounded-2xl bg-[#FEF9E7] px-8 py-16 text-center">
+              <h2 className="mb-4 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
+                Начните следить за машиной сегодня
+              </h2>
+              <p className="mb-8 text-[#6B6B6B]">Бесплатно для одной машины. Без карты, без рекламы.</p>
+              <MagneticButton
+                as="a"
+                href="/register"
+                className="rounded-lg bg-[#191918] px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-[#191918]/85"
+              >
+                Завести журнал
+              </MagneticButton>
+            </div>
+          </Reveal>
+        </section>
       </main>
+
+      <footer className="border-t border-[#EFEEEC]">
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="flex flex-col justify-between gap-8 md:flex-row">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#191918]">
+                  <span className="text-[10px] font-bold text-white">CT</span>
+                </div>
+                <span className="text-[15px] font-semibold text-[#191918]">CarTrack</span>
+              </div>
+              <p className="max-w-xs text-sm text-[#6B6B6B]">
+                Трекер обслуживания автомобиля. Сделано для тех, кто любит свою машину.
+              </p>
+            </div>
+
+            <div className="flex gap-12">
+              <div>
+                <p className="mb-3 text-xs uppercase tracking-wider text-[#9B9A97]">Продукт</p>
+                <div className="flex flex-col gap-2">
+                  <a href="#features" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+                    Возможности
+                  </a>
+                  <Link href="/register" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+                    Регистрация
+                  </Link>
+                  <Link href="/login" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+                    Войти
+                  </Link>
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-3 text-xs uppercase tracking-wider text-[#9B9A97]">Поддержка</p>
+                <div className="flex flex-col gap-2">
+                  <a
+                    href="https://t.me/cartrack_official_bot"
+                    className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+                  >
+                    Telegram-бот
+                  </a>
+                  <a
+                    href="mailto:xalune.work@gmail.com"
+                    className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+                  >
+                    xalune.work@gmail.com
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 flex items-center justify-between border-t border-[#EFEEEC] pt-6">
+            <span className="text-xs text-[#9B9A97]">© 2026 CarTrack</span>
+            <span className="text-xs text-[#9B9A97]">RU / EN</span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
