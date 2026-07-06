@@ -9,7 +9,7 @@ import {
   Settings,
   Wrench,
 } from 'lucide-react'
-import { MagneticButton } from '@shared/ui'
+import { MagneticButton, RotatingWord } from '@shared/ui'
 import { Reveal } from './Reveal'
 
 function LandingNav() {
@@ -204,7 +204,8 @@ export function LandingPage() {
           <h1 className="mb-5 font-serif text-4xl leading-[1.05] tracking-tight text-[#191918] md:text-7xl">
             Знай свою машину.
             <br />
-            Всегда.
+            Без{' '}
+            <RotatingWord words={['таблиц', 'чеков в бардачке', 'забытых замен', 'лишних трат']} />
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-[#6B6B6B]">
             CarTrack помнит каждую замену масла и предупреждает за недели до срока — по вашему реальному
