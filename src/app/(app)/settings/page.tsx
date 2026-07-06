@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu } from 'lucide-react'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
+import { ExportButton } from '@features/export-pdf'
 
 interface UserInfo {
   id: string
@@ -195,6 +196,21 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Экспорт данных
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Скачайте полную историю обслуживания в PDF — удобно показать покупателю при продаже машины.
+          </p>
+          <ExportButton />
+        </CardContent>
+      </Card>
 
       <Separator />
 
