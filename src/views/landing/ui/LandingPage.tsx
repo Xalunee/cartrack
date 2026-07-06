@@ -7,6 +7,7 @@ import {
   Gauge,
   LayoutDashboard,
   Settings,
+  TrendingUp,
   Wrench,
 } from 'lucide-react'
 import { MagneticButton, RotatingWord } from '@shared/ui'
@@ -193,6 +194,73 @@ function ProductPreview() {
   )
 }
 
+const phoneMaintenance = [
+  { title: 'Замена масла', status: 'Скоро', badge: 'bg-[#FEF9E7] text-[#B08A00]' },
+  { title: 'Тормозные колодки', status: 'OK', badge: 'bg-[#EDF7ED] text-[#2E7D32]' },
+  { title: 'Воздушный фильтр', status: 'Критично', badge: 'bg-[#FDEBEC] text-[#C62828]' },
+]
+
+const phoneNav = [LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings]
+
+function PhoneMockup() {
+  return (
+    <div className="w-[240px] rounded-[36px] border border-[#EFEEEC] bg-white shadow-xl">
+      {/* Dynamic island */}
+      <div className="mx-auto mt-2 h-4 w-16 rounded-full bg-[#191918]" />
+
+      <div className="px-4 pt-3">
+        {/* Header */}
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-[13px] font-semibold text-[#191918]">Skoda Octavia</p>
+            <p className="text-[11px] text-[#9B9A97]">87 420 км</p>
+          </div>
+          <span className="rounded-md bg-[#EDF7ED] px-2 py-0.5 text-[10px] font-medium text-[#2E7D32]">
+            OK
+          </span>
+        </div>
+
+        {/* Mileage big */}
+        <div className="mt-4 rounded-xl border border-[#EFEEEC] bg-[#FBFBFA] p-3">
+          <p className="text-[10px] text-[#9B9A97]">Текущий пробег</p>
+          <div className="flex items-end gap-1">
+            <span className="text-2xl font-semibold tracking-tight text-[#191918]">87 420</span>
+            <span className="pb-1 text-[11px] text-[#9B9A97]">км</span>
+          </div>
+        </div>
+
+        {/* Maintenance rows */}
+        <div className="mt-3 space-y-2">
+          {phoneMaintenance.map((item) => (
+            <div
+              key={item.title}
+              className="flex items-center justify-between rounded-lg border border-[#EFEEEC] px-3 py-2"
+            >
+              <span className="text-[12px] font-medium text-[#191918]">{item.title}</span>
+              <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${item.badge}`}>
+                {item.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom nav */}
+      <div className="mt-4 flex items-center justify-around border-t border-[#EFEEEC] px-2 py-2.5">
+        {phoneNav.map((Icon, i) => (
+          <Icon
+            key={i}
+            className={`h-4 w-4 ${i === 0 ? 'text-[#2383E2]' : 'text-[#C7C6C2]'}`}
+          />
+        ))}
+      </div>
+
+      {/* Home indicator */}
+      <div className="mx-auto mb-2 h-1 w-20 rounded-full bg-[#191918]/20" />
+    </div>
+  )
+}
+
 export function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-[#191918]">
@@ -228,14 +296,26 @@ export function LandingPage() {
 
         {/* Product preview */}
         <section className="mx-auto max-w-5xl px-6 pb-20">
-          <div className="overflow-hidden rounded-xl border border-[#EFEEEC] bg-white shadow-[0_8px_40px_rgba(0,0,0,0.06)]">
-            {/* Browser chrome bar */}
-            <div className="flex items-center gap-1.5 border-b border-[#EFEEEC] bg-[#FBFBFA] px-4 py-2.5">
-              <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
-              <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
-              <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
+          {/* Mobile: phone only */}
+          <div className="flex justify-center md:hidden">
+            <PhoneMockup />
+          </div>
+
+          {/* Desktop: browser frame with phone overlapping bottom-right */}
+          <div className="relative hidden md:block">
+            <div className="overflow-hidden rounded-xl border border-[#EFEEEC] bg-white shadow-[0_8px_40px_rgba(0,0,0,0.06)]">
+              {/* Browser chrome bar */}
+              <div className="flex items-center gap-1.5 border-b border-[#EFEEEC] bg-[#FBFBFA] px-4 py-2.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
+              </div>
+              <ProductPreview />
             </div>
-            <ProductPreview />
+
+            <div className="absolute -bottom-8 -right-4 rotate-[3deg]">
+              <PhoneMockup />
+            </div>
           </div>
         </section>
 
