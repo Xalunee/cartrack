@@ -2,12 +2,14 @@ import Link from 'next/link'
 import {
   AlertTriangle,
   BarChart3,
+  FileText,
   Gauge,
   LayoutDashboard,
   Settings,
   Wrench,
 } from 'lucide-react'
 import { MagneticButton } from '@shared/ui'
+import { Reveal } from './Reveal'
 
 function LandingNav() {
   return (
@@ -232,6 +234,103 @@ export function LandingPage() {
               <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
             </div>
             <ProductPreview />
+          </div>
+        </section>
+
+        {/* Bento features */}
+        <section id="features" className="mx-auto max-w-6xl px-6 py-20">
+          <Reveal>
+            <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
+              Возможности
+            </p>
+            <h2 className="mb-12 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
+              Всё важное про машину
+              <br />в одном спокойном месте.
+            </h2>
+          </Reveal>
+
+          <div className="grid gap-4 md:grid-cols-6">
+            {/* Card A — Умный прогноз (soft blue, span 4) */}
+            <Reveal className="md:col-span-4" delay={0}>
+              <div className="h-full rounded-2xl bg-[#EBF5FE] p-6">
+                <h3 className="text-lg font-semibold text-[#191918]">Умный прогноз</h3>
+                <p className="mt-1 text-sm text-[#6B6B6B]">
+                  Считает по вашему темпу езды и заранее говорит, когда пора в сервис.
+                </p>
+                <div className="mt-5 rounded-lg bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[13px] font-medium text-[#191918]">Замена масла</p>
+                    <p className="text-[13px] text-[#6B6B6B]">осталось 2 300 км</p>
+                  </div>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#F1F0EE]">
+                    <div className="h-full w-[78%] rounded-full bg-[#FFD43B]" />
+                  </div>
+                  <p className="mt-3 text-[12px] text-[#9B9A97]">
+                    След. замена ~15 августа — по вашему темпу езды
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Card B — Трекинг пробега (soft yellow, span 2) */}
+            <Reveal className="md:col-span-2" delay={80}>
+              <div className="h-full rounded-2xl bg-[#FEF9E7] p-6">
+                <h3 className="text-lg font-semibold text-[#191918]">Трекинг пробега</h3>
+                <p className="mt-1 text-sm text-[#6B6B6B]">Вносите раз в неделю — остальное посчитаем.</p>
+                <div className="mt-5 rounded-lg bg-white p-4 shadow-sm">
+                  <div className="flex items-end gap-1.5">
+                    <span className="text-2xl font-semibold tracking-tight text-[#191918]">87 420</span>
+                    <span className="pb-1 text-[12px] text-[#9B9A97]">км</span>
+                  </div>
+                  <span className="mt-2 inline-block rounded-md bg-[#EDF7ED] px-2 py-0.5 text-[11px] font-medium text-[#2E7D32]">
+                    +248 за неделю
+                  </span>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Card C — Учёт расходов (soft green, span 2) */}
+            <Reveal className="md:col-span-2" delay={0}>
+              <div className="h-full rounded-2xl bg-[#EDF7ED] p-6">
+                <h3 className="text-lg font-semibold text-[#191918]">Учёт расходов</h3>
+                <p className="mt-1 text-sm text-[#6B6B6B]">Запчасти, ТО и ремонт — по месяцам.</p>
+                <div className="mt-5 flex h-16 items-end gap-2 rounded-lg bg-white p-4 shadow-sm">
+                  <span className="w-full rounded-sm bg-[#DDEEDD]" style={{ height: '45%' }} />
+                  <span className="w-full rounded-sm bg-[#2383E2]" style={{ height: '100%' }} />
+                  <span className="w-full rounded-sm bg-[#DDEEDD]" style={{ height: '60%' }} />
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Card D — Журнал событий (soft purple, span 2) */}
+            <Reveal className="md:col-span-2" delay={80}>
+              <div className="h-full rounded-2xl bg-[#F6F0FA] p-6">
+                <h3 className="text-lg font-semibold text-[#191918]">Журнал событий</h3>
+                <p className="mt-1 text-sm text-[#6B6B6B]">Сервис, штрафы, поломки — всё рядом.</p>
+                <div className="mt-5 space-y-2">
+                  <div className="rounded-lg bg-white px-3 py-2 text-[13px] text-[#191918] shadow-sm">
+                    🔧 СТО · замена колодок
+                  </div>
+                  <div className="rounded-lg bg-white px-3 py-2 text-[13px] text-[#191918] shadow-sm">
+                    ⚠️ Штраф · 500 ₽
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Card E — Экспорт при продаже (soft gray, span 2) */}
+            <Reveal className="md:col-span-2" delay={160}>
+              <div className="h-full rounded-2xl bg-[#F7F6F4] p-6">
+                <h3 className="text-lg font-semibold text-[#191918]">Экспорт при продаже</h3>
+                <p className="mt-1 text-sm text-[#6B6B6B]">Вся история в один клик.</p>
+                <div className="mt-5 flex items-center gap-3 rounded-lg bg-white p-4 shadow-sm">
+                  <div className="flex h-10 w-8 flex-shrink-0 items-center justify-center rounded-md bg-[#FDEBEC]">
+                    <FileText className="h-4 w-4 text-[#C62828]" />
+                  </div>
+                  <p className="text-[13px] text-[#6B6B6B]">История обслуживания · PDF</p>
+                </div>
+              </div>
+            </Reveal>
           </div>
         </section>
       </main>
