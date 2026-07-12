@@ -11,7 +11,14 @@ const createSchema = z.object({
   currentMileage: z.number().int().min(0),
 })
 
-const updateSchema = createSchema.partial()
+const updateSchema = createSchema.partial().extend({
+  stsNumber: z
+    .string()
+    .length(10)
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => (v === '' ? null : v)),
+})
 
 export async function GET() {
   const session = await auth()
