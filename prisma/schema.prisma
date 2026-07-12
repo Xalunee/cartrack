@@ -32,16 +32,39 @@ model Car {
   model          String
   year           Int
   licensePlate   String?
+  stsNumber      String?  // СТС — свидетельство о регистрации, 10 символов
   currentMileage Int      @default(0)
   lastTrackedAt  DateTime @default(now())
+  lastFinesCheckAt DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   maintenanceItems MaintenanceItem[]
   mileageLogs      MileageLog[]
   events           CarEvent[]
+  fines            Fine[]
 
   @@map("cars")
+}
+
+model Fine {
+  id             String    @id @default(cuid())
+  carId          String
+  car            Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  numPost        String    @unique // номер постановления — дедупликация
+  koapCode       String?   // статья КоАП
+  koapText       String?   // расшифровка
+  sum            Float     // полная сумма
+  enableDiscount Boolean   @default(false)
+  dateDiscount   DateTime? // до какой даты скидка 50%
+  dateDecision   DateTime? // дата нарушения
+  divisionName   String?
+  isPaid         Boolean   @default(false) // помечает пользователь
+  notifiedAt     DateTime? // когда отправлено уведомление в TG
+  createdAt      DateTime  @default(now())
+
+  @@map("fines")
 }
 
 model MaintenanceItem {
