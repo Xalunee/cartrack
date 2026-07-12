@@ -5,10 +5,22 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
 import { ExportButton } from '@features/export-pdf'
+import { useCarQuery, useUpdateCarMutation } from '@entities/car'
+import { StsDialog } from '@features/set-sts'
 
 interface UserInfo {
   id: string
@@ -28,6 +40,14 @@ export default function SettingsPage() {
   const [isStandalone, setIsStandalone] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
   const [isSamsung, setIsSamsung] = useState(false)
+  const [confirmingStsDelete, setConfirmingStsDelete] = useState(false)
+
+  const { data: car } = useCarQuery()
+  const updateCarMutation = useUpdateCarMutation()
+
+  function maskSts(sts: string) {
+    return '•'.repeat(Math.max(sts.length - 4, 0)) + sts.slice(-4)
+  }
 
   useEffect(() => {
     apiClient<UserInfo>('/api/user')
@@ -168,6 +188,45 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4" />
+            СТС
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {car?.stsNumber ? (
+            <>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Номер</span>
+                <span className="font-mono">{maskSts(car.stsNumber)}</span>
+              </div>
+              <div className="flex gap-2">
+                <StsDialog
+                  currentValue={car.stsNumber}
+                  trigger={<Button variant="outline" size="sm">Изменить</Button>}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConfirmingStsDelete(true)}
+                >
+                  Удалить
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Укажите СТС, чтобы CarTrack мог проверять штрафы ГИБДД.
+              </p>
+              <StsDialog trigger={<Button size="sm">Указать СТС</Button>} />
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       {!isStandalone && (
         <Card>
           <CardHeader>
@@ -222,6 +281,28 @@ export default function SettingsPage() {
         <LogOut className="h-4 w-4 mr-2" />
         Выйти
       </Button>
+
+      <AlertDialog open={confirmingStsDelete} onOpenChange={setConfirmingStsDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить СТС?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Проверка штрафов будет отключена. Историю уже найденных штрафов это не затронет.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                updateCarMutation.mutate({ stsNumber: '' })
+                setConfirmingStsDelete(false)
+              }}
+            >
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings } from 'lucide-react'
+import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Receipt, Settings } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { href: '/maintenance', label: 'Сервис', icon: Wrench },
   { href: '/mileage', label: 'Пробег', icon: TrendingUp },
   { href: '/events', label: 'События', icon: AlertTriangle },
+  { href: '/fines', label: 'Штрафы', icon: Receipt },
   { href: '/settings', label: 'Настройки', icon: Settings },
 ]
 
@@ -26,14 +27,14 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors',
+                'flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-colors',
                 active
                   ? 'text-foreground font-medium'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-[10px]">{label}</span>
+              <span className="text-[9px]">{label}</span>
             </Link>
           )
         })}

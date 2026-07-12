@@ -14,6 +14,7 @@ export default auth((req) => {
     pathname.startsWith('/maintenance') ||
     pathname.startsWith('/mileage') ||
     pathname.startsWith('/events') ||
+    pathname.startsWith('/fines') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/onboarding')
 

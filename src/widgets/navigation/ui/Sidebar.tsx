@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Receipt, Settings, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 import { ThemeToggle } from '@shared/ui'
 import { signOut } from 'next-auth/react'
@@ -12,6 +12,7 @@ const links = [
   { href: '/maintenance', label: 'Обслуживание', icon: Wrench },
   { href: '/mileage', label: 'Пробег', icon: TrendingUp },
   { href: '/events', label: 'События', icon: AlertTriangle },
+  { href: '/fines', label: 'Штрафы', icon: Receipt },
   { href: '/settings', label: 'Настройки', icon: Settings },
 ]
 

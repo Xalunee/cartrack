@@ -5,8 +5,10 @@ export interface Car {
   model: string
   year: number
   licensePlate: string | null
+  stsNumber: string | null
   currentMileage: number
   lastTrackedAt: Date
+  lastFinesCheckAt: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -19,4 +21,6 @@ export interface CreateCarDto {
   currentMileage: number
 }
 
-export interface UpdateCarDto extends Partial<CreateCarDto> {}
+export interface UpdateCarDto extends Partial<CreateCarDto> {
+  stsNumber?: string
+}
