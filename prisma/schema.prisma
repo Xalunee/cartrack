@@ -60,7 +60,24 @@ model MaintenanceItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  serviceRecords ServiceRecord[]
+
   @@map("maintenance_items")
+}
+
+model ServiceRecord {
+  id                String          @id @default(cuid())
+  maintenanceItemId String
+  maintenanceItem   MaintenanceItem @relation(fields: [maintenanceItemId], references: [id], onDelete: Cascade)
+
+  mileage   Int
+  date      DateTime
+  cost      Float?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([maintenanceItemId])
+  @@map("service_records")
 }
 
 model MileageLog {
