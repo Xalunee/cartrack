@@ -8,6 +8,10 @@ export interface ServiceRecord {
   createdAt: Date
 }
 
+export interface ServiceRecordWithItem extends ServiceRecord {
+  itemName: string
+}
+
 export interface CompleteServiceDto {
   mileage: number
   date: string

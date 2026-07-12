@@ -1,8 +1,9 @@
 import { apiClient } from '@shared/api/client'
 import type { MaintenanceItemWithStatus } from '@entities/maintenance-item'
-import { ServiceRecord, CompleteServiceDto, UpdateServiceRecordDto } from '../model/types'
+import { ServiceRecord, ServiceRecordWithItem, CompleteServiceDto, UpdateServiceRecordDto } from '../model/types'
 
 export const serviceRecordApi = {
+  getAll: () => apiClient<ServiceRecordWithItem[]>('/api/service-records'),
   getForItem: (itemId: string) =>
     apiClient<ServiceRecord[]>(`/api/maintenance/${itemId}/records`),
   complete: (itemId: string, data: CompleteServiceDto) =>

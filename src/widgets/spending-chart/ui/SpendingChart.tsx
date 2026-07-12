@@ -15,17 +15,17 @@ import {
 export function SpendingChart() {
   const { data: items } = useMaintenanceQuery()
 
-  const totalYear = items?.reduce((sum, item) => sum + (item.lastServiceCost ?? 0), 0) ?? 0
+  const totalYear = items?.reduce((sum, item) => sum + item.totalSpent, 0) ?? 0
 
   const topItems = items
-    ?.filter((item) => item.lastServiceCost)
-    .sort((a, b) => (b.lastServiceCost ?? 0) - (a.lastServiceCost ?? 0))
+    ?.filter((item) => item.totalSpent > 0)
+    .sort((a, b) => b.totalSpent - a.totalSpent)
     .slice(0, 5)
 
   const chartData = topItems?.map((item) => ({
     name: item.name.length > 12 ? item.name.slice(0, 12) + '…' : item.name,
     fullName: item.name,
-    cost: item.lastServiceCost ?? 0,
+    cost: item.totalSpent,
   }))
 
   return (
@@ -75,7 +75,7 @@ export function SpendingChart() {
               <div key={item.id} className="flex items-center justify-between gap-2 text-xs">
                 <span className="text-muted-foreground truncate">{item.name}</span>
                 <span className="tabular-nums flex-shrink-0">
-                  {(item.lastServiceCost ?? 0).toLocaleString('ru')} ₽
+                  {item.totalSpent.toLocaleString('ru')} ₽
                 </span>
               </div>
             ))}

@@ -4,6 +4,7 @@ import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { useCarQuery } from '@entities/car'
 import { MaintenanceDialog } from '@features/add-maintenance'
 import { StatusOverview } from '@widgets/status-overview'
+import { ServiceArchive } from '@widgets/service-archive'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -16,7 +17,7 @@ export default function MaintenancePage() {
   const criticalCount = items?.filter((i) => i.resource.status === 'critical').length ?? 0
   const soonCount = items?.filter((i) => i.resource.status === 'soon').length ?? 0
   const okCount = items?.filter((i) => i.resource.status === 'ok').length ?? 0
-  const totalSpent = items?.reduce((sum, i) => sum + (i.lastServiceCost ?? 0), 0) ?? 0
+  const totalSpent = items?.reduce((sum, i) => sum + i.totalSpent, 0) ?? 0
 
   if (isLoading) {
     return (
@@ -86,6 +87,8 @@ export default function MaintenancePage() {
         </h2>
         <StatusOverview />
       </div>
+
+      <ServiceArchive />
     </div>
   )
 }

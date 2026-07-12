@@ -4,8 +4,17 @@ import { CAR_QUERY_KEY } from '@entities/car'
 import { serviceRecordApi } from './serviceRecordApi'
 import { CompleteServiceDto, UpdateServiceRecordDto } from '../model/types'
 
+export const ALL_SERVICE_RECORDS_QUERY_KEY = ['service-records', 'all'] as const
+
 export function serviceRecordsQueryKey(itemId: string) {
   return ['service-records', itemId] as const
+}
+
+export function useAllServiceRecordsQuery() {
+  return useQuery({
+    queryKey: ALL_SERVICE_RECORDS_QUERY_KEY,
+    queryFn: serviceRecordApi.getAll,
+  })
 }
 
 export function useServiceRecordsQuery(itemId: string) {
@@ -23,6 +32,7 @@ export function useCompleteServiceMutation(itemId: string) {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: CAR_QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: serviceRecordsQueryKey(itemId) })
+      queryClient.invalidateQueries({ queryKey: ALL_SERVICE_RECORDS_QUERY_KEY })
     },
   })
 }
@@ -35,6 +45,7 @@ export function useUpdateServiceRecordMutation(itemId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: serviceRecordsQueryKey(itemId) })
+      queryClient.invalidateQueries({ queryKey: ALL_SERVICE_RECORDS_QUERY_KEY })
     },
   })
 }
@@ -46,6 +57,7 @@ export function useDeleteServiceRecordMutation(itemId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: serviceRecordsQueryKey(itemId) })
+      queryClient.invalidateQueries({ queryKey: ALL_SERVICE_RECORDS_QUERY_KEY })
     },
   })
 }

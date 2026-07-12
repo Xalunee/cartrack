@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@shared/api/client'
 import { MaintenanceItemWithStatus, useDeleteMaintenanceMutation } from '@entities/maintenance-item'
 import { MaintenanceDialog } from '@features/add-maintenance'
+import { ServiceTimeline } from '@widgets/service-timeline'
 import { StatusBadge, ResourceBar } from '@shared/ui'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -172,6 +173,8 @@ export default function MaintenanceDetailPage() {
           {confirmDelete ? 'Точно удалить?' : 'Удалить'}
         </Button>
       </div>
+
+      <ServiceTimeline itemId={id} />
     </div>
   )
 }

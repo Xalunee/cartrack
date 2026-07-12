@@ -29,13 +29,19 @@ export async function GET(
   })
   if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
 
-  const item = await db.maintenanceItem.findFirst({ where: { id, carId: car.id } })
+  const item = await db.maintenanceItem.findFirst({
+    where: { id, carId: car.id },
+    include: { serviceRecords: { select: { cost: true } } },
+  })
   if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
 
-  const pace = calculateDrivingPace(car.mileageLogs)
-  const resource = calculateRemainingResource(item, car.currentMileage, pace)
+  const { serviceRecords, ...rest } = item
+  const totalSpent = serviceRecords.reduce((sum, r) => sum + (r.cost ?? 0), 0)
 
-  return NextResponse.json({ ...item, resource })
+  const pace = calculateDrivingPace(car.mileageLogs)
+  const resource = calculateRemainingResource(rest, car.currentMileage, pace)
+
+  return NextResponse.json({ ...rest, totalSpent, resource })
 }
 
 export async function PATCH(

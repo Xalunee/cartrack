@@ -16,6 +16,7 @@ export interface MaintenanceItem {
 
 export interface MaintenanceItemWithStatus extends MaintenanceItem {
   resource: RemainingResource
+  totalSpent: number
 }
 
 export interface CreateMaintenanceItemDto {
