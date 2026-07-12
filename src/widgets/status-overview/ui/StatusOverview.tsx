@@ -1,7 +1,9 @@
 'use client'
 
 import { useMaintenanceQuery } from '@entities/maintenance-item'
+import { useCarQuery } from '@entities/car'
 import { MaintenanceDialog } from '@features/add-maintenance'
+import { CompleteServiceDialog } from '@features/complete-service'
 import { StatusBadge, ResourceBar } from '@shared/ui'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,6 +14,7 @@ import Link from 'next/link'
 
 export function StatusOverview() {
   const { data: items, isLoading } = useMaintenanceQuery()
+  const { data: car } = useCarQuery()
 
   if (isLoading) {
     return (
@@ -75,8 +78,34 @@ export function StatusOverview() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <StatusBadge status={item.resource.status} />
+                  {car && (
+                    <CompleteServiceDialog
+                      itemId={item.id}
+                      itemName={item.name}
+                      prevMileage={item.lastServiceMileage ?? 0}
+                      currentMileage={car.currentMileage}
+                      trigger={
+                        <Button
+                          size="sm"
+                          variant={item.resource.status === 'ok' ? 'outline' : 'default'}
+                          className="h-7 px-2 text-xs"
+                          onClick={(event) => {
+                            event.preventDefault()
+                            event.stopPropagation()
+                          }}
+                        >
+                          Заменил
+                        </Button>
+                      }
+                    />
+                  )}
                   <MaintenanceDialog item={item} trigger={
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      onClick={(event) => event.preventDefault()}
+                    >
                       <Wrench className="h-3.5 w-3.5" />
                     </Button>
                   } />
