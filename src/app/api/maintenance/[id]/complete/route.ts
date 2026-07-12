@@ -1,0 +1,76 @@
+import { NextResponse } from 'next/server'
+import { auth } from '@shared/lib/auth'
+import { db } from '@shared/lib/db'
+import { z } from 'zod'
+import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
+
+const completeSchema = z.object({
+  mileage: z.number().int().min(0),
+  date: z.string().datetime(),
+  cost: z.number().min(0).optional(),
+  notes: z.string().optional(),
+})
+
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id } = await params
+  const body = await req.json()
+  const parsed = completeSchema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+
+  const car = await db.car.findUnique({
+    where: { userId: session.user.id },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+  })
+  if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+  const item = await db.maintenanceItem.findFirst({ where: { id, carId: car.id } })
+  if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+
+  const { mileage, cost, notes } = parsed.data
+  const date = new Date(parsed.data.date)
+
+  const prevMileage = item.lastServiceMileage ?? 0
+  if (mileage < prevMileage) {
+    return NextResponse.json(
+      { error: 'Пробег замены не может быть меньше предыдущей замены' },
+      { status: 400 }
+    )
+  }
+  if (mileage > car.currentMileage) {
+    return NextResponse.json(
+      { error: 'Пробег замены не может превышать текущий пробег машины' },
+      { status: 400 }
+    )
+  }
+  if (date > new Date()) {
+    return NextResponse.json({ error: 'Дата замены не может быть в будущем' }, { status: 400 })
+  }
+
+  const updated = await db.$transaction(async (tx) => {
+    await tx.serviceRecord.create({
+      data: { maintenanceItemId: item.id, mileage, date, cost, notes },
+    })
+
+    return tx.maintenanceItem.update({
+      where: { id: item.id },
+      data: {
+        lastServiceMileage: mileage,
+        lastServiceDate: date,
+        lastServiceCost: cost ?? null,
+        lastServiceNotes: notes ?? null,
+      },
+    })
+  })
+
+  const pace = calculateDrivingPace(car.mileageLogs)
+  const resource = calculateRemainingResource(updated, car.currentMileage, pace)
+
+  return NextResponse.json({ ...updated, resource })
+}

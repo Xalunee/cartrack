@@ -37,10 +37,12 @@ export async function GET() {
   const items = await db.maintenanceItem.findMany({
     where: { carId: car.id },
     orderBy: { createdAt: 'asc' },
+    include: { serviceRecords: { select: { cost: true } } },
   })
 
-  const withStatus = items.map((item: MaintenanceItem) => ({
+  const withStatus = items.map(({ serviceRecords, ...item }: MaintenanceItem & { serviceRecords: { cost: number | null }[] }) => ({
     ...item,
+    totalSpent: serviceRecords.reduce((sum, r) => sum + (r.cost ?? 0), 0),
     resource: calculateRemainingResource(item, car.currentMileage, pace),
   }))
 
