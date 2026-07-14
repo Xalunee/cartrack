@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 
 const updateSchema = z.object({
   mileage: z.number().int().min(0).optional(),
@@ -27,26 +28,17 @@ export async function PATCH(
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
 
-  await db.mileageLog.update({
-    where: { id },
-    data: {
-      ...(parsed.data.mileage !== undefined && { mileage: parsed.data.mileage }),
-      ...(parsed.data.note !== undefined && { note: parsed.data.note }),
-      ...(parsed.data.recordedAt !== undefined && { recordedAt: new Date(parsed.data.recordedAt) }),
-    },
-  })
-
-  const latestLog = await db.mileageLog.findFirst({
-    where: { carId: car.id },
-    orderBy: { recordedAt: 'desc' },
-  })
-
-  if (latestLog) {
-    await db.car.update({
-      where: { id: car.id },
-      data: { currentMileage: latestLog.mileage },
+  await db.$transaction(async (tx) => {
+    await tx.mileageLog.update({
+      where: { id },
+      data: {
+        ...(parsed.data.mileage !== undefined && { mileage: parsed.data.mileage }),
+        ...(parsed.data.note !== undefined && { note: parsed.data.note }),
+        ...(parsed.data.recordedAt !== undefined && { recordedAt: new Date(parsed.data.recordedAt) }),
+      },
     })
-  }
+    await recomputeCurrentMileage(tx, car.id)
+  })
 
   return NextResponse.json({ success: true })
 }
@@ -65,19 +57,10 @@ export async function DELETE(
   const log = await db.mileageLog.findFirst({ where: { id, carId: car.id } })
   if (!log) return NextResponse.json({ error: 'Log not found' }, { status: 404 })
 
-  await db.mileageLog.delete({ where: { id } })
-
-  const latestLog = await db.mileageLog.findFirst({
-    where: { carId: car.id },
-    orderBy: { recordedAt: 'desc' },
+  await db.$transaction(async (tx) => {
+    await tx.mileageLog.delete({ where: { id } })
+    await recomputeCurrentMileage(tx, car.id)
   })
-
-  if (latestLog) {
-    await db.car.update({
-      where: { id: car.id },
-      data: { currentMileage: latestLog.mileage },
-    })
-  }
 
   return NextResponse.json({ success: true })
 }

@@ -3,6 +3,7 @@ import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
 import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 
 const createSchema = z.object({
   mileage: z.number().int().min(0),
@@ -43,15 +44,13 @@ export async function POST(req: Request) {
     )
   }
 
-  const [log] = await db.$transaction([
-    db.mileageLog.create({
+  await db.$transaction(async (tx) => {
+    const created = await tx.mileageLog.create({
       data: { carId: car.id, mileage: parsed.data.mileage, note: parsed.data.note },
-    }),
-    db.car.update({
-      where: { id: car.id },
-      data: { currentMileage: parsed.data.mileage, lastTrackedAt: new Date() },
-    }),
-  ])
+    })
+    await recomputeCurrentMileage(tx, car.id)
+    return created
+  })
 
   const allLogs = await db.mileageLog.findMany({
     where: { carId: car.id },
