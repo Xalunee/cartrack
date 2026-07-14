@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Wrench,
 } from 'lucide-react'
-import { MagneticButton, RotatingWord } from '@shared/ui'
+import { RotatingWord } from '@shared/ui'
 import {
   CarIllustration,
   WrenchIllustration,
@@ -48,13 +48,12 @@ function LandingNav() {
           <Link href="/login" className="hidden text-sm text-[#6B6B6B] transition-colors hover:text-[#191918] sm:block">
             Войти
           </Link>
-          <MagneticButton
-            as="a"
+          <a
             href="/register"
-            className="rounded-lg bg-[#191918] px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#191918]/85"
+            className="rounded-lg border border-[#191918] px-3.5 py-1.5 text-sm font-medium text-[#191918] transition-colors hover:bg-[#191918] hover:text-white"
           >
             Завести журнал
-          </MagneticButton>
+          </a>
         </div>
       </div>
     </nav>
@@ -296,13 +295,12 @@ export function LandingPage() {
             .
           </p>
           <div className="mb-3 flex items-center justify-center gap-5">
-            <MagneticButton
-              as="a"
+            <a
               href="/register"
-              className="rounded-lg bg-[#191918] px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-[#191918]/85"
+              className="rounded-lg border-2 border-[#191918] px-6 py-3 text-[15px] font-medium text-[#191918] transition-colors hover:bg-[#191918] hover:text-white"
             >
               Завести журнал
-            </MagneticButton>
+            </a>
             <a href="#features" className="text-[15px] text-[#2383E2] hover:underline">
               Посмотреть возможности →
             </a>
@@ -553,13 +551,12 @@ export function LandingPage() {
                 Начните следить за машиной сегодня
               </h2>
               <p className="mb-8 text-[#6B6B6B]">Бесплатно для одной машины. Без карты, без рекламы.</p>
-              <MagneticButton
-                as="a"
+              <a
                 href="/register"
-                className="rounded-lg bg-[#191918] px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-[#191918]/85"
+                className="rounded-lg border-2 border-[#191918] px-6 py-3 text-[15px] font-medium text-[#191918] transition-colors hover:bg-[#191918] hover:text-white"
               >
                 Завести журнал
-              </MagneticButton>
+              </a>
             </div>
           </Reveal>
         </section>
