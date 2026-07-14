@@ -54,7 +54,11 @@ export function StatusOverview() {
           style={{ borderLeftColor: `hsl(var(--status-${item.resource.status}))` }}
           role="button"
           tabIndex={0}
-          onClick={() => router.push(`/maintenance/${item.id}`)}
+          onClick={(event) => {
+            const target = event.target as HTMLElement
+            if (target.closest('[data-slot="dialog-content"], [data-slot="dialog-overlay"]')) return
+            router.push(`/maintenance/${item.id}`)
+          }}
           onKeyDown={(event) => {
             if (event.target !== event.currentTarget) return
             if (event.key === 'Enter' || event.key === ' ') {
