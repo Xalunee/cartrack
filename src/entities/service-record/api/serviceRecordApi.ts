@@ -7,10 +7,13 @@ export const serviceRecordApi = {
   getForItem: (itemId: string) =>
     apiClient<ServiceRecord[]>(`/api/maintenance/${itemId}/records`),
   complete: (itemId: string, data: CompleteServiceDto) =>
-    apiClient<MaintenanceItemWithStatus>(`/api/maintenance/${itemId}/complete`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+    apiClient<MaintenanceItemWithStatus & { mileageLogWarning: string | null }>(
+      `/api/maintenance/${itemId}/complete`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    ),
   update: (id: string, data: UpdateServiceRecordDto) =>
     apiClient<ServiceRecord>(`/api/service-records/${id}`, {
       method: 'PATCH',

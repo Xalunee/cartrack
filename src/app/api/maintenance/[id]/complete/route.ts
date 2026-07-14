@@ -4,6 +4,8 @@ import { db } from '@shared/lib/db'
 import { z } from 'zod'
 import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
+import { validateMileagePoint } from '@shared/lib/calculations/mileage-validation'
+import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 
 const completeSchema = z.object({
   mileage: z.number().int().min(0),
@@ -53,10 +55,29 @@ export async function POST(
     return NextResponse.json({ error: 'Дата замены не может быть в будущем' }, { status: 400 })
   }
 
+  let mileageLogWarning: string | null = null
+
   const updated = await db.$transaction(async (tx) => {
     await tx.serviceRecord.create({
       data: { maintenanceItemId: item.id, mileage, date, cost, notes },
     })
+
+    const duplicate = await tx.mileageLog.findFirst({ where: { carId: car.id, mileage } })
+
+    if (!duplicate) {
+      const validation = await validateMileagePoint(tx, car.id, { mileage, recordedAt: date })
+      if (validation.ok) {
+        await tx.mileageLog.create({
+          data: { carId: car.id, mileage, recordedAt: date, note: `Обслуживание: ${item.name}` },
+        })
+        // Completion mileage is already guaranteed <= car.currentMileage, so this
+        // recompute can never lower it — it only keeps currentMileage/lastTrackedAt
+        // consistent if this happens to be the latest-by-date log.
+        await recomputeCurrentMileage(tx, car.id)
+      } else {
+        mileageLogWarning = 'Служба записана, но точка пробега не добавлена — противоречит истории'
+      }
+    }
 
     return tx.maintenanceItem.update({
       where: { id: item.id },
@@ -72,5 +93,5 @@ export async function POST(
   const pace = calculateDrivingPace(car.mileageLogs)
   const resource = calculateRemainingResource(updated, car.currentMileage, pace)
 
-  return NextResponse.json({ ...updated, resource })
+  return NextResponse.json({ ...updated, resource, mileageLogWarning })
 }

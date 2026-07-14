@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { MAINTENANCE_QUERY_KEY } from '@entities/maintenance-item'
 import { CAR_QUERY_KEY } from '@entities/car'
+import { MILEAGE_QUERY_KEY } from '@entities/mileage-log'
 import { serviceRecordApi } from './serviceRecordApi'
 import { CompleteServiceDto, UpdateServiceRecordDto } from '../model/types'
 
@@ -33,6 +34,7 @@ export function useCompleteServiceMutation(itemId: string) {
       queryClient.invalidateQueries({ queryKey: CAR_QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: serviceRecordsQueryKey(itemId) })
       queryClient.invalidateQueries({ queryKey: ALL_SERVICE_RECORDS_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: MILEAGE_QUERY_KEY })
     },
   })
 }

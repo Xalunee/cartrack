@@ -84,10 +84,9 @@ export function CompleteServiceDialog({
               ? `через ${updated.resource.remainingKm.toLocaleString('ru')} км`
               : null
 
-          setConfirmation(
-            forecast ? `Записано. Следующая замена ~${forecast}` : 'Записано.'
-          )
-          setTimeout(() => setOpen(false), 1200)
+          const base = forecast ? `Записано. Следующая замена ~${forecast}` : 'Записано.'
+          setConfirmation(updated.mileageLogWarning ? `${base}\n${updated.mileageLogWarning}` : base)
+          setTimeout(() => setOpen(false), updated.mileageLogWarning ? 2400 : 1200)
         },
       }
     )
@@ -101,7 +100,7 @@ export function CompleteServiceDialog({
           <DialogTitle>Заменил: {itemName}</DialogTitle>
         </DialogHeader>
         {confirmation ? (
-          <p className="text-sm py-4" style={{ color: 'hsl(var(--status-ok))' }}>
+          <p className="text-sm py-4 whitespace-pre-line" style={{ color: 'hsl(var(--status-ok))' }}>
             {confirmation}
           </p>
         ) : (
