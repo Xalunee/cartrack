@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/button'
 import { Plus, Wrench } from 'lucide-react'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export function StatusOverview() {
+  const router = useRouter()
   const { data: items, isLoading } = useMaintenanceQuery()
   const { data: car } = useCarQuery()
 
@@ -47,11 +48,21 @@ export function StatusOverview() {
   return (
     <div className="space-y-2 stagger-children">
       {items.map((item) => (
-        <Link key={item.id} href={`/maintenance/${item.id}`} className="block">
-          <Card
-            className="overflow-hidden card-hover cursor-pointer border-l-2 py-0"
-            style={{ borderLeftColor: `hsl(var(--status-${item.resource.status}))` }}
-          >
+        <Card
+          key={item.id}
+          className="overflow-hidden card-hover cursor-pointer border-l-2 py-0"
+          style={{ borderLeftColor: `hsl(var(--status-${item.resource.status}))` }}
+          role="button"
+          tabIndex={0}
+          onClick={() => router.push(`/maintenance/${item.id}`)}
+          onKeyDown={(event) => {
+            if (event.target !== event.currentTarget) return
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              router.push(`/maintenance/${item.id}`)
+            }
+          }}
+        >
             <CardContent className="p-3">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="flex-1 min-w-0">
@@ -104,7 +115,10 @@ export function StatusOverview() {
                       variant="ghost"
                       size="sm"
                       className="h-7 w-7 p-0"
-                      onClick={(event) => event.preventDefault()}
+                      onClick={(event) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                      }}
                     >
                       <Wrench className="h-3.5 w-3.5" />
                     </Button>
@@ -120,9 +134,8 @@ export function StatusOverview() {
                   След. замена ~{format(new Date(item.resource.forecastDate), 'd MMM yyyy', { locale: ru })}
                 </p>
               )}
-            </CardContent>
-          </Card>
-        </Link>
+          </CardContent>
+        </Card>
       ))}
     </div>
   )

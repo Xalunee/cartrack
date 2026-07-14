@@ -95,7 +95,7 @@ export function CompleteServiceDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger ?? <Button size="sm">Заменил</Button>}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" onClick={(event) => event.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Заменил: {itemName}</DialogTitle>
         </DialogHeader>
