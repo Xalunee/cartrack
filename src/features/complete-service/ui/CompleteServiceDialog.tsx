@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useCompleteServiceMutation } from '@entities/service-record'
+import { ApiError } from '@shared/api/client'
 import { createCompleteServiceSchema, type CompleteServiceFormValues } from '../model/schema'
 
 interface CompleteServiceDialogProps {
@@ -49,7 +50,7 @@ export function CompleteServiceDialog({
   const [confirmation, setConfirmation] = useState<string | null>(null)
   const mutation = useCompleteServiceMutation(itemId)
 
-  const schema = createCompleteServiceSchema(prevMileage, currentMileage)
+  const schema = createCompleteServiceSchema(prevMileage)
   const form = useForm<CompleteServiceFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -84,7 +85,19 @@ export function CompleteServiceDialog({
               ? `через ${updated.resource.remainingKm.toLocaleString('ru')} км`
               : null
 
-          const base = forecast ? `Записано. Следующая замена ~${forecast}` : 'Записано.'
+          const advanced = values.mileage > currentMileage
+          const advancedNote = advanced
+            ? `Текущий пробег обновлён: ${values.mileage.toLocaleString('ru')} км.`
+            : null
+
+          const base = [
+            'Записано.',
+            advancedNote,
+            forecast ? `Следующая замена ~${forecast}` : null,
+          ]
+            .filter(Boolean)
+            .join(' ')
+
           setConfirmation(updated.mileageLogWarning ? `${base}\n${updated.mileageLogWarning}` : base)
           setTimeout(() => setOpen(false), updated.mileageLogWarning ? 2400 : 1200)
         },
@@ -124,7 +137,9 @@ export function CompleteServiceDialog({
                         }
                       />
                     </FormControl>
-                    <p className="text-xs text-muted-foreground">Пробег на момент замены</p>
+                    <p className="text-xs text-muted-foreground">
+                      Пробег на момент замены — может быть больше последнего записанного
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -197,7 +212,12 @@ export function CompleteServiceDialog({
               </div>
 
               {mutation.error && (
-                <p className="text-sm text-destructive">{mutation.error.message ?? 'Ошибка'}</p>
+                <div className="text-sm text-destructive space-y-0.5">
+                  <p>{mutation.error.message ?? 'Ошибка'}</p>
+                  {mutation.error instanceof ApiError && mutation.error.suggestion && (
+                    <p className="text-xs">{mutation.error.suggestion}</p>
+                  )}
+                </div>
               )}
             </form>
           </Form>

@@ -1,12 +1,11 @@
 import { z } from 'zod'
 
-export function createCompleteServiceSchema(prevMileage: number, currentMileage: number) {
+export function createCompleteServiceSchema(prevMileage: number) {
   return z.object({
     mileage: z
       .number()
       .int()
-      .min(prevMileage, 'Пробег замены не может быть меньше предыдущей замены')
-      .max(currentMileage, 'Пробег замены не может превышать текущий пробег машины'),
+      .min(prevMileage, 'Пробег замены не может быть меньше предыдущей замены'),
     date: z.string().refine((value) => new Date(value) <= new Date(), {
       message: 'Дата не может быть в будущем',
     }),
