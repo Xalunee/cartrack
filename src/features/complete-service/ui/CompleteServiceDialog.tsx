@@ -138,7 +138,7 @@ export function CompleteServiceDialog({
                       />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      Пробег на момент замены — может быть больше последнего записанного
+                      Пробег на момент замены
                     </p>
                     <FormMessage />
                   </FormItem>
