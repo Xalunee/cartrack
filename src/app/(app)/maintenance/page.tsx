@@ -4,7 +4,7 @@ import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { useCarQuery } from '@entities/car'
 import { MaintenanceDialog } from '@features/add-maintenance'
 import { StatusOverview } from '@widgets/status-overview'
-import { ServiceArchive } from '@widgets/service-archive'
+import { ServiceHistory } from '@widgets/service-history'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -88,7 +88,7 @@ export default function MaintenancePage() {
         <StatusOverview />
       </div>
 
-      <ServiceArchive />
+      <ServiceHistory />
     </div>
   )
 }

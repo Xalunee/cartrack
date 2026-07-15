@@ -12,7 +12,7 @@ export async function GET() {
   const records = await db.serviceRecord.findMany({
     where: { maintenanceItem: { carId: car.id } },
     include: { maintenanceItem: { select: { name: true } } },
-    orderBy: { mileage: 'desc' },
+    orderBy: [{ date: 'desc' }, { mileage: 'desc' }],
   })
 
   const withItemName = records.map(({ maintenanceItem, ...record }) => ({

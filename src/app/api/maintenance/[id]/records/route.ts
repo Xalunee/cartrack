@@ -18,7 +18,7 @@ export async function GET(
 
   const records = await db.serviceRecord.findMany({
     where: { maintenanceItemId: item.id },
-    orderBy: { mileage: 'desc' },
+    orderBy: [{ date: 'desc' }, { mileage: 'desc' }],
   })
 
   return NextResponse.json(records)

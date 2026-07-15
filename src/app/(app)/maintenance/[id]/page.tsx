@@ -174,7 +174,7 @@ export default function MaintenanceDetailPage() {
         </Button>
       </div>
 
-      <ServiceTimeline itemId={id} />
+      <ServiceTimeline itemId={id} item={item} />
     </div>
   )
 }
