@@ -24,6 +24,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@shared/lib/utils'
+import { getPeriodStart, DEFAULT_PERIOD } from '@shared/lib/period'
+import { PeriodSwitcher, type Period } from '@shared/ui'
 import { TrendingUp, Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import {
   LineChart,
@@ -44,8 +46,12 @@ export function MileageTracker() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [editingLog, setEditingLog] = useState<MileageLog | null>(null)
   const [deletingLog, setDeletingLog] = useState<MileageLog | null>(null)
+  const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD)
+
+  const periodStart = getPeriodStart(period)
 
   const chartData = data?.logs
+    .filter((log) => new Date(log.recordedAt) >= periodStart)
     .slice()
     .reverse()
     .slice(-10)
@@ -59,22 +65,25 @@ export function MileageTracker() {
     <>
       <Card className="h-full">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-y-2">
             <CardTitle className="text-base flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Пробег
             </CardTitle>
-            {car && (
-              <LogMileageDialog
-                currentMileage={car.currentMileage}
-                trigger={
-                  <Button size="sm" variant="outline">
-                    <Plus className="h-3.5 w-3.5 mr-1" />
-                    Внести
-                  </Button>
-                }
-              />
-            )}
+            <div className="flex items-center gap-2">
+              <PeriodSwitcher value={period} onChange={setPeriod} />
+              {car && (
+                <LogMileageDialog
+                  currentMileage={car.currentMileage}
+                  trigger={
+                    <Button size="sm" variant="outline">
+                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      Внести
+                    </Button>
+                  }
+                />
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -153,8 +162,8 @@ export function MileageTracker() {
             </div>
           )}
           {chartData && chartData.length < 2 && (
-            <p className="text-xs text-muted-foreground text-center py-4">
-              Добавьте ещё пробег для графика
+            <p className="text-xs text-muted-foreground text-center py-8">
+              Нет данных за период
             </p>
           )}
           {data?.logs && data.logs.length > 0 && (

@@ -1,7 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PeriodSwitcher, type Period } from '@shared/ui'
+import { getPeriodStart, DEFAULT_PERIOD } from '@shared/lib/period'
 import { BarChart2 } from 'lucide-react'
 import {
   BarChart,
@@ -12,33 +15,58 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+const PERIOD_LABEL: Record<Period, string> = {
+  month: 'месяц',
+  halfyear: 'полгода',
+  year: 'год',
+}
+
 export function SpendingChart() {
   const { data: items } = useMaintenanceQuery()
+  const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD)
 
-  const totalYear = items?.reduce((sum, item) => sum + item.totalSpent, 0) ?? 0
+  const periodStart = getPeriodStart(period)
 
-  const topItems = items
-    ?.filter((item) => item.totalSpent > 0)
-    .sort((a, b) => b.totalSpent - a.totalSpent)
+  const itemsInPeriod = items?.map((item) => ({
+    id: item.id,
+    name: item.name,
+    spentInPeriod: item.serviceRecords
+      .filter((r) => new Date(r.date) >= periodStart)
+      .reduce((sum, r) => sum + (r.cost ?? 0), 0),
+  }))
+
+  const total = itemsInPeriod?.reduce((sum, item) => sum + item.spentInPeriod, 0) ?? 0
+
+  const topItems = itemsInPeriod
+    ?.filter((item) => item.spentInPeriod > 0)
+    .sort((a, b) => b.spentInPeriod - a.spentInPeriod)
     .slice(0, 5)
 
   const chartData = topItems?.map((item) => ({
     name: item.name.length > 12 ? item.name.slice(0, 12) + '…' : item.name,
     fullName: item.name,
-    cost: item.totalSpent,
+    cost: item.spentInPeriod,
   }))
 
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <BarChart2 className="h-4 w-4" />
-            Расходы
-          </CardTitle>
-          <span className="text-base font-semibold tabular-nums">
-            {totalYear.toLocaleString('ru')} ₽
-          </span>
+        <div className="flex items-center justify-between flex-wrap gap-y-2">
+          <div>
+            <CardTitle className="text-base flex items-center gap-2">
+              <BarChart2 className="h-4 w-4" />
+              Расходы
+            </CardTitle>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              За {PERIOD_LABEL[period]}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <PeriodSwitcher value={period} onChange={setPeriod} />
+            <span className="text-base font-semibold tabular-nums">
+              {total.toLocaleString('ru')} ₽
+            </span>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
@@ -75,15 +103,15 @@ export function SpendingChart() {
               <div key={item.id} className="flex items-center justify-between gap-2 text-xs">
                 <span className="text-muted-foreground truncate">{item.name}</span>
                 <span className="tabular-nums flex-shrink-0">
-                  {item.totalSpent.toLocaleString('ru')} ₽
+                  {item.spentInPeriod.toLocaleString('ru')} ₽
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-1.5 py-6">
+          <div className="flex-1 flex flex-col items-center justify-center gap-1.5 py-8">
             <BarChart2 className="h-6 w-6 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground">Нет данных о расходах</p>
+            <p className="text-xs text-muted-foreground">Нет данных за период</p>
           </div>
         )}
       </CardContent>

@@ -14,9 +14,16 @@ export interface MaintenanceItem {
   updatedAt: Date
 }
 
+export interface MaintenanceItemServiceRecordSummary {
+  id: string
+  date: Date
+  cost: number | null
+}
+
 export interface MaintenanceItemWithStatus extends MaintenanceItem {
   resource: RemainingResource
   totalSpent: number
+  serviceRecords: MaintenanceItemServiceRecordSummary[]
 }
 
 export interface CreateMaintenanceItemDto {
