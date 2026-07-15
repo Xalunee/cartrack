@@ -41,18 +41,23 @@ export async function POST(
   const prevMileage = item.lastServiceMileage ?? 0
   if (mileage < prevMileage) {
     return NextResponse.json(
-      { error: 'Пробег замены не может быть меньше предыдущей замены' },
-      { status: 400 }
-    )
-  }
-  if (mileage > car.currentMileage) {
-    return NextResponse.json(
-      { error: 'Пробег замены не может превышать текущий пробег машины' },
+      {
+        error: 'Пробег замены не может быть меньше предыдущей замены',
+        suggestion: `Предыдущая замена была на ${prevMileage.toLocaleString('ru')} км. Введите значение не меньше этого.`,
+      },
       { status: 400 }
     )
   }
   if (date > new Date()) {
     return NextResponse.json({ error: 'Дата замены не может быть в будущем' }, { status: 400 })
+  }
+
+  const validation = await validateMileagePoint(db, car.id, { mileage, recordedAt: date })
+  if (!validation.ok) {
+    return NextResponse.json(
+      { error: validation.message, suggestion: validation.suggestion },
+      { status: 400 }
+    )
   }
 
   let mileageLogWarning: string | null = null
@@ -65,19 +70,14 @@ export async function POST(
     const duplicate = await tx.mileageLog.findFirst({ where: { carId: car.id, mileage } })
 
     if (!duplicate) {
-      const validation = await validateMileagePoint(tx, car.id, { mileage, recordedAt: date })
-      if (validation.ok) {
-        await tx.mileageLog.create({
-          data: { carId: car.id, mileage, recordedAt: date, note: `Обслуживание: ${item.name}` },
-        })
-        // Completion mileage is already guaranteed <= car.currentMileage, so this
-        // recompute can never lower it — it only keeps currentMileage/lastTrackedAt
-        // consistent if this happens to be the latest-by-date log.
-        await recomputeCurrentMileage(tx, car.id)
-      } else {
-        mileageLogWarning = 'Служба записана, но точка пробега не добавлена — противоречит истории'
-      }
+      await tx.mileageLog.create({
+        data: { carId: car.id, mileage, recordedAt: date, note: `Обслуживание: ${item.name}` },
+      })
+    } else {
+      mileageLogWarning = 'Служба записана, но точка пробега уже была в истории'
     }
+
+    await recomputeCurrentMileage(tx, car.id)
 
     return tx.maintenanceItem.update({
       where: { id: item.id },
