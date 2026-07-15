@@ -1,52 +1,78 @@
-const CACHE_NAME = 'cartrack-v3'
-const STATIC_CACHE = 'cartrack-static-v3'
-const API_CACHE = 'cartrack-api-v2'
+const CACHE_NAME = 'cartrack-v4'
+const STATIC_CACHE = 'cartrack-static-v4'
+const API_CACHE = 'cartrack-api-v3'
+const CURRENT_CACHES = [CACHE_NAME, STATIC_CACHE, API_CACHE]
 
 // Static assets to precache
-const PRECACHE_URLS = [
-  '/',
-  '/dashboard',
-  '/maintenance',
-  '/mileage',
-  '/events',
-  '/settings',
-  '/offline',
-]
+const PRECACHE_URLS = ['/', '/dashboard', '/maintenance', '/mileage', '/events', '/settings', '/offline']
 
 // API routes to cache
-const CACHEABLE_API = [
-  '/api/car',
-  '/api/maintenance',
-  '/api/mileage',
-  '/api/events',
-  '/api/user',
-]
+const CACHEABLE_API = ['/api/car', '/api/maintenance', '/api/mileage', '/api/events', '/api/user']
 
-// Install — precache core pages
+// Minimal inline fallback — guarantees a Russian response even if /offline isn't cached
+const FALLBACK_HTML = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Нет подключения — CarTrack</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #0a0a0a; color: #fafafa; }
+  @media (prefers-color-scheme: light) { body { background: #ffffff; color: #0a0a0a; } }
+  .card { text-align: center; max-width: 320px; padding: 2rem; }
+  h1 { font-size: 1.125rem; font-weight: 600; margin: 0 0 0.5rem; }
+  p { font-size: 0.875rem; opacity: 0.7; margin: 0 0 1.5rem; }
+  button { font: inherit; padding: 0.5rem 1rem; border-radius: 0.375rem; border: 1px solid currentColor; background: transparent; color: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Страница недоступна</h1>
+  <p>Не удалось загрузить страницу. Проверьте подключение к интернету и попробуйте снова.</p>
+  <button onclick="location.reload()">Обновить</button>
+</div>
+</body>
+</html>`
+
+function fallbackResponse() {
+  return new Response(FALLBACK_HTML, {
+    status: 200,
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  })
+}
+
+// Install — precache core pages, never fail the whole install if one URL fails
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(PRECACHE_URLS).catch(() => {
-        // Some pages may fail to cache, that's ok
-        console.log('Some precache URLs failed')
-      })
-    })
+    caches.open(STATIC_CACHE).then((cache) =>
+      Promise.allSettled(
+        PRECACHE_URLS.map(async (url) => {
+          try {
+            await cache.add(url)
+          } catch (e) {
+            console.warn('[SW] precache failed:', url, e)
+          }
+        })
+      )
+    )
   )
   self.skipWaiting()
 })
 
-// Activate — clean old caches
+// Activate — delete every cache not in the current set, notify clients to refresh
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((names) => {
-      return Promise.all(
-        names
-          .filter((name) => name !== STATIC_CACHE && name !== API_CACHE)
-          .map((name) => caches.delete(name))
+    (async () => {
+      const names = await caches.keys()
+      await Promise.all(
+        names.filter((name) => !CURRENT_CACHES.includes(name)).map((name) => caches.delete(name))
       )
-    })
+      await self.clients.claim()
+
+      const clients = await self.clients.matchAll({ type: 'window' })
+      clients.forEach((c) => c.postMessage({ type: 'SW_UPDATED' }))
+    })()
   )
-  self.clients.claim()
 })
 
 // Fetch handler
@@ -56,25 +82,51 @@ self.addEventListener('fetch', (event) => {
   // Never intercept auth routes — CSRF tokens and session cookies must flow freely
   if (url.pathname.startsWith('/api/auth')) return
 
-  // API requests: network first, cache fallback
+  // Content-hashed Next.js static assets: safe to cache-first indefinitely
+  if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached
+        return fetch(event.request)
+          .then((response) => {
+            if (response.ok) {
+              const clone = response.clone()
+              caches.open(STATIC_CACHE).then((cache) => cache.put(event.request, clone))
+            }
+            return response
+          })
+          .catch(() => fallbackResponse())
+      })
+    )
+    return
+  }
+
+  // Everything else under /_next/ (data, RSC payloads) changes every deploy — network-first, never cached
+  if (url.pathname.startsWith('/_next/')) {
+    event.respondWith(fetch(event.request).catch(() => fallbackResponse()))
+    return
+  }
+
+  // API requests: network first, cache fallback (GET only)
   if (CACHEABLE_API.some((path) => url.pathname.startsWith(path))) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Only cache successful GET responses
           if (response.ok && event.request.method === 'GET') {
             const clone = response.clone()
-            caches.open(API_CACHE).then((cache) => {
-              cache.put(event.request, clone)
-            })
+            caches.open(API_CACHE).then((cache) => cache.put(event.request, clone))
           }
           return response
         })
         .catch(() => {
-          // Offline — try cache
+          if (event.request.method !== 'GET') {
+            return new Response(JSON.stringify({ error: 'Offline', offline: true }), {
+              headers: { 'Content-Type': 'application/json' },
+              status: 503,
+            })
+          }
           return caches.match(event.request).then((cached) => {
             if (cached) return cached
-            // Return empty JSON if no cache
             return new Response(JSON.stringify({ error: 'Offline', offline: true }), {
               headers: { 'Content-Type': 'application/json' },
               status: 503,
@@ -85,24 +137,25 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Navigation requests: network first, cache fallback, then offline page
+  // Navigation requests: network first → cache for this URL → /offline → hardcoded fallback (never undefined)
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Only cache GET navigations — POST (form submits) cannot be cached
-          if (event.request.method === 'GET') {
+          if (event.request.method === 'GET' && response.ok) {
             const clone = response.clone()
-            caches.open(STATIC_CACHE).then((cache) => {
-              cache.put(event.request, clone)
-            })
+            caches.open(STATIC_CACHE).then((cache) => cache.put(event.request, clone))
           }
           return response
         })
-        .catch(() => {
-          return caches.match(event.request).then((cached) => {
-            return cached || caches.match('/offline')
-          })
+        .catch(async () => {
+          const cached = await caches.match(event.request)
+          if (cached) return cached
+
+          const offline = await caches.match('/offline')
+          if (offline) return offline
+
+          return fallbackResponse()
         })
     )
     return
@@ -112,19 +165,15 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached
-      return fetch(event.request).then((response) => {
-        // Cache static assets
-        if (response.ok && url.origin === self.location.origin) {
-          const clone = response.clone()
-          caches.open(STATIC_CACHE).then((cache) => {
-            cache.put(event.request, clone)
-          })
-        }
-        return response
-      }).catch(() => {
-        // Return nothing for failed static asset requests
-        return new Response('', { status: 404 })
-      })
+      return fetch(event.request)
+        .then((response) => {
+          if (response.ok && url.origin === self.location.origin) {
+            const clone = response.clone()
+            caches.open(STATIC_CACHE).then((cache) => cache.put(event.request, clone))
+          }
+          return response
+        })
+        .catch(() => new Response('', { status: 404 }))
     })
   )
 })
