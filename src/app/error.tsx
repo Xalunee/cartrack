@@ -1,0 +1,45 @@
+'use client'
+
+import { useEffect } from 'react'
+import { AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  useEffect(() => {
+    console.error(error)
+  }, [error])
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 page-enter">
+      <Card className="glass w-full max-w-sm text-center">
+        <CardContent className="pt-8 pb-6">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+            <AlertTriangle className="h-7 w-7 text-muted-foreground" />
+          </div>
+          <h1 className="text-lg font-semibold mb-2">Что-то пошло не так</h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            Произошла ошибка при загрузке страницы.
+          </p>
+          {process.env.NODE_ENV === 'development' && (
+            <pre className="mb-6 max-h-32 overflow-auto rounded bg-muted p-3 text-left font-mono text-xs text-muted-foreground">
+              {error.message}
+            </pre>
+          )}
+          <div className="flex gap-3 justify-center">
+            <Button onClick={() => reset()}>Попробовать снова</Button>
+            <Button variant="ghost" onClick={() => (window.location.href = '/dashboard')}>
+              На главную
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
