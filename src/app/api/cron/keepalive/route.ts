@@ -8,5 +8,25 @@ export async function GET(req: Request) {
   }
 
   const count = await db.user.count()
-  return NextResponse.json({ ok: true, users: count, timestamp: new Date().toISOString() })
+
+  const supabaseUrl = process.env.SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_ANON_KEY
+
+  let restPing: { status: number } | { skipped: string }
+  if (supabaseUrl && supabaseKey) {
+    const res = await fetch(`${supabaseUrl}/rest/v1/`, {
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+      signal: AbortSignal.timeout(10000),
+    })
+    restPing = { status: res.status }
+  } else {
+    restPing = { skipped: 'SUPABASE_URL or SUPABASE_ANON_KEY not set' }
+  }
+
+  return NextResponse.json({
+    ok: true,
+    users: count,
+    restPing,
+    timestamp: new Date().toISOString(),
+  })
 }
