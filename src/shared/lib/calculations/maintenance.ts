@@ -9,7 +9,7 @@ interface MaintenanceItemData {
 
 /**
  * Determine status based on used percent.
- * ok: < 70% used | soon: 70–90% used | critical: > 90% used or overdue
+ * ok: < 70% used | soon: 70–90% used | critical: >= 90% used or overdue
  */
 function getStatus(usedPercent: number): MaintenanceStatus {
   if (usedPercent >= 90) return 'critical'
@@ -38,7 +38,11 @@ export function calculateRemainingResource(
     remainingKm = item.intervalKm - usedKm
     usedPercentKm = Math.min(100, (usedKm / item.intervalKm) * 100)
 
-    if (pace && remainingKm > 0) {
+    // A zero pace is a real state (flat odometer across two days), so guard the
+    // division — otherwise daysUntil is Infinity and forecastDate an Invalid
+    // Date, which also shadows the day-based forecast below (every comparison
+    // against an Invalid Date is false). Leaving it null lets that branch win.
+    if (pace && pace.kmPerDay > 0 && remainingKm > 0) {
       const daysUntil = remainingKm / pace.kmPerDay
       forecastDate = new Date(Date.now() + daysUntil * 24 * 60 * 60 * 1000)
     }
