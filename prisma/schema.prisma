@@ -1,3 +1,8 @@
+// ⚠️ When adding a new model: Postgres creates tables with RLS DISABLED by default.
+// Supabase exposes every table in the `public` schema through its REST API, so a new
+// table is publicly readable until RLS is enabled. Add an `alter table ... enable row
+// level security;` statement in a migration for every new model.
+
 generator client {
   provider = "prisma-client-js"
 }
