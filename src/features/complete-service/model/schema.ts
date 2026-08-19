@@ -1,16 +1,15 @@
 import { z } from 'zod'
+import { costField, mileageField, pastDateField, textField } from '@shared/lib/validation/limits'
 
 export function createCompleteServiceSchema(prevMileage: number) {
   return z.object({
-    mileage: z
-      .number()
-      .int()
-      .min(prevMileage, 'Пробег замены не может быть меньше предыдущей замены'),
-    date: z.string().refine((value) => new Date(value) <= new Date(), {
-      message: 'Дата не может быть в будущем',
-    }),
-    cost: z.number().min(0).optional(),
-    notes: z.string().optional(),
+    mileage: mileageField().min(
+      prevMileage,
+      'Пробег замены не может быть меньше предыдущей замены'
+    ),
+    date: pastDateField(),
+    cost: costField().optional(),
+    notes: textField().optional(),
   })
 }
 

@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { costField, mileageField, pastDateTimeField, textField } from '@shared/lib/validation/limits'
 
 const updateSchema = z.object({
-  mileage: z.number().int().min(0).optional(),
-  date: z.string().datetime().optional(),
-  cost: z.number().min(0).optional(),
-  notes: z.string().optional(),
+  mileage: mileageField().optional(),
+  date: pastDateTimeField().optional(),
+  cost: costField().optional(),
+  notes: textField().optional(),
 })
 
 async function findOwnedRecord(userId: string, id: string) {

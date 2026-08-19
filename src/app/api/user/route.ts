@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { LIMITS, nameField, passwordField } from '@shared/lib/validation/limits'
 import bcrypt from 'bcryptjs'
 
 const updateSchema = z.object({
-  name: z.string().min(1).optional(),
-  currentPassword: z.string().optional(),
-  newPassword: z.string().min(6).optional(),
+  name: nameField('Введите имя').optional(),
+  // Bounded but with no minimum — it is an existing credential being checked, not
+  // a new one being set, so length rules must not gate it.
+  currentPassword: z.string().max(LIMITS.passwordLength).optional(),
+  newPassword: passwordField().optional(),
 }).refine(
   (data) => {
     if (data.newPassword && !data.currentPassword) return false

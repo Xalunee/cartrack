@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server'
 import { db } from '@shared/lib/db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { emailField, nameField, passwordField } from '@shared/lib/validation/limits'
 
 const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6, 'Минимум 6 символов'),
-  name: z.string().min(1).optional(),
+  email: emailField(),
+  password: passwordField(),
+  name: nameField('Введите имя').optional(),
 })
 
 export async function POST(req: Request) {

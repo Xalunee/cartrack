@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { mileageField, pastDateTimeField, textField } from '@shared/lib/validation/limits'
 import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
 import { validateMileagePoint } from '@shared/lib/calculations/mileage-validation'
 import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 
 const createSchema = z.object({
-  mileage: z.number().int().min(0),
-  note: z.string().optional(),
-  recordedAt: z.string().datetime().optional(),
+  mileage: mileageField(),
+  note: textField().optional(),
+  recordedAt: pastDateTimeField().optional(),
 })
 
 export async function GET() {

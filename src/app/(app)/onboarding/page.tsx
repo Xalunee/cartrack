@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { licensePlateField, mileageField, nameField, yearField } from '@shared/lib/validation/limits'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -20,18 +21,11 @@ import { Car } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 
 const schema = z.object({
-  brand: z.string().min(1, 'Введите марку'),
-  model: z.string().min(1, 'Введите модель'),
-  year: z
-    .number()
-    .int()
-    .min(1900, 'Некорректный год')
-    .max(new Date().getFullYear() + 1, 'Некорректный год'),
-  licensePlate: z.string().optional(),
-  currentMileage: z
-    .number()
-    .int()
-    .min(0, 'Пробег не может быть отрицательным'),
+  brand: nameField('Введите марку'),
+  model: nameField('Введите модель'),
+  year: yearField(),
+  licensePlate: licensePlateField().optional(),
+  currentMileage: mileageField(),
 })
 
 type FormValues = z.infer<typeof schema>

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { costField, nameField, pastDateField, textField } from '@shared/lib/validation/limits'
 
 export const eventTypeLabels = {
   ACCIDENT: 'Авария',
@@ -10,10 +11,10 @@ export const eventTypeLabels = {
 
 export const addEventSchema = z.object({
   type: z.enum(['ACCIDENT', 'MALFUNCTION', 'FINE', 'SERVICE', 'NOTE']),
-  title: z.string().min(1, 'Введите название'),
-  description: z.string().optional(),
-  cost: z.number().min(0).optional(),
-  occurredAt: z.string().optional(),
+  title: nameField('Введите название'),
+  description: textField().optional(),
+  cost: costField().optional(),
+  occurredAt: pastDateField().optional(),
 })
 
 export type AddEventFormValues = z.infer<typeof addEventSchema>

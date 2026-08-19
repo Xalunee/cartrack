@@ -2,16 +2,17 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { costField, mileageField, pastDateTimeField, textField } from '@shared/lib/validation/limits'
 import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
 import { validateMileagePoint } from '@shared/lib/calculations/mileage-validation'
 import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 
 const completeSchema = z.object({
-  mileage: z.number().int().min(0),
-  date: z.string().datetime(),
-  cost: z.number().min(0).optional(),
-  notes: z.string().optional(),
+  mileage: mileageField(),
+  date: pastDateTimeField(),
+  cost: costField().optional(),
+  notes: textField().optional(),
 })
 
 export async function POST(
@@ -47,9 +48,6 @@ export async function POST(
       },
       { status: 400 }
     )
-  }
-  if (date > new Date()) {
-    return NextResponse.json({ error: 'Дата замены не может быть в будущем' }, { status: 400 })
   }
 
   const validation = await validateMileagePoint(db, car.id, { mileage, recordedAt: date })

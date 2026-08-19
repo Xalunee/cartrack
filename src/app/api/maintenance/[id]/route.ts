@@ -2,17 +2,26 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import {
+  costField,
+  intervalDaysField,
+  intervalKmField,
+  mileageField,
+  nameField,
+  pastDateTimeField,
+  textField,
+} from '@shared/lib/validation/limits'
 import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
 
 const updateSchema = z.object({
-  name: z.string().min(1).optional(),
-  intervalKm: z.number().int().positive().optional(),
-  intervalDays: z.number().int().positive().optional(),
-  lastServiceMileage: z.number().int().min(0).optional(),
-  lastServiceDate: z.string().datetime().optional(),
-  lastServiceCost: z.number().min(0).optional(),
-  lastServiceNotes: z.string().optional(),
+  name: nameField('Введите название').optional(),
+  intervalKm: intervalKmField().optional(),
+  intervalDays: intervalDaysField().optional(),
+  lastServiceMileage: mileageField().optional(),
+  lastServiceDate: pastDateTimeField().optional(),
+  lastServiceCost: costField().optional(),
+  lastServiceNotes: textField().optional(),
 })
 
 export async function GET(

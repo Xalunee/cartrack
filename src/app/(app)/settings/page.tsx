@@ -22,6 +22,7 @@ import { ExportButton } from '@features/export-pdf'
 import { useCarQuery, useUpdateCarMutation } from '@entities/car'
 import { StsDialog } from '@features/set-sts'
 import { useHydrated, useMediaQuery } from '@shared/lib/client-env'
+import { TELEGRAM_FALLBACK_LABEL } from '@shared/config'
 
 interface UserInfo {
   id: string
@@ -274,7 +275,7 @@ export default function SettingsPage() {
                   )}
 
                   <details open={popupBlocked} className="text-xs text-muted-foreground">
-                    <summary className="cursor-pointer select-none">Не открылся Telegram?</summary>
+                    <summary className="cursor-pointer select-none">{TELEGRAM_FALLBACK_LABEL}</summary>
                     <div className="mt-2 space-y-2">
                       <a
                         href={link.url}

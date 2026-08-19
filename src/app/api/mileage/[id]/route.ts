@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { mileageField, pastDateTimeField, textField } from '@shared/lib/validation/limits'
 import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 import { validateMileagePoint } from '@shared/lib/calculations/mileage-validation'
 
 const updateSchema = z.object({
-  mileage: z.number().int().min(0).optional(),
-  note: z.string().optional().nullable(),
-  recordedAt: z.string().datetime().optional(),
+  mileage: mileageField().optional(),
+  note: textField().optional().nullable(),
+  recordedAt: pastDateTimeField().optional(),
 })
 
 export async function PATCH(

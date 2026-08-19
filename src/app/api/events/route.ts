@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { costField, nameField, pastDateTimeField, textField } from '@shared/lib/validation/limits'
 
 const createSchema = z.object({
   type: z.enum(['ACCIDENT', 'MALFUNCTION', 'FINE', 'SERVICE', 'NOTE']),
-  title: z.string().min(1),
-  description: z.string().optional(),
-  cost: z.number().min(0).optional(),
-  occurredAt: z.string().datetime().optional(),
+  title: nameField('Введите название'),
+  description: textField().optional(),
+  cost: costField().optional(),
+  occurredAt: pastDateTimeField().optional(),
 })
 
 export async function GET() {

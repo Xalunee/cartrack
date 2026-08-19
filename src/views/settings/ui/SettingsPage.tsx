@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { nameField, passwordField } from '@shared/lib/validation/limits'
 import { useUserQuery, useUpdateUserMutation } from '@entities/user'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,13 +20,13 @@ import {
 import { User, Lock, CheckCircle2 } from 'lucide-react'
 
 const profileSchema = z.object({
-  name: z.string().min(1, 'Введите имя'),
+  name: nameField('Введите имя'),
 })
 
 const passwordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Введите текущий пароль'),
-    newPassword: z.string().min(6, 'Минимум 6 символов'),
+    newPassword: passwordField(),
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {

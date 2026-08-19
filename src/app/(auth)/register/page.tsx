@@ -4,6 +4,7 @@ import { signIn } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { emailField, nameField, passwordField } from '@shared/lib/validation/limits'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -21,9 +22,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { apiClient } from '@shared/api/client'
 
 const schema = z.object({
-  name: z.string().min(1, 'Введите имя'),
-  email: z.string().email('Неверный email'),
-  password: z.string().min(6, 'Минимум 6 символов'),
+  name: nameField('Введите имя'),
+  email: emailField(),
+  password: passwordField(),
 })
 
 type FormValues = z.infer<typeof schema>

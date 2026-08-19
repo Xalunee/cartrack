@@ -6,6 +6,8 @@ import { Bot, InlineKeyboard, Keyboard } from 'grammy'
 import { db } from '@shared/lib/db'
 import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
+import { LIMITS } from '@shared/lib/validation/limits'
+import { TELEGRAM_FALLBACK_LABEL } from '@shared/config'
 import type { DrivingPace, MaintenanceStatus, RemainingResource } from '@shared/types'
 
 const token = process.env.TELEGRAM_BOT_TOKEN
@@ -230,14 +232,15 @@ function settingsUrl() {
 
 /**
  * The manual /link command is the exception, not the entry point: the token it
- * needs is only shown on the settings page, under «Не открылся Telegram?», and
+ * needs is only shown on the settings page, under the fallback disclosure, and
  * only after the link button has been pressed. So every reply that mentions the
  * command has to send the user to that button first, or they arrive on the site
- * looking for a token that is not there yet.
+ * looking for a token that is not there yet. The disclosure's own label is
+ * imported rather than retyped, so renaming it cannot strand this instruction.
  */
 const LINK_INSTRUCTIONS =
   'Зайди на сайт → Настройки → Telegram и нажми «Привязать Telegram» — бот сам откроет этот чат.\n\n' +
-  'Команда /link нужна только если чат не открылся: там же, под «Не открылся Telegram?», лежит готовая команда — скопируй и пришли её сюда.'
+  `Команда /link нужна только если чат не открылся: там же, под «${TELEGRAM_FALLBACK_LABEL}», лежит готовая команда — скопируй и пришли её сюда.`
 
 /** One message for every failure mode that is not "you are already linked". */
 const LINK_FAILED_TEXT =
@@ -519,6 +522,16 @@ bot.on('message:text', async (ctx) => {
   if (isNaN(mileage) || mileage < 0) {
     await ctx.reply(
       'Отправь текущий пробег числом (например: 87650)',
+      { reply_markup: mainMenu() }
+    )
+    return
+  }
+
+  // Same ceiling the web forms and API routes use. Without it a mistyped reading
+  // is stored, becomes currentMileage, and then rejects every real one after it.
+  if (mileage > LIMITS.mileage) {
+    await ctx.reply(
+      `Слишком большой пробег — не больше ${LIMITS.mileage.toLocaleString('ru')} км.`,
       { reply_markup: mainMenu() }
     )
     return

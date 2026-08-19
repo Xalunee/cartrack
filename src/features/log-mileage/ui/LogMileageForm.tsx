@@ -2,10 +2,11 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { mileageField } from '@shared/lib/validation/limits'
 import { Button, Input, Label } from '@shared/ui'
 import { useLogMileageMutation } from '../model/useMutation'
 
-const schema = z.object({ mileage: z.number().positive() })
+const schema = z.object({ mileage: mileageField().positive() })
 type FormData = z.infer<typeof schema>
 
 export function LogMileageForm() {

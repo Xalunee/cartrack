@@ -3,10 +3,14 @@ import Credentials from 'next-auth/providers/credentials'
 import { db } from '@shared/lib/db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { emailField } from '@shared/lib/validation/limits'
 import { authConfig } from './auth.config'
 
+// The password has no upper bound here on purpose: this checks a credential that
+// already exists, and refusing one longer than we now allow would lock the account
+// out rather than protect it. bcrypt reads only the first 72 bytes either way.
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: emailField(),
   password: z.string().min(6),
 })
 

@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
+import { licensePlateField, mileageField, nameField, yearField } from '@shared/lib/validation/limits'
 
 const createSchema = z.object({
-  brand: z.string().min(1),
-  model: z.string().min(1),
-  year: z.number().int().min(1900).max(new Date().getFullYear() + 1),
-  licensePlate: z.string().optional(),
-  currentMileage: z.number().int().min(0),
+  brand: nameField('Введите марку'),
+  model: nameField('Введите модель'),
+  year: yearField(),
+  licensePlate: licensePlateField().optional(),
+  currentMileage: mileageField(),
 })
 
 const updateSchema = createSchema.partial().extend({
