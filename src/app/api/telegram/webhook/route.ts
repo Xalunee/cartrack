@@ -1,17 +1,34 @@
+import { MaintenanceItem } from '@prisma/client'
 import { NextResponse } from 'next/server'
+import { format } from 'date-fns'
+import { ru } from 'date-fns/locale'
 import { Bot, InlineKeyboard, Keyboard } from 'grammy'
 import { db } from '@shared/lib/db'
+import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
+import type { DrivingPace, MaintenanceStatus, RemainingResource } from '@shared/types'
 
 const token = process.env.TELEGRAM_BOT_TOKEN
 if (!token) throw new Error('TELEGRAM_BOT_TOKEN is not set')
 
 const bot = new Bot(token)
 
+/** How many recent readings the driving pace is derived from. */
+const MILEAGE_LOGS_FOR_PACE = 8
+
 // --- Helper: get user by chatId ---
 async function getUserByChatId(chatId: string) {
   return db.user.findFirst({
     where: { telegramChatId: chatId },
-    include: { car: { include: { maintenanceItems: true } } },
+    include: {
+      car: {
+        include: {
+          maintenanceItems: { orderBy: { createdAt: 'asc' } },
+          // Same window as /api/maintenance — enough for a driving pace.
+          mileageLogs: { orderBy: { recordedAt: 'desc' }, take: MILEAGE_LOGS_FOR_PACE },
+        },
+      },
+    },
   })
 }
 
@@ -35,31 +52,85 @@ function mainReplyKeyboard() {
     .persistent()
 }
 
-/** Only the fields the status text needs — any maintenance item row fits. */
-interface MaintenanceStatusItem {
-  name: string
-  intervalKm: number | null
-  lastServiceMileage: number | null
+const STATUS_EMOJI: Record<MaintenanceStatus, string> = {
+  critical: '🔴',
+  soon: '🟡',
+  ok: '🟢',
+}
+
+/** Worst first, same order the web app lists items in. */
+const STATUS_ORDER: Record<MaintenanceStatus, number> = { critical: 0, soon: 1, ok: 2 }
+
+/** Short date, with the year only when it is not the current one. */
+function shortDate(date: Date): string {
+  const pattern = date.getFullYear() === new Date().getFullYear() ? 'd MMM' : 'd MMM yyyy'
+  return format(date, pattern, { locale: ru })
+}
+
+function remainingText(value: number, unit: string): string {
+  const amount = Math.abs(value).toLocaleString('ru')
+  if (value > 0) return `${amount} ${unit}`
+  if (value === 0) return 'пора'
+  return `просрочено на ${amount} ${unit}`
+}
+
+/**
+ * One Telegram line per item. Whatever the shared calculation could not work out
+ * — no intervals, or no last service to count from — surfaces as "нет данных".
+ */
+function formatItemLine(name: string, resource: RemainingResource): string {
+  const parts: string[] = []
+  if (resource.remainingKm !== null) parts.push(remainingText(resource.remainingKm, 'км'))
+  if (resource.remainingDays !== null) parts.push(remainingText(resource.remainingDays, 'дн.'))
+
+  const unique = [...new Set(parts)]
+  if (!unique.length) return `➖ ${name} — нет данных`
+
+  // For a km interval the forecast adds something the numbers do not say: when
+  // the current pace gets there. For a days-only item it just repeats the day
+  // count, so it stays off those lines.
+  if (resource.forecastDate && resource.remainingKm !== null) {
+    unique.push(`~${shortDate(resource.forecastDate)}`)
+  }
+
+  return `${STATUS_EMOJI[resource.status]} ${name} — ${unique.join(' · ')}`
+}
+
+function withResources(
+  items: MaintenanceItem[],
+  currentMileage: number,
+  pace: DrivingPace | null
+) {
+  return items
+    .map((item) => ({
+      name: item.name,
+      resource: calculateRemainingResource(item, currentMileage, pace),
+    }))
+    .sort((a, b) => STATUS_ORDER[a.resource.status] - STATUS_ORDER[b.resource.status])
 }
 
 // --- Helper: format maintenance status ---
 function formatMaintenanceStatus(
-  items: MaintenanceStatusItem[],
-  currentMileage: number
+  items: MaintenanceItem[],
+  currentMileage: number,
+  pace: DrivingPace | null
 ): string {
   if (!items.length) return 'Нет позиций обслуживания'
 
-  return items
-    .map((item) => {
-      if (!item.intervalKm || item.lastServiceMileage === null) {
-        return `➖ ${item.name} — нет данных`
-      }
-      const remaining = item.intervalKm - (currentMileage - item.lastServiceMileage)
-      if (remaining <= 0) return `🔴 ${item.name} — просрочено на ${Math.abs(remaining).toLocaleString('ru')} км`
-      if (remaining < item.intervalKm * 0.3) return `🟡 ${item.name} — ${remaining.toLocaleString('ru')} км`
-      return `🟢 ${item.name} — ${remaining.toLocaleString('ru')} км`
-    })
+  return withResources(items, currentMileage, pace)
+    .map(({ name, resource }) => formatItemLine(name, resource))
     .join('\n')
+}
+
+/** Only the items that need attention — an item without data never qualifies. */
+function formatAlerts(
+  items: MaintenanceItem[],
+  currentMileage: number,
+  pace: DrivingPace | null
+): string[] {
+  return withResources(items, currentMileage, pace)
+    .filter(({ resource }) => resource.status !== 'ok')
+    .map(({ name, resource }) => formatItemLine(name, resource))
 }
 
 // --- /start command ---
@@ -181,7 +252,8 @@ bot.callbackQuery('action:status', async (ctx) => {
   }
 
   const car = user.car
-  const statusText = formatMaintenanceStatus(car.maintenanceItems, car.currentMileage)
+  const pace = calculateDrivingPace(car.mileageLogs)
+  const statusText = formatMaintenanceStatus(car.maintenanceItems, car.currentMileage, pace)
 
   await ctx.editMessageText(
     `🚗 ${car.brand} ${car.model} ${car.year}\n` +
@@ -292,7 +364,8 @@ bot.hears('📊 Статус', async (ctx) => {
   }
 
   const car = user.car
-  const statusText = formatMaintenanceStatus(car.maintenanceItems, car.currentMileage)
+  const pace = calculateDrivingPace(car.mileageLogs)
+  const statusText = formatMaintenanceStatus(car.maintenanceItems, car.currentMileage, pace)
 
   await ctx.reply(
     `🚗 ${car.brand} ${car.model} ${car.year}\n` +
@@ -405,16 +478,13 @@ bot.callbackQuery(/^confirm:mileage:(\d+)$/, async (ctx) => {
     }),
   ])
 
-  // Build alerts
-  const alerts = user.car.maintenanceItems
-    .map((item) => {
-      if (!item.intervalKm || item.lastServiceMileage === null) return null
-      const remaining = item.intervalKm - (mileage - item.lastServiceMileage)
-      if (remaining <= 0) return `🔴 ${item.name} — просрочено`
-      if (remaining < item.intervalKm * 0.3) return `🟡 ${item.name} — ${remaining.toLocaleString('ru')} км`
-      return null
-    })
-    .filter(Boolean)
+  // Build alerts against the reading just saved, with the pace it implies — the
+  // fetched car still holds the previous mileage and log list.
+  const logs = [{ mileage, recordedAt: new Date() }, ...user.car.mileageLogs].slice(
+    0,
+    MILEAGE_LOGS_FOR_PACE
+  )
+  const alerts = formatAlerts(user.car.maintenanceItems, mileage, calculateDrivingPace(logs))
 
   let message = `✅ Пробег обновлён: ${mileage.toLocaleString('ru')} км`
   if (diff > 0) message += `\n+${diff.toLocaleString('ru')} км`
