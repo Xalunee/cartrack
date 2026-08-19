@@ -1,37 +1,64 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import { cn } from '@shared/lib/utils'
+import { useClientFlag } from '@shared/lib/client-env'
+
+const SHOWN_KEY = 'cartrack-splash-shown'
+/** Time on screen before the fade-out starts, and the fade itself. */
+const VISIBLE_MS = 800
+const FADE_MS = 400
+
+/** Client-only: reads session storage, the URL, the viewport and display-mode. */
+function shouldShowSplash(): boolean {
+  if (sessionStorage.getItem(SHOWN_KEY)) return false
+
+  const path = window.location.pathname
+  const isLanding = path === '/'
+  const isAuthPage = path === '/login' || path === '/register'
+  if (isLanding || isAuthPage) return false
+
+  const isMobile = window.innerWidth < 768
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+
+  return isMobile || isStandalone
+}
+
+/**
+ * Answered once per page load and then cached: the effect below sets the session
+ * flag, so asking a second time would return false and yank the splash away
+ * mid-animation.
+ */
+let decision: boolean | null = null
+function shouldShowSplashOnce(): boolean {
+  if (decision === null) decision = shouldShowSplash()
+  return decision
+}
 
 export function SplashScreen() {
-  const [visible, setVisible] = useState(false)
+  // False during SSR and hydration, so the first client pass renders exactly
+  // what the server sent. Reading the URL rather than usePathname keeps this a
+  // snapshot of the entry page — a later client-side navigation must not raise
+  // the splash.
+  const show = useClientFlag(shouldShowSplashOnce)
   const [fading, setFading] = useState(false)
-  const pathname = usePathname()
+  const [finished, setFinished] = useState(false)
 
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem('cartrack-splash-shown')
-    if (alreadyShown) return
+    if (!show) return
 
-    const isLanding = pathname === '/'
-    const isAuthPage = pathname === '/login' || pathname === '/register'
-    const isMobile = window.innerWidth < 768
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    sessionStorage.setItem(SHOWN_KEY, '1')
 
-    if (!isLanding && !isAuthPage && (isMobile || isStandalone)) {
-      setVisible(true)
-      sessionStorage.setItem('cartrack-splash-shown', '1')
+    const fade = setTimeout(() => setFading(true), VISIBLE_MS)
+    const hide = setTimeout(() => setFinished(true), VISIBLE_MS + FADE_MS)
 
-      const timer = setTimeout(() => {
-        setFading(true)
-        setTimeout(() => setVisible(false), 400)
-      }, 800)
-
-      return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(fade)
+      clearTimeout(hide)
     }
-  }, [])
+  }, [show])
 
-  if (!visible) return null
+  if (!show || finished) return null
 
   return (
     <div

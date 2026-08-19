@@ -35,8 +35,18 @@ function mainReplyKeyboard() {
     .persistent()
 }
 
+/** Only the fields the status text needs — any maintenance item row fits. */
+interface MaintenanceStatusItem {
+  name: string
+  intervalKm: number | null
+  lastServiceMileage: number | null
+}
+
 // --- Helper: format maintenance status ---
-function formatMaintenanceStatus(items: any[], currentMileage: number): string {
+function formatMaintenanceStatus(
+  items: MaintenanceStatusItem[],
+  currentMileage: number
+): string {
   if (!items.length) return 'Нет позиций обслуживания'
 
   return items

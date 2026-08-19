@@ -36,4 +36,4 @@ export interface CreateMaintenanceItemDto {
   lastServiceNotes?: string
 }
 
-export interface UpdateMaintenanceItemDto extends Partial<CreateMaintenanceItemDto> {}
+export type UpdateMaintenanceItemDto = Partial<CreateMaintenanceItemDto>

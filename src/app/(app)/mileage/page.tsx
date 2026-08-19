@@ -50,8 +50,6 @@ export default function MileagePage() {
   const logs = data?.logs ?? []
   const totalLogs = logs.length
   const lastLog = logs[0]
-  const firstLog = logs[logs.length - 1]
-  const totalKm = lastLog && firstLog ? lastLog.mileage - firstLog.mileage : 0
 
   if (isLoading) {
     return (

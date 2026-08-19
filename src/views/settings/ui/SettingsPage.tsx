@@ -56,7 +56,7 @@ export function SettingsPage() {
     if (user?.name) {
       profileForm.reset({ name: user.name })
     }
-  }, [user])
+  }, [user, profileForm])
 
   function onProfileSubmit(values: ProfileValues) {
     updateMutation.mutate(

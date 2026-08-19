@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@shared/lib/utils'
+import { useMediaQuery } from '@shared/lib/client-env'
 
 interface RevealProps {
   children: ReactNode
@@ -13,23 +14,23 @@ interface RevealProps {
 
 export function Reveal({ children, className, delay = 0, as = 'div' }: RevealProps) {
   const ref = useRef<HTMLElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [revealed, setRevealed] = useState(false)
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+
+  // Reduced motion means "already revealed" — no observer, nothing to animate.
+  const visible = revealed || reduceMotion
 
   useEffect(() => {
+    if (reduceMotion) return
+
     const node = ref.current
     if (!node) return
-
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) {
-      setVisible(true)
-      return
-    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisible(true)
+            setRevealed(true)
             observer.disconnect()
           }
         })
@@ -39,7 +40,7 @@ export function Reveal({ children, className, delay = 0, as = 'div' }: RevealPro
 
     observer.observe(node)
     return () => observer.disconnect()
-  }, [])
+  }, [reduceMotion])
 
   const Tag = as
 

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   validateMileagePoint,
   isBigJump,
+  LARGE_JUMP_THRESHOLD,
 } from '@shared/lib/calculations/mileage-validation'
 
 /**
@@ -423,12 +424,28 @@ describe('validateMileagePoint', () => {
 })
 
 describe('isBigJump', () => {
+  const BASE = 10_000
+
   it('flags a delta at the default threshold', () => {
-    expect(isBigJump(11_000, 10_000)).toEqual({ big: true, delta: 1_000 })
+    expect(isBigJump(BASE + LARGE_JUMP_THRESHOLD, BASE)).toEqual({
+      big: true,
+      delta: LARGE_JUMP_THRESHOLD,
+    })
   })
 
   it('does not flag a delta just below the default threshold', () => {
-    expect(isBigJump(10_999, 10_000)).toEqual({ big: false, delta: 999 })
+    expect(isBigJump(BASE + LARGE_JUMP_THRESHOLD - 1, BASE)).toEqual({
+      big: false,
+      delta: LARGE_JUMP_THRESHOLD - 1,
+    })
+  })
+
+  // The dialog compares against this constant directly, so the function default
+  // and the exported value have to stay the same number.
+  it('uses the exported threshold as its default', () => {
+    expect(isBigJump(BASE + LARGE_JUMP_THRESHOLD, BASE, LARGE_JUMP_THRESHOLD)).toEqual(
+      isBigJump(BASE + LARGE_JUMP_THRESHOLD, BASE)
+    )
   })
 
   it('honours a custom threshold', () => {

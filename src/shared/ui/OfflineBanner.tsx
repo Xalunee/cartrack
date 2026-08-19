@@ -3,39 +3,32 @@
 import { useEffect, useState } from 'react'
 import { Wifi, WifiOff } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
+import { useIsOffline } from '@shared/lib/client-env'
+
+/** How long the green "reconnected" strip stays up. */
+const RECONNECTED_MS = 3000
 
 export function OfflineBanner() {
-  const [isOffline, setIsOffline] = useState(false)
+  const isOffline = useIsOffline()
   const [showReconnected, setShowReconnected] = useState(false)
-  const [wasOffline, setWasOffline] = useState(false)
 
   useEffect(() => {
-    function handleOffline() {
-      setIsOffline(true)
-      setWasOffline(true)
-    }
+    let timer: ReturnType<typeof setTimeout> | undefined
 
+    // The browser only fires `online` after a real offline period, so the event
+    // itself is the "was offline" signal — no extra state needed to track it.
     function handleOnline() {
-      setIsOffline(false)
-      if (wasOffline) {
-        setShowReconnected(true)
-        setTimeout(() => setShowReconnected(false), 3000)
-      }
+      setShowReconnected(true)
+      timer = setTimeout(() => setShowReconnected(false), RECONNECTED_MS)
     }
 
-    if (!navigator.onLine) {
-      setIsOffline(true)
-      setWasOffline(true)
-    }
-
-    window.addEventListener('offline', handleOffline)
     window.addEventListener('online', handleOnline)
 
     return () => {
-      window.removeEventListener('offline', handleOffline)
       window.removeEventListener('online', handleOnline)
+      clearTimeout(timer)
     }
-  }, [wasOffline])
+  }, [])
 
   if (!isOffline && !showReconnected) return null
 

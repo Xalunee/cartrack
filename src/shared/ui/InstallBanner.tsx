@@ -1,36 +1,36 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Menu, Plus, Share, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useHydrated, useMediaQuery } from '@shared/lib/client-env'
+
+const DISMISSED_KEY = 'cartrack-install-dismissed'
 
 export function InstallBanner() {
-  const [show, setShow] = useState(false)
-  const [isIOS, setIsIOS] = useState(false)
-  const [isAndroid, setIsAndroid] = useState(false)
-  const [isSamsung, setIsSamsung] = useState(false)
-  const [isStandalone, setIsStandalone] = useState(false)
-
-  useEffect(() => {
-    const ua = navigator.userAgent
-    setIsIOS(/iPad|iPhone|iPod/.test(ua))
-    setIsAndroid(/Android/.test(ua))
-    setIsSamsung(/SamsungBrowser/.test(ua))
-    setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
-
-    const dismissed = localStorage.getItem('cartrack-install-dismissed')
-    if (!dismissed) {
-      setShow(true)
-    }
-  }, [])
-
-  if (isStandalone || !show) return null
-  if (!isIOS && !isAndroid) return null
+  const hydrated = useHydrated()
+  const isStandalone = useMediaQuery('(display-mode: standalone)')
+  const [dismissed, setDismissed] = useState(false)
 
   function dismiss() {
-    setShow(false)
-    localStorage.setItem('cartrack-install-dismissed', '1')
+    setDismissed(true)
+    localStorage.setItem(DISMISSED_KEY, '1')
   }
+
+  // Already installed, dismissed in this session, or not yet hydrated (browser
+  // APIs below are unavailable on the server).
+  if (!hydrated || isStandalone || dismissed) return null
+
+  // Read at render rather than from an effect: the stored flag only changes via
+  // dismiss(), which re-renders anyway.
+  if (localStorage.getItem(DISMISSED_KEY)) return null
+
+  const ua = navigator.userAgent
+  const isIOS = /iPad|iPhone|iPod/.test(ua)
+  const isAndroid = /Android/.test(ua)
+  if (!isIOS && !isAndroid) return null
+
+  const isSamsung = /SamsungBrowser/.test(ua)
 
   return (
     <div className="relative z-[60] bg-primary text-primary-foreground px-4 py-3 flex items-start gap-3 animate-fade-in">

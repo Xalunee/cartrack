@@ -35,7 +35,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ApiError } from '@shared/api/client'
-import { isBigJump } from '@shared/lib/calculations/mileage-validation'
+import { isBigJump, LARGE_JUMP_THRESHOLD } from '@shared/lib/calculations/mileage-validation'
 import {
   useLogMileageMutation,
   useUpdateMileageLogMutation,
@@ -128,7 +128,6 @@ export function LogMileageDialog({
   )
 }
 
-const LARGE_JUMP_THRESHOLD = 1000
 
 function CreateMileageDialog({
   currentMileage,

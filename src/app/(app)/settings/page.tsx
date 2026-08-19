@@ -21,6 +21,7 @@ import { signOut } from 'next-auth/react'
 import { ExportButton } from '@features/export-pdf'
 import { useCarQuery, useUpdateCarMutation } from '@entities/car'
 import { StsDialog } from '@features/set-sts'
+import { useHydrated, useMediaQuery } from '@shared/lib/client-env'
 
 interface UserInfo {
   id: string
@@ -37,10 +38,13 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false)
   const [isPending, setIsPending] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [isStandalone, setIsStandalone] = useState(false)
-  const [isIOS, setIsIOS] = useState(false)
-  const [isSamsung, setIsSamsung] = useState(false)
   const [confirmingStsDelete, setConfirmingStsDelete] = useState(false)
+
+  // Install hints depend on the browser, so they can only be known client-side.
+  const hydrated = useHydrated()
+  const isStandalone = useMediaQuery('(display-mode: standalone)')
+  const isIOS = hydrated && /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const isSamsung = hydrated && /SamsungBrowser/.test(navigator.userAgent)
 
   const { data: car } = useCarQuery()
   const updateCarMutation = useUpdateCarMutation()
@@ -54,12 +58,6 @@ export default function SettingsPage() {
       .then(setUser)
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [])
-
-  useEffect(() => {
-    setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
-    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent))
-    setIsSamsung(/SamsungBrowser/.test(navigator.userAgent))
   }, [])
 
   async function generateCode() {

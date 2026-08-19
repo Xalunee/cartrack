@@ -73,11 +73,17 @@ export async function validateMileagePoint(
   return { ok: true }
 }
 
+/**
+ * Above this delta a new reading is treated as a large jump. Lives here so the
+ * function default and every caller's comparison can never drift apart.
+ */
+export const LARGE_JUMP_THRESHOLD = 1000
+
 /** Soft "large jump" check — not a hard block, just a confirm-dialog trigger. */
 export function isBigJump(
   candidateMileage: number,
   referenceMileage: number,
-  threshold = 1000
+  threshold = LARGE_JUMP_THRESHOLD
 ): { big: boolean; delta: number } {
   const delta = candidateMileage - referenceMileage
   return { big: delta >= threshold, delta }
