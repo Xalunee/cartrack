@@ -85,7 +85,7 @@ export function isFutureDate(value: string | Date, now: Date = new Date()): bool
 export function mileageField() {
   return z
     .number({ error: 'Введите число' })
-    .int()
+    .int('Пробег должен быть целым числом')
     .min(0, 'Пробег не может быть отрицательным')
     .max(LIMITS.mileage, `Пробег не может быть больше ${LIMITS.mileage.toLocaleString('ru')} км`)
 }
@@ -100,23 +100,23 @@ export function costField() {
 export function intervalKmField() {
   return z
     .number({ error: 'Введите число' })
-    .int()
-    .positive()
+    .int('Интервал должен быть целым числом')
+    .positive('Интервал должен быть больше нуля')
     .max(LIMITS.intervalKm, `Интервал не может быть больше ${LIMITS.intervalKm.toLocaleString('ru')} км`)
 }
 
 export function intervalDaysField() {
   return z
     .number({ error: 'Введите число' })
-    .int()
-    .positive()
+    .int('Интервал должен быть целым числом')
+    .positive('Интервал должен быть больше нуля')
     .max(LIMITS.intervalDays, `Интервал не может быть больше ${LIMITS.intervalDays.toLocaleString('ru')} дн.`)
 }
 
 export function yearField() {
   return z
     .number({ error: 'Введите год' })
-    .int()
+    .int('Некорректный год')
     .min(LIMITS.yearMin, 'Некорректный год')
     .max(maxCarYear(), 'Некорректный год')
 }
@@ -157,10 +157,38 @@ export function pastDateField(requiredMessage = 'Укажите дату') {
     .refine((value) => !isFutureDate(value), { message: FUTURE_DATE_MESSAGE })
 }
 
+/**
+ * The same rule for a date the user may leave blank. A date input holds `''`, not
+ * `undefined`, when it is untouched or cleared, so `pastDateField().optional()`
+ * would reject the resting state of every optional date field in the app — the
+ * dialogs turn `''` into `undefined` themselves before sending.
+ */
+export function optionalPastDateField() {
+  return z
+    .string()
+    .refine((value) => value === '' || !isFutureDate(value), { message: FUTURE_DATE_MESSAGE })
+    .optional()
+}
+
 /** ISO datetime as the client sends it over the wire, same future rule. */
 export function pastDateTimeField() {
   return z
     .string()
     .datetime()
     .refine((value) => !isFutureDate(value), { message: FUTURE_DATE_MESSAGE })
+}
+
+// --- Login ---
+//
+// Both fields below check a credential that already exists, so neither may be
+// gated on a bound introduced after the account was created: rejecting the value
+// locks the account out instead of protecting it. The bounds belong on
+// registration, where the value is accepted for the first time.
+
+export function existingEmailField() {
+  return z.string().email('Неверный email')
+}
+
+export function existingPasswordField() {
+  return z.string().min(6, 'Минимум 6 символов')
 }

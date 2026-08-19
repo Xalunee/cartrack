@@ -6,7 +6,7 @@ import { mileageField } from '@shared/lib/validation/limits'
 import { Button, Input, Label } from '@shared/ui'
 import { useLogMileageMutation } from '../model/useMutation'
 
-const schema = z.object({ mileage: mileageField().positive() })
+const schema = z.object({ mileage: mileageField().positive('Пробег должен быть больше нуля') })
 type FormData = z.infer<typeof schema>
 
 export function LogMileageForm() {

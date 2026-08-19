@@ -11,6 +11,7 @@ import {
   maxCarYear,
   mileageField,
   nameField,
+  optionalPastDateField,
   passwordField,
   pastDateField,
   pastDateTimeField,
@@ -37,9 +38,14 @@ describe('numeric ceilings', () => {
     expect(mileageField().safeParse(2_147_483_648).success).toBe(false)
   })
 
-  it('still rejects negative and fractional readings', () => {
+  it('still rejects negative and fractional readings, in Russian', () => {
     expect(mileageField().safeParse(-1).success).toBe(false)
-    expect(mileageField().safeParse(1000.5).success).toBe(false)
+
+    const fractional = mileageField().safeParse(1000.5)
+    expect(fractional.success).toBe(false)
+    if (!fractional.success) {
+      expect(fractional.error.issues[0].message).toBe('Пробег должен быть целым числом')
+    }
   })
 
   it('keeps a cost that would poison totalSpent out', () => {
@@ -52,7 +58,10 @@ describe('numeric ceilings', () => {
   it('bounds both interval kinds', () => {
     expect(intervalKmField().safeParse(LIMITS.intervalKm).success).toBe(true)
     expect(intervalKmField().safeParse(LIMITS.intervalKm + 1).success).toBe(false)
-    expect(intervalKmField().safeParse(0).success).toBe(false)
+
+    const zero = intervalKmField().safeParse(0)
+    expect(zero.success).toBe(false)
+    if (!zero.success) expect(zero.error.issues[0].message).toBe('Интервал должен быть больше нуля')
 
     expect(intervalDaysField().safeParse(LIMITS.intervalDays).success).toBe(true)
     expect(intervalDaysField().safeParse(LIMITS.intervalDays + 1).success).toBe(false)
@@ -135,9 +144,23 @@ describe('date fields', () => {
     if (!parsed.success) expect(parsed.error.issues[0].message).toBe(FUTURE_DATE_MESSAGE)
   })
 
-  it('requires a date and accepts a past one', () => {
+  it('requires a date when the field is required', () => {
     expect(pastDateField().safeParse('').success).toBe(false)
     expect(pastDateField().safeParse('2024-03-01').success).toBe(true)
+  })
+
+  it('accepts the empty string a blank optional date input holds', () => {
+    // The resting state of an untouched or cleared date input is '', not
+    // undefined, so rejecting it would break every optional date field.
+    expect(optionalPastDateField().safeParse('').success).toBe(true)
+    expect(optionalPastDateField().safeParse(undefined).success).toBe(true)
+    expect(optionalPastDateField().safeParse('2024-03-01').success).toBe(true)
+  })
+
+  it('still rejects a future date once the optional field is filled', () => {
+    const parsed = optionalPastDateField().safeParse('2030-01-01')
+    expect(parsed.success).toBe(false)
+    if (!parsed.success) expect(parsed.error.issues[0].message).toBe(FUTURE_DATE_MESSAGE)
   })
 
   it('holds the wire format to ISO and to the same future rule', () => {

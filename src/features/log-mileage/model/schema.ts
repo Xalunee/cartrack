@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { mileageField, pastDateField, textField } from '@shared/lib/validation/limits'
+import { mileageField, optionalPastDateField, pastDateField, textField } from '@shared/lib/validation/limits'
 
 export const logMileageSchema = z.object({
   mileage: mileageField(),
   note: textField().optional(),
-  recordedAt: pastDateField().optional(),
+  recordedAt: optionalPastDateField(),
 })
 
 export type LogMileageFormValues = z.infer<typeof logMileageSchema>

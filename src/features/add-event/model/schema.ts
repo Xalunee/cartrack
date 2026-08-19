@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { costField, nameField, pastDateField, textField } from '@shared/lib/validation/limits'
+import { costField, nameField, optionalPastDateField, textField } from '@shared/lib/validation/limits'
 
 export const eventTypeLabels = {
   ACCIDENT: 'Авария',
@@ -14,7 +14,7 @@ export const addEventSchema = z.object({
   title: nameField('Введите название'),
   description: textField().optional(),
   cost: costField().optional(),
-  occurredAt: pastDateField().optional(),
+  occurredAt: optionalPastDateField(),
 })
 
 export type AddEventFormValues = z.infer<typeof addEventSchema>

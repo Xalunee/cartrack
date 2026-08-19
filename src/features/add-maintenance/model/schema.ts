@@ -5,7 +5,7 @@ import {
   intervalKmField,
   mileageField,
   nameField,
-  pastDateField,
+  optionalPastDateField,
   textField,
 } from '@shared/lib/validation/limits'
 
@@ -15,7 +15,7 @@ export const maintenanceSchema = z
     intervalKm: intervalKmField().optional(),
     intervalDays: intervalDaysField().optional(),
     lastServiceMileage: mileageField().optional(),
-    lastServiceDate: pastDateField().optional(),
+    lastServiceDate: optionalPastDateField(),
     lastServiceCost: costField().optional(),
     lastServiceNotes: textField().optional(),
   })

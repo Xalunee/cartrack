@@ -4,7 +4,7 @@ import { signIn } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { emailField } from '@shared/lib/validation/limits'
+import { existingEmailField, existingPasswordField } from '@shared/lib/validation/limits'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -20,12 +20,9 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-// No upper bound on the password here on purpose: this form checks an existing
-// credential, and refusing to submit one that is longer than we now allow would
-// lock out an account rather than protect it.
 const schema = z.object({
-  email: emailField(),
-  password: z.string().min(6, 'Минимум 6 символов'),
+  email: existingEmailField(),
+  password: existingPasswordField(),
 })
 
 type FormValues = z.infer<typeof schema>
