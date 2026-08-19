@@ -33,6 +33,8 @@ interface UserInfo {
 
 interface TelegramLink {
   token: string
+  /** Public @username of the bot, so the manual fallback can name where to paste. */
+  botUsername: string
   url: string
 }
 
@@ -281,9 +283,15 @@ export default function SettingsPage() {
                         className="inline-flex items-center gap-1 text-primary underline"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
-                        Открыть бота в Telegram
+                        Открыть @{link.botUsername} в Telegram
                       </a>
-                      <p>Или отправьте боту эту команду:</p>
+                      <p>
+                        Или найдите бота{' '}
+                        <code className="font-mono bg-muted px-1.5 py-0.5 rounded select-all">
+                          @{link.botUsername}
+                        </code>{' '}
+                        в Telegram и отправьте ему эту команду:
+                      </p>
                       <div className="flex items-center gap-2">
                         <code className="font-mono bg-muted px-2 py-1 rounded break-all">
                           /link {link.token}

@@ -17,8 +17,10 @@ export async function POST() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Built server-side so the bot username never has to reach the client, and so a
-  // missing env var fails loudly instead of producing a link that goes nowhere.
+  // The deep link is built server-side so a missing env var fails loudly instead
+  // of producing a link that goes nowhere. The username itself is public — it is
+  // already in the t.me URL — and the client needs it to name the bot in the
+  // manual fallback, so it is returned alongside the link.
   const botUsername = process.env.TELEGRAM_BOT_USERNAME?.replace(/^@/, '')
   if (!botUsername) {
     console.error('[telegram/generate-code] TELEGRAM_BOT_USERNAME is not set in this environment')
@@ -41,6 +43,7 @@ export async function POST() {
 
   return NextResponse.json({
     token,
+    botUsername,
     url: `https://t.me/${botUsername}?start=${token}`,
     expiresIn: '15 минут',
   })

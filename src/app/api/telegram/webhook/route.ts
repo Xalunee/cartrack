@@ -228,10 +228,20 @@ function settingsUrl() {
   return (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings'
 }
 
+/**
+ * The manual /link command is the exception, not the entry point: the token it
+ * needs is only shown on the settings page, under «Не открылся Telegram?», and
+ * only after the link button has been pressed. So every reply that mentions the
+ * command has to send the user to that button first, or they arrive on the site
+ * looking for a token that is not there yet.
+ */
+const LINK_INSTRUCTIONS =
+  'Зайди на сайт → Настройки → Telegram и нажми «Привязать Telegram» — бот сам откроет этот чат.\n\n' +
+  'Команда /link нужна только если чат не открылся: там же, под «Не открылся Telegram?», лежит готовая команда — скопируй и пришли её сюда.'
+
 /** One message for every failure mode that is not "you are already linked". */
 const LINK_FAILED_TEXT =
-  '❌ Ссылка привязки недействительна или истекла.\n\n' +
-  'Получите новую на сайте: Настройки → Telegram.'
+  '❌ Ссылка привязки недействительна или истекла.\n\n' + LINK_INSTRUCTIONS
 
 /**
  * Shared reply for both entry points — the /start deep link and the manual
@@ -290,13 +300,11 @@ bot.command('start', async (ctx) => {
   } else {
     await ctx.reply(
       'Привет! Я бот CarTrack 🚗\n\n' +
-      'Чтобы начать, привяжи аккаунт:\n\n' +
-      '1️⃣ Зайди на сайт → Настройки → Telegram\n' +
-      '2️⃣ Нажми "Привязать Telegram"\n' +
-      '3️⃣ Кнопка сама откроет этот чат и всё привяжет',
+      'Чтобы начать, привяжи аккаунт.\n\n' +
+      LINK_INSTRUCTIONS,
       {
         reply_markup: new InlineKeyboard()
-          .url('🌐 Открыть сайт', settingsUrl())
+          .url('🌐 Открыть настройки', settingsUrl())
       }
     )
   }
@@ -310,8 +318,7 @@ bot.command('link', async (ctx) => {
   if (!token) {
     if (isLinkLockedOut(chatId)) return
     await ctx.reply(
-      'Отправь ссылку-код привязки:\n/link ТОКЕН\n\n' +
-        'Проще нажать кнопку «Привязать Telegram» на сайте — она откроет бота сама.',
+      'Привязка делается с сайта в одно нажатие.\n\n' + LINK_INSTRUCTIONS,
       {
         reply_markup: new InlineKeyboard().url('🌐 Открыть настройки', settingsUrl()),
       }
