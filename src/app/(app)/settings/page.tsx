@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert } from 'lucide-react'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert, ExternalLink } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
 import { ExportButton } from '@features/export-pdf'
@@ -31,10 +31,26 @@ interface UserInfo {
   mileageTrackInterval: number
 }
 
+interface TelegramLink {
+  token: string
+  url: string
+}
+
+// Linking finishes in Telegram, so the page has no event to wait on — it polls
+// until the webhook has stored the chat id, then gives up rather than spinning.
+// The token outlives this window, so giving up is not the same as failing.
+const LINK_POLL_INTERVAL_MS = 3000
+const LINK_POLL_TIMEOUT_MS = 2 * 60 * 1000
+
+type LinkStatus = 'idle' | 'waiting' | 'timedout'
+
 export default function SettingsPage() {
   const router = useRouter()
   const [user, setUser] = useState<UserInfo | null>(null)
-  const [linkCode, setLinkCode] = useState<string | null>(null)
+  const [link, setLink] = useState<TelegramLink | null>(null)
+  const [linkError, setLinkError] = useState<string | null>(null)
+  const [linkStatus, setLinkStatus] = useState<LinkStatus>('idle')
+  const [popupBlocked, setPopupBlocked] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isPending, setIsPending] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -60,15 +76,83 @@ export default function SettingsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  async function generateCode() {
+  useEffect(() => {
+    if (linkStatus !== 'waiting') return
+
+    const startedAt = Date.now()
+    let stopped = false
+
+    // Every exit goes through here, so a poll and the final check resolving
+    // together cannot both apply the transition or leave the interval running.
+    function stop() {
+      if (stopped) return false
+      stopped = true
+      clearInterval(timer)
+      return true
+    }
+
+    async function checkLinked() {
+      const fresh = await apiClient<UserInfo>('/api/user')
+      if (!fresh.telegramChatId) return false
+      if (stop()) {
+        setUser(fresh)
+        setLink(null)
+        setPopupBlocked(false)
+        setLinkStatus('idle')
+      }
+      return true
+    }
+
+    const timer = setInterval(async () => {
+      if (stopped) return
+
+      if (Date.now() - startedAt > LINK_POLL_TIMEOUT_MS) {
+        // One last look before giving up: the token stays valid well past the
+        // polling window, so the link may have gone through a moment ago.
+        try {
+          if (await checkLinked()) return
+        } catch {
+          // Treat an unreachable API as "not linked yet" and fall through.
+        }
+        if (stop()) setLinkStatus('timedout')
+        return
+      }
+
+      try {
+        await checkLinked()
+      } catch {
+        // A failed poll is not a failed link — keep waiting for the next tick.
+      }
+    }, LINK_POLL_INTERVAL_MS)
+
+    return () => {
+      stopped = true
+      clearInterval(timer)
+    }
+  }, [linkStatus])
+
+  async function startLinking() {
     setIsPending(true)
+    setLinkError(null)
+
+    // Opened synchronously inside the click: after an await the tap's transient
+    // user activation is spent and Safari refuses the popup outright.
+    const popup = window.open('', '_blank')
+
     try {
-      const res = await apiClient<{ code: string }>('/api/telegram/generate-code', {
+      const res = await apiClient<TelegramLink>('/api/telegram/generate-code', {
         method: 'POST',
       })
-      setLinkCode(res.code)
+      if (popup) popup.location.href = res.url
+      setLink(res)
+      setPopupBlocked(!popup)
+      setLinkStatus('waiting')
     } catch (e) {
-      console.error(e)
+      popup?.close()
+      setLink(null)
+      setPopupBlocked(false)
+      setLinkStatus('idle')
+      setLinkError(e instanceof Error ? e.message : 'Не удалось создать ссылку привязки')
     } finally {
       setIsPending(false)
     }
@@ -79,7 +163,9 @@ export default function SettingsPage() {
     try {
       await apiClient('/api/telegram/unlink', { method: 'POST' })
       setUser((prev) => prev ? { ...prev, telegramChatId: null } : null)
-      setLinkCode(null)
+      setLink(null)
+      setPopupBlocked(false)
+      setLinkStatus('idle')
     } catch (e) {
       console.error(e)
     } finally {
@@ -87,9 +173,11 @@ export default function SettingsPage() {
     }
   }
 
-  function copyCode() {
-    if (linkCode) {
-      navigator.clipboard.writeText(linkCode)
+  function copyLinkCommand() {
+    if (link) {
+      // The bot only reads this as a command with the /link prefix — a bare token
+      // falls through to the mileage handler.
+      navigator.clipboard.writeText(`/link ${link.token}`)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
@@ -157,29 +245,63 @@ export default function SettingsPage() {
                 Привяжите Telegram чтобы получать напоминания и вносить пробег через бота.
               </p>
 
-              {linkCode ? (
+              <Button onClick={startLinking} disabled={isPending} size="sm">
+                <MessageCircle className="h-3.5 w-3.5 mr-1" />
+                {isPending ? 'Открываем Telegram...' : 'Привязать Telegram'}
+              </Button>
+
+              {linkError && <p className="text-sm text-destructive">{linkError}</p>}
+
+              {link && (
                 <div className="space-y-2">
-                  <p className="text-sm">Ваш код привязки:</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-2xl font-mono font-bold tracking-widest bg-muted px-4 py-2 rounded-lg">
-                      {linkCode}
-                    </code>
-                    <Button variant="ghost" size="sm" onClick={copyCode}>
-                      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Отправьте этот код боту командой: /link {linkCode}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Код действует 10 минут.
-                  </p>
+                  {popupBlocked ? (
+                    <p className="text-sm text-muted-foreground">
+                      Браузер заблокировал новое окно. Откройте бота по ссылке ниже —
+                      привязка сработает так же.
+                    </p>
+                  ) : linkStatus === 'waiting' ? (
+                    <p className="text-sm text-muted-foreground">
+                      Ждём подтверждения из Telegram — нажмите «Запустить» в открывшемся чате.
+                      Страница обновится сама.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Пока не видим подтверждения. Ссылка действует ещё около 15 минут —
+                      завершите привязку в Telegram и обновите страницу.
+                    </p>
+                  )}
+
+                  <details open={popupBlocked} className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer select-none">Не открылся Telegram?</summary>
+                    <div className="mt-2 space-y-2">
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-primary underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        Открыть бота в Telegram
+                      </a>
+                      <p>Или отправьте боту эту команду:</p>
+                      <div className="flex items-center gap-2">
+                        <code className="font-mono bg-muted px-2 py-1 rounded break-all">
+                          /link {link.token}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={copyLinkCommand}
+                          title="Скопировать команду целиком"
+                        >
+                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                      <p>{copied ? 'Команда скопирована целиком — вставьте её в чат.' : 'Кнопка копирует команду вместе с /link.'}</p>
+                      <p>Ссылка действует 15 минут.</p>
+                    </div>
+                  </details>
                 </div>
-              ) : (
-                <Button onClick={generateCode} disabled={isPending} size="sm">
-                  <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                  {isPending ? 'Генерация...' : 'Получить код привязки'}
-                </Button>
               )}
             </div>
           )}

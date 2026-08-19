@@ -8,6 +8,10 @@ type RestPing =
   | { skipped: string; reachedDb: false }
 
 export async function GET(req: Request) {
+  if (!process.env.CRON_SECRET) {
+    console.error('[cron/keepalive] CRON_SECRET is not set in this environment')
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
+  }
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -37,7 +41,10 @@ export async function GET(req: Request) {
         restPing = { status: res.status, body, reachedDb: false }
       }
     } catch (e) {
-      restPing = { error: e instanceof Error ? e.message : String(e), reachedDb: false }
+      // A fetch exception message carries the Supabase host and, for TLS/DNS faults,
+      // resolver detail — log it, but never hand it back over HTTP.
+      console.error('[cron/keepalive] REST ping failed:', e)
+      restPing = { error: 'rest ping failed', reachedDb: false }
     }
   } else {
     restPing = { skipped: 'SUPABASE_URL or SUPABASE_ANON_KEY not set', reachedDb: false }
@@ -47,7 +54,10 @@ export async function GET(req: Request) {
   try {
     dbResult = { users: await db.user.count() }
   } catch (e) {
-    dbResult = { error: e instanceof Error ? e.message : String(e) }
+    // Prisma errors routinely quote the connection string and host — keep them in
+    // the Vercel logs and return only the fact that the query failed.
+    console.error('[cron/keepalive] database query failed:', e)
+    dbResult = { error: 'database unreachable' }
   }
 
   // The route exists to prove the project is awake, so success is exactly "the ping

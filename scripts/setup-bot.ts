@@ -14,7 +14,7 @@ async function setup() {
   // Set commands
   const commands = [
     { command: 'start', description: '🚗 Главное меню' },
-    { command: 'link', description: '🔗 Привязать аккаунт (6-значный код)' },
+    { command: 'link', description: '🔗 Привязать аккаунт (ссылка с сайта)' },
   ]
 
   const cmdRes = await fetch(`${API}/setMyCommands`, {

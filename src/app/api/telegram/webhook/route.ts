@@ -133,9 +133,153 @@ function formatAlerts(
     .map(({ name, resource }) => formatItemLine(name, resource))
 }
 
+// --- Account linking ---
+
+/**
+ * Link tokens are 24 random bytes in base64url (32 chars). The range is loose on
+ * purpose so a token issued under a different length still validates; anything
+ * outside this alphabet cannot be one and is rejected without a database hit.
+ */
+const LINK_TOKEN_PATTERN = /^[A-Za-z0-9_-]{16,64}$/
+
+/**
+ * Defence in depth. The token itself is infeasible to guess, so this exists to
+ * stop a chat burning function invocations on a sweep. In-memory means it is
+ * per-instance and resets on redeploy — acceptable for that purpose, and the
+ * token remains the actual security boundary.
+ */
+const MAX_LINK_ATTEMPTS = 5
+const LINK_ATTEMPT_WINDOW_MS = 60 * 60 * 1000
+
+const linkAttempts = new Map<string, { count: number; firstAt: number }>()
+
+function pruneLinkAttempts(now: number) {
+  for (const [chatId, entry] of linkAttempts) {
+    if (now - entry.firstAt > LINK_ATTEMPT_WINDOW_MS) linkAttempts.delete(chatId)
+  }
+}
+
+function isLinkLockedOut(chatId: string): boolean {
+  const entry = linkAttempts.get(chatId)
+  if (!entry) return false
+  if (Date.now() - entry.firstAt > LINK_ATTEMPT_WINDOW_MS) {
+    linkAttempts.delete(chatId)
+    return false
+  }
+  return entry.count >= MAX_LINK_ATTEMPTS
+}
+
+function recordFailedLink(chatId: string) {
+  const now = Date.now()
+  const entry = linkAttempts.get(chatId)
+  if (!entry || now - entry.firstAt > LINK_ATTEMPT_WINDOW_MS) {
+    if (linkAttempts.size > 1000) pruneLinkAttempts(now)
+    linkAttempts.set(chatId, { count: 1, firstAt: now })
+    return
+  }
+  entry.count += 1
+}
+
+type LinkOutcome =
+  | { status: 'linked'; email: string }
+  | { status: 'already_linked'; email: string }
+  | { status: 'invalid' }
+  | { status: 'locked' }
+
+/**
+ * Redeems a link token for this chat. Expired and never-issued tokens are
+ * deliberately indistinguishable to the caller — telling them apart would confirm
+ * to a sweeper that a value was once real.
+ */
+async function linkAccount(chatId: string, token: string): Promise<LinkOutcome> {
+  if (isLinkLockedOut(chatId)) return { status: 'locked' }
+
+  // Not a guess, so it never counts against the attempt budget.
+  const existingLink = await db.user.findFirst({ where: { telegramChatId: chatId } })
+  if (existingLink) return { status: 'already_linked', email: existingLink.email }
+
+  if (!LINK_TOKEN_PATTERN.test(token)) {
+    recordFailedLink(chatId)
+    return { status: 'invalid' }
+  }
+
+  const user = await db.user.findFirst({
+    where: { telegramLinkCode: token, telegramLinkExpires: { gt: new Date() } },
+  })
+  if (!user) {
+    recordFailedLink(chatId)
+    return { status: 'invalid' }
+  }
+
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      telegramChatId: chatId,
+      telegramLinkCode: null,
+      telegramLinkExpires: null,
+    },
+  })
+
+  linkAttempts.delete(chatId)
+  return { status: 'linked', email: user.email }
+}
+
+function settingsUrl() {
+  return (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings'
+}
+
+/** One message for every failure mode that is not "you are already linked". */
+const LINK_FAILED_TEXT =
+  '❌ Ссылка привязки недействительна или истекла.\n\n' +
+  'Получите новую на сайте: Настройки → Telegram.'
+
+/**
+ * Shared reply for both entry points — the /start deep link and the manual
+ * /link fallback. A locked-out chat gets no reply at all.
+ */
+async function replyToLinkOutcome(
+  ctx: { reply: (text: string, other?: object) => Promise<unknown> },
+  outcome: LinkOutcome
+) {
+  if (outcome.status === 'locked') return
+
+  if (outcome.status === 'linked') {
+    await ctx.reply(
+      `✅ Аккаунт ${outcome.email} привязан!\n\n` +
+        'Теперь ты можешь вносить пробег и проверять статус.',
+      { reply_markup: mainReplyKeyboard() }
+    )
+    return
+  }
+
+  if (outcome.status === 'already_linked') {
+    await ctx.reply(
+      `Ты уже привязан к аккаунту ${outcome.email}.\n\n` +
+        'Сначала отвяжи текущий аккаунт в настройках на сайте.',
+      {
+        reply_markup: new InlineKeyboard().url('⚙️ Настройки', settingsUrl()),
+      }
+    )
+    return
+  }
+
+  await ctx.reply(LINK_FAILED_TEXT, {
+    reply_markup: new InlineKeyboard().url('🌐 Открыть настройки', settingsUrl()),
+  })
+}
+
 // --- /start command ---
 bot.command('start', async (ctx) => {
   const chatId = String(ctx.chat.id)
+
+  // Deep link from the site: /start <token>. Telegram passes the start parameter
+  // through as the command argument.
+  const payload = ctx.match?.trim()
+  if (payload) {
+    await replyToLinkOutcome(ctx, await linkAccount(chatId, payload))
+    return
+  }
+
   const user = await getUserByChatId(chatId)
 
   if (user) {
@@ -148,75 +292,34 @@ bot.command('start', async (ctx) => {
       'Привет! Я бот CarTrack 🚗\n\n' +
       'Чтобы начать, привяжи аккаунт:\n\n' +
       '1️⃣ Зайди на сайт → Настройки → Telegram\n' +
-      '2️⃣ Нажми "Получить код"\n' +
-      '3️⃣ Отправь код сюда командой: /link КОД',
+      '2️⃣ Нажми "Привязать Telegram"\n' +
+      '3️⃣ Кнопка сама откроет этот чат и всё привяжет',
       {
         reply_markup: new InlineKeyboard()
-          .url('🌐 Открыть сайт', (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings')
+          .url('🌐 Открыть сайт', settingsUrl())
       }
     )
   }
 })
 
-// --- /link command (code-based, secure) ---
+// --- /link command (manual fallback for the deep link) ---
 bot.command('link', async (ctx) => {
   const chatId = String(ctx.chat.id)
-  const code = ctx.match?.trim()
+  const token = ctx.match?.trim()
 
-  if (!code || !/^\d{6}$/.test(code)) {
+  if (!token) {
+    if (isLinkLockedOut(chatId)) return
     await ctx.reply(
-      'Отправь 6-значный код привязки:\n/link 123456\n\n' +
-      'Код можно получить на сайте: Настройки → Telegram.',
+      'Отправь ссылку-код привязки:\n/link ТОКЕН\n\n' +
+        'Проще нажать кнопку «Привязать Telegram» на сайте — она откроет бота сама.',
       {
-        reply_markup: new InlineKeyboard()
-          .url('🌐 Открыть настройки', (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings')
+        reply_markup: new InlineKeyboard().url('🌐 Открыть настройки', settingsUrl()),
       }
     )
     return
   }
 
-  // Check if this chatId is already linked to someone
-  const existingLink = await db.user.findFirst({ where: { telegramChatId: chatId } })
-  if (existingLink) {
-    await ctx.reply(
-      `Ты уже привязан к аккаунту ${existingLink.email}.\n\n` +
-      'Сначала отвяжи текущий аккаунт в настройках на сайте.',
-      {
-        reply_markup: new InlineKeyboard()
-          .url('⚙️ Настройки', (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings')
-      }
-    )
-    return
-  }
-
-  // Find user by code
-  const user = await db.user.findFirst({
-    where: {
-      telegramLinkCode: code,
-      telegramLinkExpires: { gt: new Date() },
-    },
-  })
-
-  if (!user) {
-    await ctx.reply('❌ Код неверный или истёк. Получи новый код в настройках.')
-    return
-  }
-
-  // Link
-  await db.user.update({
-    where: { id: user.id },
-    data: {
-      telegramChatId: chatId,
-      telegramLinkCode: null,
-      telegramLinkExpires: null,
-    },
-  })
-
-  await ctx.reply(
-    `✅ Аккаунт ${user.email} привязан!\n\n` +
-    'Теперь ты можешь вносить пробег и проверять статус.',
-    { reply_markup: mainReplyKeyboard() }
-  )
+  await replyToLinkOutcome(ctx, await linkAccount(chatId, token))
 })
 
 // --- Callback: mileage prompt ---
@@ -286,7 +389,7 @@ bot.callbackQuery('action:settings', async (ctx) => {
     'Для полных настроек зайди на сайт.',
     {
       reply_markup: new InlineKeyboard()
-        .url('🌐 Открыть сайт', (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings')
+        .url('🌐 Открыть сайт', settingsUrl())
         .row()
         .text('❌ Отвязать Telegram', 'action:unlink_confirm')
         .row()
@@ -391,7 +494,7 @@ bot.hears('⚙️ Настройки', async (ctx) => {
     'Для полных настроек зайди на сайт.',
     {
       reply_markup: new InlineKeyboard()
-        .url('🌐 Открыть сайт', (process.env.NEXTAUTH_URL ?? 'https://cartrack.vercel.app') + '/settings')
+        .url('🌐 Открыть сайт', settingsUrl())
         .row()
         .text('❌ Отвязать Telegram', 'action:unlink_confirm')
     }
