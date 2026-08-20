@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { syncFinesForCar } from '@shared/lib/fines-sync'
@@ -20,7 +21,13 @@ export async function POST() {
   try {
     const result = await syncFinesForCar(car.id)
     return NextResponse.json(result)
-  } catch {
+  } catch (error) {
+    // The user only ever sees "try later", so this catch is the one place the
+    // real reason exists.
+    Sentry.captureException(error, { tags: { area: 'fines', step: 'manual-check' } })
+    // Under Turbopack the SDK does not wrap route handlers, so nothing flushes
+    // the queue for us before the instance is frozen.
+    await Sentry.flush(2000).catch(() => {})
     return NextResponse.json(
       { error: 'Не удалось проверить штрафы. Попробуйте позже.' },
       { status: 502 }

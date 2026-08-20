@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { db } from '@shared/lib/db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
@@ -41,7 +42,16 @@ export async function POST(req: Request) {
       { id: user.id, email: user.email },
       { status: 201 }
     )
-  } catch {
+  } catch (error) {
+    // 'Server error' tells us nothing on its own — a failed signup has to be
+    // visible somewhere. A malformed body is the caller's problem, not ours, and
+    // bots send plenty of it.
+    if (!(error instanceof SyntaxError)) {
+      Sentry.captureException(error, { tags: { area: 'auth', step: 'register' } })
+      // Nothing flushes the queue for a route handler before the instance is
+      // frozen, so the event has to be pushed out here.
+      await Sentry.flush(2000).catch(() => {})
+    }
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import './globals.css'
 
 export default function GlobalError({
@@ -12,6 +13,9 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error(error)
+    // A digest means the error came from the server, where `onRequestError`
+    // already reported it with the real stack — this copy carries none.
+    if (!error.digest) Sentry.captureException(error)
   }, [error])
 
   return (

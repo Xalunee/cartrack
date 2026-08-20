@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
+import { captureMisconfigurationOnce } from '@shared/lib/monitoring/capture-once'
 import { db } from '@shared/lib/db'
 import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
 import { formatAlerts } from '@shared/lib/formatting/maintenance-lines'
@@ -20,6 +22,7 @@ async function sendTelegramMessage(chatId: string, text: string) {
 export async function GET(req: Request) {
   if (!process.env.CRON_SECRET) {
     console.error('[cron/notify] CRON_SECRET is not set in this environment')
+    await captureMisconfigurationOnce('[cron/notify] CRON_SECRET is not set')
     return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
   }
   const authHeader = req.headers.get('authorization')
@@ -28,6 +31,7 @@ export async function GET(req: Request) {
   }
   if (!process.env.TELEGRAM_BOT_TOKEN) {
     console.error('[cron/notify] TELEGRAM_BOT_TOKEN is not set in this environment')
+    await captureMisconfigurationOnce('[cron/notify] TELEGRAM_BOT_TOKEN is not set')
     return NextResponse.json({ error: 'TELEGRAM_BOT_TOKEN not configured' }, { status: 500 })
   }
 
@@ -87,6 +91,7 @@ export async function GET(req: Request) {
       await sendTelegramMessage(user.telegramChatId, message)
       sent++
     } catch (err) {
+      Sentry.captureException(err, { tags: { area: 'cron', job: 'notify' }, extra: { userId: user.id } })
       errors.push(`user ${user.id}: ${err instanceof Error ? err.message : String(err)}`)
     }
   }
@@ -95,6 +100,9 @@ export async function GET(req: Request) {
     `[cron/notify] candidates=${users.length} reminded=${sent} skipped=${skipped} failed=${errors.length}`
   )
   if (errors.length) console.error('[cron/notify] send errors:', errors)
+
+  // Flush before responding: the instance may be frozen right after.
+  if (errors.length) await Sentry.flush(2000).catch(() => {})
 
   return NextResponse.json({
     ok: true,

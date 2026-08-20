@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { Bot, InlineKeyboard, Keyboard } from 'grammy'
 import { db } from '@shared/lib/db'
 import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
@@ -547,6 +548,10 @@ bot.callbackQuery(/^confirm:mileage:(\d+)$/, async (ctx) => {
     // The webhook's blanket catch would swallow this and leave the user with no
     // reply at all, staring at an unanswered confirmation.
     console.error('[telegram] mileage save failed:', error)
+    Sentry.captureException(error, { tags: { area: 'telegram', step: 'mileage-save' } })
+    // This path returns normally, so the flush in the webhook's outer catch never
+    // runs for it.
+    await Sentry.flush(2000).catch(() => {})
     await ctx.editMessageText('❌ Не удалось сохранить пробег. Попробуй ещё раз позже.')
     return
   }
@@ -586,7 +591,11 @@ export async function POST(req: Request) {
     await bot.handleUpdate(body)
     return NextResponse.json({ ok: true })
   } catch (error) {
+    // We answer 200 on purpose so Telegram stops retrying, which means this catch
+    // is where webhook failures used to disappear. Report before swallowing.
     console.error('Telegram webhook error:', error)
+    Sentry.captureException(error, { tags: { area: 'telegram', step: 'webhook' } })
+    await Sentry.flush(2000).catch(() => {})
     return NextResponse.json({ ok: true })
   }
 }

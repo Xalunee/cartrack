@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
+import { captureMisconfigurationOnce } from '@shared/lib/monitoring/capture-once'
 import { db } from '@shared/lib/db'
 
 type RestPing =
@@ -10,6 +12,7 @@ type RestPing =
 export async function GET(req: Request) {
   if (!process.env.CRON_SECRET) {
     console.error('[cron/keepalive] CRON_SECRET is not set in this environment')
+    await captureMisconfigurationOnce('[cron/keepalive] CRON_SECRET is not set')
     return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
   }
   const authHeader = req.headers.get('authorization')
@@ -44,6 +47,7 @@ export async function GET(req: Request) {
       // A fetch exception message carries the Supabase host and, for TLS/DNS faults,
       // resolver detail — log it, but never hand it back over HTTP.
       console.error('[cron/keepalive] REST ping failed:', e)
+      Sentry.captureException(e, { tags: { area: 'cron', job: 'keepalive', step: 'rest-ping' } })
       restPing = { error: 'rest ping failed', reachedDb: false }
     }
   } else {
@@ -57,12 +61,16 @@ export async function GET(req: Request) {
     // Prisma errors routinely quote the connection string and host — keep them in
     // the Vercel logs and return only the fact that the query failed.
     console.error('[cron/keepalive] database query failed:', e)
+    Sentry.captureException(e, { tags: { area: 'cron', job: 'keepalive', step: 'db-query' } })
     dbResult = { error: 'database unreachable' }
   }
 
   // The route exists to prove the project is awake, so success is exactly "the ping
   // reached Postgres" — a skipped ping is the silent failure that caused the pauses.
   const ok = restPing.reachedDb
+
+  // Flush before responding: the instance may be frozen right after.
+  if (!ok || 'error' in dbResult) await Sentry.flush(2000).catch(() => {})
 
   return NextResponse.json(
     {

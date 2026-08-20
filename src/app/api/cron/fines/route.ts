@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
+import { captureMisconfigurationOnce } from '@shared/lib/monitoring/capture-once'
 import { db } from '@shared/lib/db'
 import { syncFinesForCar } from '@shared/lib/fines-sync'
 
@@ -23,6 +25,7 @@ function delay(ms: number) {
 export async function GET(req: Request) {
   if (!process.env.CRON_SECRET) {
     console.error('[cron/fines] CRON_SECRET is not set in this environment')
+    await captureMisconfigurationOnce('[cron/fines] CRON_SECRET is not set')
     return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
   }
   const authHeader = req.headers.get('authorization')
@@ -73,6 +76,9 @@ export async function GET(req: Request) {
         notified += unnotified.length
       }
     } catch (err) {
+      // The loop keeps going on purpose, so without this the failure would only
+      // ever exist in the Vercel logs nobody opens.
+      Sentry.captureException(err, { tags: { area: 'cron', job: 'fines' }, extra: { carId: car.id } })
       errors.push(`car ${car.id}: ${err instanceof Error ? err.message : String(err)}`)
     }
 
@@ -83,6 +89,10 @@ export async function GET(req: Request) {
     `[cron/fines] cars=${cars.length} checked=${checked} newFines=${newFinesTotal} notified=${notified} failed=${errors.length}`
   )
   if (errors.length) console.error('[cron/fines] errors:', errors)
+
+  // A cron invocation can be frozen the moment it responds — push what we
+  // captured before that happens.
+  if (errors.length) await Sentry.flush(2000).catch(() => {})
 
   return NextResponse.json({ checked, newFines: newFinesTotal, notified })
 }
