@@ -11,7 +11,7 @@ import {
   pastDateTimeField,
   textField,
 } from '@shared/lib/validation/limits'
-import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
 
 const updateSchema = z.object({
@@ -34,7 +34,7 @@ export async function GET(
   const { id } = await params
   const car = await db.car.findUnique({
     where: { userId: session.user.id },
-    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: MILEAGE_LOGS_FOR_PACE } },
   })
   if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
 
@@ -67,7 +67,7 @@ export async function PATCH(
 
   const car = await db.car.findUnique({
     where: { userId: session.user.id },
-    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: MILEAGE_LOGS_FOR_PACE } },
   })
   if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
 

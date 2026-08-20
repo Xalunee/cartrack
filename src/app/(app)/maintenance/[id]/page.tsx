@@ -174,7 +174,9 @@ export default function MaintenanceDetailPage() {
         </Button>
       </div>
 
-      <ServiceTimeline itemId={id} item={item} />
+      {/* Keyed so switching items remounts it: the route segment and component
+          position stay the same, so its state would otherwise carry over. */}
+      <ServiceTimeline key={id} itemId={id} item={item} />
     </div>
   )
 }

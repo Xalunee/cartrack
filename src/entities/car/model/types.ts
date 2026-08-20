@@ -21,6 +21,8 @@ export interface CreateCarDto {
   currentMileage: number
 }
 
-export interface UpdateCarDto extends Partial<CreateCarDto> {
+// currentMileage is not updatable — PATCH /api/car rejects it. It follows the
+// MileageLog history via recomputeCurrentMileage.
+export interface UpdateCarDto extends Partial<Omit<CreateCarDto, 'currentMileage'>> {
   stsNumber?: string
 }

@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
+import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -40,7 +41,6 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
       model: car.model,
       year: car.year,
       licensePlate: car.licensePlate ?? '',
-      currentMileage: car.currentMileage,
     },
   })
 
@@ -51,7 +51,6 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
         model: car.model,
         year: car.year,
         licensePlate: car.licensePlate ?? '',
-        currentMileage: car.currentMileage,
       })
     }
   }, [open, car, form])
@@ -140,25 +139,26 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="currentMileage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Текущий пробег (км)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      onChange={(event) =>
-                        field.onChange(Number(event.target.value))
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Read-only: the odometer follows the mileage log history, so it is
+                corrected by adding or fixing a reading, not by editing the car. */}
+            <div className="rounded-md border px-3 py-2 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-muted-foreground">Текущий пробег</span>
+                <span className="font-medium tabular-nums">
+                  {car.currentMileage.toLocaleString('ru')} км
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Пробег считается по истории записей.{' '}
+                <Link
+                  href="/mileage"
+                  className="underline underline-offset-2"
+                  onClick={() => setOpen(false)}
+                >
+                  Внести или исправить пробег
+                </Link>
+              </p>
+            </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Отмена

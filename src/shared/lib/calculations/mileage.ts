@@ -6,8 +6,15 @@ interface MileageLogEntry {
 }
 
 /**
+ * How many of the most recent readings a pace is derived from. Every caller
+ * fetching logs for a pace must use this as its `take`, or it hands the
+ * calculation a different window than the one it is written for.
+ */
+export const MILEAGE_LOGS_FOR_PACE = 8
+
+/**
  * Calculate average driving pace from mileage logs.
- * Uses the last 8 logs max for relevance.
+ * Uses the most recent MILEAGE_LOGS_FOR_PACE readings for relevance.
  * Returns null if not enough data (< 2 logs).
  */
 export function calculateDrivingPace(
@@ -17,7 +24,7 @@ export function calculateDrivingPace(
 
   const sorted = [...logs]
     .sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime())
-    .slice(-8)
+    .slice(-MILEAGE_LOGS_FOR_PACE)
 
   // Odometers never run backwards — drop any point whose mileage is lower than
   // the running max of earlier-dated points, so a single backdated/out-of-order

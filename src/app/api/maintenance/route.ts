@@ -12,7 +12,7 @@ import {
   pastDateTimeField,
   textField,
 } from '@shared/lib/validation/limits'
-import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
 
 const createSchema = z.object({
@@ -28,7 +28,7 @@ const createSchema = z.object({
 async function getCarAndPace(userId: string) {
   const car = await db.car.findUnique({
     where: { userId },
-    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: MILEAGE_LOGS_FOR_PACE } },
   })
   if (!car) return null
   const pace = calculateDrivingPace(car.mileageLogs)

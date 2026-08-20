@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
@@ -40,6 +40,20 @@ export function EditServiceRecordDialog({
   trigger,
 }: EditServiceRecordDialogProps) {
   const [open, setOpen] = useState(false)
+  const [confirmation, setConfirmation] = useState<{ text: string; closeAfterMs: number } | null>(
+    null
+  )
+
+  // The confirmation closes the dialog on a timer. Owning that timer in an effect
+  // ties it to the message it belongs to: clearing or replacing the confirmation,
+  // and unmounting, all cancel it. A loose setTimeout would survive a close and
+  // fire into a dialog the user had since reopened, shutting it over fresh input.
+  useEffect(() => {
+    if (!confirmation) return
+    const timer = setTimeout(() => setOpen(false), confirmation.closeAfterMs)
+    return () => clearTimeout(timer)
+  }, [confirmation])
+
   const mutation = useUpdateServiceRecordMutation(itemId)
 
   const schema = createEditServiceRecordSchema(lowerBound, upperBound)
@@ -54,6 +68,7 @@ export function EditServiceRecordDialog({
   })
 
   function onOpenChange(next: boolean) {
+    setConfirmation(null)
     setOpen(next)
     if (next) {
       form.reset({
@@ -71,7 +86,19 @@ export function EditServiceRecordDialog({
         id: record.id,
         data: { ...values, date: new Date(values.date).toISOString() },
       },
-      { onSuccess: () => setOpen(false) }
+      {
+        // Same shape as the complete dialog: the record is saved either way, but
+        // when the paired mileage point could not be matched the user has to be
+        // told, or they walk away from a desync the server already spotted.
+        onSuccess: (updated) => {
+          setConfirmation({
+            text: updated.mileageLogWarning
+              ? `Сохранено.\n${updated.mileageLogWarning}`
+              : 'Сохранено.',
+            closeAfterMs: updated.mileageLogWarning ? 2400 : 1200,
+          })
+        },
+      }
     )
   }
 
@@ -82,6 +109,11 @@ export function EditServiceRecordDialog({
         <DialogHeader>
           <DialogTitle>Редактировать замену</DialogTitle>
         </DialogHeader>
+        {confirmation ? (
+          <p className="text-sm py-4 whitespace-pre-line" style={{ color: 'hsl(var(--status-ok))' }}>
+            {confirmation.text}
+          </p>
+        ) : (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -159,7 +191,7 @@ export function EditServiceRecordDialog({
             />
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Отмена
               </Button>
               <Button type="submit" disabled={mutation.isPending}>
@@ -172,6 +204,7 @@ export function EditServiceRecordDialog({
             )}
           </form>
         </Form>
+        )}
       </DialogContent>
     </Dialog>
   )

@@ -3,6 +3,7 @@ import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
 import { licensePlateField, mileageField, nameField, yearField } from '@shared/lib/validation/limits'
+import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 
 const createSchema = z.object({
   brand: nameField('Введите марку'),
@@ -12,7 +13,13 @@ const createSchema = z.object({
   currentMileage: mileageField(),
 })
 
-const updateSchema = createSchema.partial().extend({
+/**
+ * currentMileage is deliberately absent. Car.currentMileage is derived from the
+ * MileageLog history by recomputeCurrentMileage — writing it here would produce
+ * a number no log backs, which the next mileage write silently reverts. Mileage
+ * corrections go through POST/PATCH /api/mileage.
+ */
+const updateSchema = createSchema.omit({ currentMileage: true }).partial().extend({
   stsNumber: z
     .string()
     .length(10)
@@ -42,7 +49,23 @@ export async function POST(req: Request) {
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
 
-  const car = await db.car.create({ data: { ...parsed.data, userId: session.user.id } })
+  // The starting odometer reading is a mileage point like any other, so it gets
+  // a log of its own. Without it the car opens with a currentMileage nothing
+  // backs, and the first recompute would throw the onboarding value away.
+  const car = await db.$transaction(async (tx) => {
+    const created = await tx.car.create({ data: { ...parsed.data, userId: session.user.id } })
+    await tx.mileageLog.create({
+      data: {
+        carId: created.id,
+        mileage: parsed.data.currentMileage,
+        recordedAt: created.createdAt,
+        note: 'Начальный пробег',
+      },
+    })
+    await recomputeCurrentMileage(tx, created.id)
+    return tx.car.findUniqueOrThrow({ where: { id: created.id } })
+  })
+
   return NextResponse.json(car, { status: 201 })
 }
 

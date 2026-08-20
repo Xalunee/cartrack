@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@shared/lib/db'
+import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
+import { formatAlerts } from '@shared/lib/formatting/maintenance-lines'
 
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`
 
@@ -38,6 +40,8 @@ export async function GET(req: Request) {
       car: {
         include: {
           maintenanceItems: true,
+          // Needed for the pace the shared calculation forecasts from.
+          mileageLogs: { orderBy: { recordedAt: 'desc' }, take: MILEAGE_LOGS_FOR_PACE },
         },
       },
     },
@@ -63,18 +67,11 @@ export async function GET(req: Request) {
       continue
     }
 
-    const criticalItems = car.maintenanceItems
-      .filter((item) => {
-        if (!item.intervalKm || item.lastServiceMileage === null) return false
-        const remaining = item.intervalKm - (car.currentMileage - item.lastServiceMileage)
-        return remaining < item.intervalKm * 0.3
-      })
-      .map((item) => {
-        const remaining = item.intervalKm! - (car.currentMileage - item.lastServiceMileage!)
-        return remaining <= 0
-          ? `🔴 ${item.name} — просрочено`
-          : `🟡 ${item.name} — осталось ${remaining.toLocaleString('ru')} км`
-      })
+    // The shared calculation and the shared formatting, not hand-rolled km
+    // arithmetic: a day-interval-only item has no intervalKm to count against
+    // and used to be invisible here even when months overdue.
+    const pace = calculateDrivingPace(car.mileageLogs)
+    const criticalItems = formatAlerts(car.maintenanceItems, car.currentMileage, pace)
 
     let message =
       `🚗 Пора внести пробег!\n\n` +

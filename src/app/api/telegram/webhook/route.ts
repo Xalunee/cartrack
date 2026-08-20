@@ -1,22 +1,18 @@
-import { MaintenanceItem } from '@prisma/client'
 import { NextResponse } from 'next/server'
-import { format } from 'date-fns'
-import { ru } from 'date-fns/locale'
 import { Bot, InlineKeyboard, Keyboard } from 'grammy'
 import { db } from '@shared/lib/db'
-import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
-import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
+import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
+import { formatAlerts, formatMaintenanceStatus } from '@shared/lib/formatting/maintenance-lines'
+import { validateMileagePoint } from '@shared/lib/calculations/mileage-validation'
+import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 import { LIMITS } from '@shared/lib/validation/limits'
+import { parseMileageInput } from '@shared/lib/validation/mileage-input'
 import { TELEGRAM_FALLBACK_LABEL } from '@shared/config'
-import type { DrivingPace, MaintenanceStatus, RemainingResource } from '@shared/types'
 
 const token = process.env.TELEGRAM_BOT_TOKEN
 if (!token) throw new Error('TELEGRAM_BOT_TOKEN is not set')
 
 const bot = new Bot(token)
-
-/** How many recent readings the driving pace is derived from. */
-const MILEAGE_LOGS_FOR_PACE = 8
 
 // --- Helper: get user by chatId ---
 async function getUserByChatId(chatId: string) {
@@ -52,87 +48,6 @@ function mainReplyKeyboard() {
     .text('⚙️ Настройки')
     .resized()
     .persistent()
-}
-
-const STATUS_EMOJI: Record<MaintenanceStatus, string> = {
-  critical: '🔴',
-  soon: '🟡',
-  ok: '🟢',
-}
-
-/** Worst first, same order the web app lists items in. */
-const STATUS_ORDER: Record<MaintenanceStatus, number> = { critical: 0, soon: 1, ok: 2 }
-
-/** Short date, with the year only when it is not the current one. */
-function shortDate(date: Date): string {
-  const pattern = date.getFullYear() === new Date().getFullYear() ? 'd MMM' : 'd MMM yyyy'
-  return format(date, pattern, { locale: ru })
-}
-
-function remainingText(value: number, unit: string): string {
-  const amount = Math.abs(value).toLocaleString('ru')
-  if (value > 0) return `${amount} ${unit}`
-  if (value === 0) return 'пора'
-  return `просрочено на ${amount} ${unit}`
-}
-
-/**
- * One Telegram line per item. Whatever the shared calculation could not work out
- * — no intervals, or no last service to count from — surfaces as "нет данных".
- */
-function formatItemLine(name: string, resource: RemainingResource): string {
-  const parts: string[] = []
-  if (resource.remainingKm !== null) parts.push(remainingText(resource.remainingKm, 'км'))
-  if (resource.remainingDays !== null) parts.push(remainingText(resource.remainingDays, 'дн.'))
-
-  const unique = [...new Set(parts)]
-  if (!unique.length) return `➖ ${name} — нет данных`
-
-  // For a km interval the forecast adds something the numbers do not say: when
-  // the current pace gets there. For a days-only item it just repeats the day
-  // count, so it stays off those lines.
-  if (resource.forecastDate && resource.remainingKm !== null) {
-    unique.push(`~${shortDate(resource.forecastDate)}`)
-  }
-
-  return `${STATUS_EMOJI[resource.status]} ${name} — ${unique.join(' · ')}`
-}
-
-function withResources(
-  items: MaintenanceItem[],
-  currentMileage: number,
-  pace: DrivingPace | null
-) {
-  return items
-    .map((item) => ({
-      name: item.name,
-      resource: calculateRemainingResource(item, currentMileage, pace),
-    }))
-    .sort((a, b) => STATUS_ORDER[a.resource.status] - STATUS_ORDER[b.resource.status])
-}
-
-// --- Helper: format maintenance status ---
-function formatMaintenanceStatus(
-  items: MaintenanceItem[],
-  currentMileage: number,
-  pace: DrivingPace | null
-): string {
-  if (!items.length) return 'Нет позиций обслуживания'
-
-  return withResources(items, currentMileage, pace)
-    .map(({ name, resource }) => formatItemLine(name, resource))
-    .join('\n')
-}
-
-/** Only the items that need attention — an item without data never qualifies. */
-function formatAlerts(
-  items: MaintenanceItem[],
-  currentMileage: number,
-  pace: DrivingPace | null
-): string[] {
-  return withResources(items, currentMileage, pace)
-    .filter(({ resource }) => resource.status !== 'ok')
-    .map(({ name, resource }) => formatItemLine(name, resource))
 }
 
 // --- Account linking ---
@@ -511,6 +426,27 @@ bot.hears('⚙️ Настройки', async (ctx) => {
   )
 })
 
+/**
+ * Every reading the bot is about to store goes through the same gate the web API
+ * uses: the shared non-decreasing-odometer check, reported back in the same
+ * words. Returns the refusal text, or null when the point is acceptable.
+ */
+async function rejectMileagePoint(
+  carId: string,
+  currentMileage: number,
+  mileage: number,
+  recordedAt: Date
+): Promise<string | null> {
+  if (mileage < currentMileage) {
+    return `Пробег не может быть меньше текущего (${currentMileage.toLocaleString('ru')} км)`
+  }
+
+  const validation = await validateMileagePoint(db, carId, { mileage, recordedAt })
+  if (!validation.ok) return `${validation.message}\n\n${validation.suggestion}`
+
+  return null
+}
+
 // --- Handle plain number as mileage input ---
 bot.on('message:text', async (ctx) => {
   const chatId = String(ctx.chat.id)
@@ -518,24 +454,18 @@ bot.on('message:text', async (ctx) => {
 
   if (text.startsWith('/')) return
 
-  const mileage = parseInt(text.replace(/\s/g, ''), 10)
-  if (isNaN(mileage) || mileage < 0) {
+  const parsed = parseMileageInput(text)
+  if (!parsed.ok) {
     await ctx.reply(
-      'Отправь текущий пробег числом (например: 87650)',
+      parsed.reason === 'too_large'
+        ? `Слишком большой пробег — не больше ${LIMITS.mileage.toLocaleString('ru')} км.`
+        : 'Отправь текущий пробег числом (например: 87650)',
       { reply_markup: mainMenu() }
     )
     return
   }
 
-  // Same ceiling the web forms and API routes use. Without it a mistyped reading
-  // is stored, becomes currentMileage, and then rejects every real one after it.
-  if (mileage > LIMITS.mileage) {
-    await ctx.reply(
-      `Слишком большой пробег — не больше ${LIMITS.mileage.toLocaleString('ru')} км.`,
-      { reply_markup: mainMenu() }
-    )
-    return
-  }
+  const { mileage } = parsed
 
   const user = await getUserByChatId(chatId)
   if (!user || !user.car) {
@@ -543,11 +473,14 @@ bot.on('message:text', async (ctx) => {
     return
   }
 
-  if (mileage < user.car.currentMileage) {
-    await ctx.reply(
-      `Пробег не может быть меньше текущего (${user.car.currentMileage.toLocaleString('ru')} км)`,
-      { reply_markup: mainMenu() }
-    )
+  const refusal = await rejectMileagePoint(
+    user.car.id,
+    user.car.currentMileage,
+    mileage,
+    new Date()
+  )
+  if (refusal) {
+    await ctx.reply(refusal, { reply_markup: mainMenu() })
     return
   }
 
@@ -568,7 +501,14 @@ bot.on('message:text', async (ctx) => {
 bot.callbackQuery(/^confirm:mileage:(\d+)$/, async (ctx) => {
   await ctx.answerCallbackQuery()
   const chatId = String(ctx.chat!.id)
-  const mileage = parseInt(ctx.match![1], 10)
+  // The number comes back from a callback payload, not fresh user input, but it
+  // still gets the same bounds check — a stale or crafted payload is untrusted.
+  const parsed = parseMileageInput(ctx.match![1])
+  if (!parsed.ok) {
+    await ctx.editMessageText('Ошибка: некорректный пробег.')
+    return
+  }
+  const { mileage } = parsed
 
   const user = await getUserByChatId(chatId)
   if (!user || !user.car) {
@@ -576,38 +516,45 @@ bot.callbackQuery(/^confirm:mileage:(\d+)$/, async (ctx) => {
     return
   }
 
-  if (mileage < user.car.currentMileage) {
-    await ctx.editMessageText('Ошибка: пробег уже был обновлён.')
+  const car = user.car
+  const recordedAt = new Date()
+
+  // Re-checked here, not just before the confirm button: minutes may have passed
+  // and another path may have moved the odometer in between.
+  const refusal = await rejectMileagePoint(car.id, car.currentMileage, mileage, recordedAt)
+  if (refusal) {
+    await ctx.editMessageText(`❌ ${refusal}`)
     return
   }
 
-  const diff = mileage - user.car.currentMileage
+  const diff = mileage - car.currentMileage
 
-  // Save mileage
-  await db.$transaction([
-    db.mileageLog.create({
-      data: {
-        carId: user.car.id,
-        mileage,
-        note: 'Через Telegram',
-      },
-    }),
-    db.car.update({
-      where: { id: user.car.id },
-      data: {
-        currentMileage: mileage,
-        lastTrackedAt: new Date(),
-      },
-    }),
-  ])
+  // Save mileage. currentMileage is never written directly — recompute derives
+  // it from the log history, the same as every other write path.
+  try {
+    await db.$transaction(async (tx) => {
+      await tx.mileageLog.create({
+        data: {
+          carId: car.id,
+          mileage,
+          recordedAt,
+          note: 'Через Telegram',
+        },
+      })
+      await recomputeCurrentMileage(tx, car.id)
+    })
+  } catch (error) {
+    // The webhook's blanket catch would swallow this and leave the user with no
+    // reply at all, staring at an unanswered confirmation.
+    console.error('[telegram] mileage save failed:', error)
+    await ctx.editMessageText('❌ Не удалось сохранить пробег. Попробуй ещё раз позже.')
+    return
+  }
 
   // Build alerts against the reading just saved, with the pace it implies — the
   // fetched car still holds the previous mileage and log list.
-  const logs = [{ mileage, recordedAt: new Date() }, ...user.car.mileageLogs].slice(
-    0,
-    MILEAGE_LOGS_FOR_PACE
-  )
-  const alerts = formatAlerts(user.car.maintenanceItems, mileage, calculateDrivingPace(logs))
+  const logs = [{ mileage, recordedAt }, ...car.mileageLogs].slice(0, MILEAGE_LOGS_FOR_PACE)
+  const alerts = formatAlerts(car.maintenanceItems, mileage, calculateDrivingPace(logs))
 
   let message = `✅ Пробег обновлён: ${mileage.toLocaleString('ru')} км`
   if (diff > 0) message += `\n+${diff.toLocaleString('ru')} км`

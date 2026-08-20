@@ -3,10 +3,10 @@ import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
 import { costField, mileageField, pastDateTimeField, textField } from '@shared/lib/validation/limits'
-import { calculateDrivingPace } from '@shared/lib/calculations/mileage'
+import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
 import { calculateRemainingResource } from '@shared/lib/calculations/maintenance'
 import { validateMileagePoint } from '@shared/lib/calculations/mileage-validation'
-import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
+import { recomputeCurrentMileage, serviceMileageLogNote } from '@shared/lib/car-mileage'
 
 const completeSchema = z.object({
   mileage: mileageField(),
@@ -29,7 +29,7 @@ export async function POST(
 
   const car = await db.car.findUnique({
     where: { userId: session.user.id },
-    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: 8 } },
+    include: { mileageLogs: { orderBy: { recordedAt: 'desc' }, take: MILEAGE_LOGS_FOR_PACE } },
   })
   if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
 
@@ -69,7 +69,7 @@ export async function POST(
 
     if (!duplicate) {
       await tx.mileageLog.create({
-        data: { carId: car.id, mileage, recordedAt: date, note: `Обслуживание: ${item.name}` },
+        data: { carId: car.id, mileage, recordedAt: date, note: serviceMileageLogNote(item.name) },
       })
     } else {
       mileageLogWarning = 'Служба записана, но точка пробега уже была в истории'
