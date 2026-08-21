@@ -13,8 +13,10 @@ export default auth((req) => {
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/maintenance') ||
     pathname.startsWith('/mileage') ||
+    pathname.startsWith('/service') ||
     pathname.startsWith('/events') ||
     pathname.startsWith('/fines') ||
+    pathname.startsWith('/profile') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/onboarding')
 

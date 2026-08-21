@@ -15,7 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert, ExternalLink, ChevronLeft } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
 import { ExportButton } from '@features/export-pdf'
@@ -198,7 +199,16 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
-      <div className="mb-5">
+      {/* Settings sits behind the profile rather than on a tab, and installed as a
+          PWA there is no browser back button — so the way out is spelled out. */}
+      <div className="mb-5 flex items-center gap-1">
+        <Link
+          href="/profile"
+          aria-label="Назад к профилю"
+          className="-ml-2 flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Link>
         <h1 className="text-lg font-semibold tracking-tight">Настройки</h1>
       </div>
 

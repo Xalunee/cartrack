@@ -5,6 +5,7 @@ import { useCarQuery } from '@entities/car'
 import { MaintenanceDialog } from '@features/add-maintenance'
 import { CompleteServiceDialog } from '@features/complete-service'
 import { StatusBadge, ResourceBar } from '@shared/ui'
+import { isInteractiveTarget } from '@shared/lib/card-activation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Plus, Wrench } from 'lucide-react'
@@ -55,8 +56,7 @@ export function StatusOverview() {
           role="button"
           tabIndex={0}
           onClick={(event) => {
-            const target = event.target as HTMLElement
-            if (target.closest('[data-slot="dialog-content"], [data-slot="dialog-overlay"]')) return
+            if (isInteractiveTarget(event.target as HTMLElement)) return
             router.push(`/maintenance/${item.id}`)
           }}
           onKeyDown={(event) => {

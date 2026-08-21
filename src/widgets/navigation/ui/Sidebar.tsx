@@ -2,19 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Receipt, Settings, LogOut } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 import { ThemeToggle } from '@shared/ui'
 import { signOut } from 'next-auth/react'
-
-const links = [
-  { href: '/dashboard', label: 'Главная', icon: LayoutDashboard },
-  { href: '/maintenance', label: 'Обслуживание', icon: Wrench },
-  { href: '/mileage', label: 'Пробег', icon: TrendingUp },
-  { href: '/events', label: 'События', icon: AlertTriangle },
-  { href: '/fines', label: 'Штрафы', icon: Receipt },
-  { href: '/settings', label: 'Настройки', icon: Settings },
-]
+import { NAV_SECTIONS, isSectionActive } from '../model/navigation'
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -33,12 +25,14 @@ export function Sidebar() {
         </div>
         <span className="text-sm font-semibold tracking-tight">CarTrack</span>
       </div>
-      {links.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href
+      {NAV_SECTIONS.map((section) => {
+        const Icon = section.icon
+        const active = isSectionActive(section, pathname)
         return (
           <Link
-            key={href}
-            href={href}
+            key={section.href}
+            href={section.href}
+            aria-current={active ? 'page' : undefined}
             className={cn(
               'flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors',
               active
@@ -47,7 +41,7 @@ export function Sidebar() {
             )}
           >
             <Icon className="h-4 w-4" />
-            {label}
+            {section.label}
           </Link>
         )
       })}

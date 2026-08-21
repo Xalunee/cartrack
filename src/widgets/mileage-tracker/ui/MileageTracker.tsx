@@ -24,6 +24,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@shared/lib/utils'
+import { isInteractiveTarget } from '@shared/lib/card-activation'
 import { getPeriodStart, DEFAULT_PERIOD } from '@shared/lib/period'
 import { PeriodSwitcher, type Period } from '@shared/ui'
 import { TrendingUp, Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
@@ -37,8 +38,10 @@ import {
 } from 'recharts'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import { useRouter } from 'next/navigation'
 
 export function MileageTracker() {
+  const router = useRouter()
   const { data: car } = useCarQuery()
   const { data, isLoading } = useMileageQuery()
   const deleteMutation = useDeleteMileageLogMutation()
@@ -49,6 +52,10 @@ export function MileageTracker() {
   const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD)
 
   const periodStart = getPeriodStart(period)
+
+  function openMileagePage() {
+    router.push('/mileage')
+  }
 
   const chartData = data?.logs
     .filter((log) => new Date(log.recordedAt) >= periodStart)
@@ -63,7 +70,25 @@ export function MileageTracker() {
 
   return (
     <>
-      <Card className="h-full">
+      <Card
+        className="h-full card-hover cursor-pointer"
+        role="button"
+        tabIndex={0}
+        onClick={(event) => {
+          // The card body opens the full mileage page, but the card also holds
+          // the period switcher, «Внести», the chart and the row menus, plus the
+          // dialogs those open — a click from any of them is theirs, not ours.
+          if (isInteractiveTarget(event.target as HTMLElement)) return
+          openMileagePage()
+        }}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            openMileagePage()
+          }
+        }}
+      >
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between flex-wrap gap-y-2">
             <CardTitle className="text-base flex items-center gap-2">
@@ -102,7 +127,10 @@ export function MileageTracker() {
           )}
           {isLoading && <div className="h-32 skeleton" />}
           {chartData && chartData.length >= 2 && (
-            <div className="select-none outline-none [-webkit-tap-highlight-color:transparent]">
+            <div
+              data-card-interactive
+              className="select-none outline-none [-webkit-tap-highlight-color:transparent]"
+            >
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart
                   data={chartData}
@@ -177,6 +205,7 @@ export function MileageTracker() {
                 return (
                   <div
                     key={log.id}
+                    data-card-interactive
                     className={cn(
                       'flex items-center justify-between py-2 border-b border-border last:border-0 rounded px-1 -mx-1 transition-colors',
                       activeIndex === chartIndex && 'bg-accent'

@@ -12,7 +12,7 @@ import { LogMileageDialog } from '@features/log-mileage'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@shared/lib/utils'
-import { Car, Plus, RefreshCw } from 'lucide-react'
+import { Car, ChevronRight, Plus, RefreshCw } from 'lucide-react'
 
 export function DashboardPage() {
   const { data: car, isLoading } = useCarQuery()
@@ -113,9 +113,15 @@ export function DashboardPage() {
 
       <div className="animate-fade-in-delay-2">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-foreground">
+          {/* The cards below open a single item, so the list page — and the
+              replacement history on it — needs an entry point of its own. */}
+          <Link
+            href="/maintenance"
+            className="group flex items-center gap-0.5 text-sm font-semibold text-foreground transition-colors hover:text-muted-foreground"
+          >
             Обслуживание
-          </h2>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          </Link>
           <MaintenanceDialog trigger={
             <Button variant="outline" size="sm">
               <Plus className="h-3.5 w-3.5 mr-1" /> Добавить

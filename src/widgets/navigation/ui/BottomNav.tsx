@@ -2,17 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Receipt, Settings } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
-
-const links = [
-  { href: '/dashboard', label: 'Главная', icon: LayoutDashboard },
-  { href: '/maintenance', label: 'Сервис', icon: Wrench },
-  { href: '/mileage', label: 'Пробег', icon: TrendingUp },
-  { href: '/events', label: 'События', icon: AlertTriangle },
-  { href: '/fines', label: 'Штрафы', icon: Receipt },
-  { href: '/settings', label: 'Настройки', icon: Settings },
-]
+import { NAV_SECTIONS, isSectionActive } from '../model/navigation'
 
 export function BottomNav() {
   const pathname = usePathname()
@@ -20,21 +11,23 @@ export function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border md:hidden bg-background pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around h-[4.5rem] px-2">
-        {links.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href
+        {NAV_SECTIONS.map((section) => {
+          const Icon = section.icon
+          const active = isSectionActive(section, pathname)
           return (
             <Link
-              key={href}
-              href={href}
+              key={section.href}
+              href={section.href}
+              aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-1.5 py-2 rounded-xl transition-colors',
+                'flex flex-1 flex-col items-center gap-1 px-2 py-2 rounded-xl transition-colors',
                 active
                   ? 'text-foreground font-medium'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-[9px]">{label}</span>
+              <Icon className="h-6 w-6" />
+              <span className="text-xs">{section.label}</span>
             </Link>
           )
         })}
