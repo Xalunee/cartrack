@@ -214,22 +214,6 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Аккаунт</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Email</span>
-            <span>{user?.email}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Имя</span>
-            <span>{user?.name ?? '-'}</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
             Telegram
@@ -237,14 +221,15 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {user?.telegramChatId ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: 'hsl(var(--status-ok))' }} />
-                <span className="text-sm">Telegram привязан</span>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: 'hsl(var(--status-ok))' }} />
+                <span className="truncate text-sm">Telegram привязан</span>
               </div>
               <Button
                 variant="outline"
                 size="sm"
+                className="shrink-0"
                 onClick={unlinkTelegram}
                 disabled={isPending}
               >
@@ -258,10 +243,12 @@ export default function SettingsPage() {
                 Привяжите Telegram чтобы получать напоминания и вносить пробег через бота.
               </p>
 
-              <Button onClick={startLinking} disabled={isPending} size="sm">
-                <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                {isPending ? 'Открываем Telegram...' : 'Привязать Telegram'}
-              </Button>
+              <div className="flex justify-end">
+                <Button onClick={startLinking} disabled={isPending} size="sm">
+                  <MessageCircle className="h-3.5 w-3.5 mr-1" />
+                  {isPending ? 'Открываем Telegram...' : 'Привязать Telegram'}
+                </Button>
+              </div>
 
               {linkError && <p className="text-sm text-destructive">{linkError}</p>}
 
@@ -341,7 +328,7 @@ export default function SettingsPage() {
                 <span className="text-muted-foreground">Номер</span>
                 <span className="font-mono">{maskSts(car.stsNumber)}</span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex justify-end gap-2">
                 <StsDialog
                   currentValue={car.stsNumber}
                   trigger={<Button variant="outline" size="sm">Изменить</Button>}
@@ -360,7 +347,9 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">
                 Укажите СТС, чтобы CarTrack мог проверять штрафы ГИБДД.
               </p>
-              <StsDialog trigger={<Button size="sm">Указать СТС</Button>} />
+              <div className="flex justify-end">
+                <StsDialog trigger={<Button size="sm">Указать СТС</Button>} />
+              </div>
             </>
           )}
         </CardContent>
@@ -406,7 +395,9 @@ export default function SettingsPage() {
           <p className="text-sm text-muted-foreground mb-4">
             Скачайте полную историю обслуживания в PDF — удобно показать покупателю при продаже машины.
           </p>
-          <ExportButton />
+          <div className="flex justify-end">
+            <ExportButton />
+          </div>
         </CardContent>
       </Card>
 

@@ -2,12 +2,10 @@
 
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@shared/lib/utils'
-import { useExportPdf } from '@features/export-pdf'
-import { AlertTriangle, Receipt, Wrench, FileDown, type LucideIcon } from 'lucide-react'
+import { AlertTriangle, Receipt, Wrench, type LucideIcon } from 'lucide-react'
 
 const TILE_CLASS = 'h-full text-left card-hover transition-colors'
-/** The ring goes on the link/button, which is what actually takes focus. */
+/** The ring goes on the link, which is what actually takes focus. */
 const TILE_WRAPPER_CLASS =
   'rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50'
 
@@ -40,24 +38,24 @@ const linkTiles: (TileBodyProps & { href: string })[] = [
     href: '/fines',
     icon: Receipt,
     title: 'Штрафы',
-    description: 'Проверка штрафов ГИБДД по номеру СТС',
+    description: 'Неоплаченные штрафы ГИБДД и сроки скидки 50%',
   },
   {
     href: '/maintenance',
     icon: Wrench,
-    title: 'История замен',
-    description: 'Все выполненные работы и расходы на них',
+    title: 'Обслуживание',
+    description: 'Ресурс деталей, выполненные работы и расходы',
   },
 ]
 
 export function ServicePage() {
-  const { exportPdf, generating, ready } = useExportPdf()
-
   return (
     <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       <div className="mb-5">
         <h1 className="text-lg font-semibold tracking-tight">Сервис</h1>
-        <p className="text-sm text-muted-foreground">Всё, что не нужно каждый день</p>
+        <p className="text-sm text-muted-foreground">
+          Штрафы, история обслуживания и события по машине
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 stagger-children">
@@ -68,22 +66,6 @@ export function ServicePage() {
             </Card>
           </Link>
         ))}
-
-        {/* Not a destination — the file is built in the browser and downloaded. */}
-        <button
-          type="button"
-          onClick={exportPdf}
-          disabled={generating || !ready}
-          className={cn(TILE_WRAPPER_CLASS, 'disabled:opacity-60')}
-        >
-          <Card className={cn(TILE_CLASS, 'h-full')}>
-            <TileBody
-              icon={FileDown}
-              title={generating ? 'Формирование...' : 'Экспорт в PDF'}
-              description="Полная история обслуживания одним файлом"
-            />
-          </Card>
-        </button>
       </div>
     </div>
   )

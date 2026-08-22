@@ -9,14 +9,7 @@ import { useMileageQuery } from '@entities/mileage-log'
 import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { calculateProfileStats } from '@shared/lib/calculations/profile-stats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Settings, User } from 'lucide-react'
-
-function initials(name: string | null, email: string | undefined) {
-  const source = name?.trim() || email?.split('@')[0] || ''
-  const parts = source.split(/[\s._-]+/).filter(Boolean)
-  const letters = parts.slice(0, 2).map((p) => p[0])
-  return letters.join('').toUpperCase() || '—'
-}
+import { Settings } from 'lucide-react'
 
 export function ProfilePage() {
   const { data: user, isLoading: userLoading } = useUserQuery()
@@ -85,14 +78,20 @@ export function ProfilePage() {
         </Link>
       </div>
 
+      {/* Label left, value hard against the right edge — the same shape as the
+          «Машина» card below, so neither leaves half the row empty. */}
       <Card>
-        <CardContent className="p-4 flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold">
-            {user ? initials(user.name, user.email) : <User className="h-5 w-5 text-muted-foreground" />}
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Аккаунт</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex justify-between gap-3 text-sm">
+            <span className="shrink-0 text-muted-foreground">Имя</span>
+            <span className="truncate">{user?.name ?? 'Без имени'}</span>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name ?? 'Без имени'}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email ?? '—'}</p>
+          <div className="flex justify-between gap-3 text-sm">
+            <span className="shrink-0 text-muted-foreground">Email</span>
+            <span className="truncate">{user?.email ?? '—'}</span>
           </div>
         </CardContent>
       </Card>

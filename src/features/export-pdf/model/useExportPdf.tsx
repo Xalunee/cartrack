@@ -6,9 +6,9 @@ import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { useEventsQuery } from '@entities/event'
 
 /**
- * The export is offered from more than one place — the settings screen and the
- * service hub — and both need the same three queries plus the same lazy renderer
- * import, so the behaviour lives here and the buttons stay presentational.
+ * Building the file needs three queries and a lazy renderer import, none of which
+ * the button itself cares about — so the behaviour lives here and ExportButton
+ * stays presentational.
  */
 export function useExportPdf() {
   const { data: car } = useCarQuery()
