@@ -16,7 +16,7 @@ import { FAQ } from '../model/faq'
 import { TicketList } from './TicketList'
 
 export function HelpPage() {
-  const { data: tickets, isLoading } = useSupportTicketsQuery()
+  const { data: tickets, isLoading, isError } = useSupportTicketsQuery()
 
   return (
     <div className="page-enter mx-auto max-w-2xl space-y-5 px-4 py-6 md:max-w-4xl lg:max-w-5xl">
@@ -78,6 +78,12 @@ export function HelpPage() {
               <div className="skeleton h-16 rounded-lg" />
               <div className="skeleton h-16 rounded-lg" />
             </div>
+          ) : isError ? (
+            // Never the empty state on failure: "обращений не было" is exactly
+            // what a user reads as "моё обращение пропало".
+            <p className="text-destructive text-sm">
+              Не удалось загрузить обращения. Обновите страницу — отправленные никуда не делись.
+            </p>
           ) : tickets && tickets.length > 0 ? (
             <TicketList tickets={tickets} />
           ) : (

@@ -1,6 +1,10 @@
-const CACHE_NAME = 'cartrack-v4'
-const STATIC_CACHE = 'cartrack-static-v4'
-const API_CACHE = 'cartrack-api-v3'
+// Bumped to v5 to drop caches poisoned by the bug fixed below: /api/support
+// fell through to the cache-first branch and its first (empty) response was
+// pinned in STATIC_CACHE forever. Renaming the caches is what evicts it from
+// browsers that already stored it.
+const CACHE_NAME = 'cartrack-v5'
+const STATIC_CACHE = 'cartrack-static-v5'
+const API_CACHE = 'cartrack-api-v4'
 const CURRENT_CACHES = [CACHE_NAME, STATIC_CACHE, API_CACHE]
 
 // Static assets to precache
@@ -133,6 +137,28 @@ self.addEventListener('fetch', (event) => {
             })
           })
         })
+    )
+    return
+  }
+
+  // Any other API route: straight to the network, never cached.
+  //
+  // Without this, an API route that is not listed in CACHEABLE_API falls all the
+  // way through to the cache-first branch at the bottom — which is meant for
+  // static assets. A same-origin fetch() has mode 'cors', not 'navigate', so
+  // nothing above catches it. The first response for that URL then gets stored
+  // and replayed forever: /api/support answered with an empty list before the
+  // user had written anything, and every later request was served that same
+  // empty list, so their own tickets never appeared.
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request).catch(
+        () =>
+          new Response(JSON.stringify({ error: 'Offline', offline: true }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 503,
+          })
+      )
     )
     return
   }

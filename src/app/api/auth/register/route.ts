@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     // A counter for me, not a step in signing up: it swallows its own failures,
     // so an unreachable Telegram cannot cost someone their account.
-    await notifyAdminOfRegistration()
+    await notifyAdminOfRegistration(user.name)
 
     return NextResponse.json(
       { id: user.id, email: user.email },

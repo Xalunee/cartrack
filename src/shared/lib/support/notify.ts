@@ -85,16 +85,21 @@ export async function notifyAdminOfTicketMessage(n: TicketMessageNotification) {
 }
 
 /**
- * A counter, not a record of who joined: the fact of a registration and the new
- * total are all this is for, so no email and no name travel with it.
+ * Who joined and how many there are now. The name is here because it is not an
+ * identifier — nobody signs in with it — while the email still is, so the email
+ * stays out.
  */
-export async function notifyAdminOfRegistration() {
+export async function notifyAdminOfRegistration(name: string | null) {
   const token = adminBotToken()
   const chatId = adminChatId()
   if (!token || !chatId) return
 
   await swallow('registration', async () => {
     const total = await db.user.count()
-    await sendMessage(token, chatId, `👤 Новая регистрация. Всего пользователей: ${total}.`)
+    await sendMessage(
+      token,
+      chatId,
+      `👤 Новая регистрация: ${name?.trim() || 'без имени'}.\nВсего пользователей: ${total}.`
+    )
   })
 }

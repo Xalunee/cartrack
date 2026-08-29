@@ -16,6 +16,7 @@ export default auth((req) => {
     pathname.startsWith('/service') ||
     pathname.startsWith('/events') ||
     pathname.startsWith('/fines') ||
+    pathname.startsWith('/help') ||
     pathname.startsWith('/profile') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/onboarding')
