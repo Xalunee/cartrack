@@ -1,47 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Dark rounded background -->
-  <rect width="512" height="512" rx="108" fill="#0a0a0a"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- CarTrack mark: a CT monogram read as road geometry.
+       Literal colours on purpose — this file has to work standalone
+       (favicon, PNG source, Telegram avatar), outside the CSS cascade.
+       The token for the same blue lives in globals.css as the brand-mark custom property. -->
+  <rect width="120" height="120" rx="27" fill="#2383E2"/>
 
-  <!-- Speedometer arc (220° sweep, from ~-200deg to ~20deg) -->
-  <!-- Center: 256,290 | Radius: 148 -->
-  <!-- Arc from 200deg to 340deg clockwise = the gauge range -->
-  <path
-    d="M 108 290
-       A 148 148 0 1 1 404 290"
-    fill="none"
-    stroke="#2a2a2a"
-    stroke-width="28"
-    stroke-linecap="round"
-  />
-  <!-- Active arc portion (~60% filled) in white -->
-  <path
-    d="M 108 290
-       A 148 148 0 0 1 350 156"
-    fill="none"
-    stroke="white"
-    stroke-width="28"
-    stroke-linecap="round"
-  />
+  <!-- C: a road curve. White arc, then a thin plate-coloured stroke
+       knocked back over it as a solid centre marking. -->
+  <g transform="translate(41, 60)">
+    <path d="M15.5 -23.5 A 19.5 19.5 0 1 0 15.5 23.5" fill="none" stroke="#fff" stroke-width="8.2" stroke-linecap="round"/>
+    <path d="M15.5 -23.5 A 19.5 19.5 0 1 0 15.5 23.5" fill="none" stroke="#2383E2" stroke-width="1.7" stroke-linecap="round"/>
+  </g>
 
-  <!-- Tick marks at bottom left, center, bottom right -->
-  <line x1="120" y1="268" x2="140" y2="255" stroke="#555" stroke-width="6" stroke-linecap="round"/>
-  <line x1="256" y1="144" x2="256" y2="166" stroke="#555" stroke-width="6" stroke-linecap="round"/>
-  <line x1="392" y1="268" x2="372" y2="255" stroke="#555" stroke-width="6" stroke-linecap="round"/>
-
-  <!-- Needle: pivots at center 256,290, points toward ~60% position -->
-  <line x1="256" y1="290" x2="338" y2="172" stroke="white" stroke-width="10" stroke-linecap="round"/>
-  <!-- Needle pivot dot -->
-  <circle cx="256" cy="290" r="16" fill="white"/>
-  <circle cx="256" cy="290" r="8" fill="#0a0a0a"/>
-
-  <!-- "CT" monogram below center -->
-  <text
-    x="256" y="390"
-    text-anchor="middle"
-    font-family="ui-monospace, monospace"
-    font-weight="700"
-    font-size="72"
-    letter-spacing="4"
-    fill="white"
-  >CT</text>
+  <!-- T: crossbar plus a tapering stem. Its strokes are deliberately
+       thinner than the C's so the arc keeps the visual weight, and its
+       centre marking is dashed where the C's is solid — two different
+       real road markings, and the contrast is the point. -->
+  <g transform="translate(83, 60)">
+    <line x1="-14" y1="-24" x2="14" y2="-24" stroke="#fff" stroke-width="7.4" stroke-linecap="round"/>
+    <path d="M-4.4 -20.5 L-6.4 25 L6.4 25 L4.4 -20.5 Z" fill="#fff"/>
+    <line x1="0" y1="-15" x2="0" y2="21" stroke="#2383E2" stroke-width="1.9" stroke-linecap="round" stroke-dasharray="3.3 4.6"/>
+  </g>
 </svg>

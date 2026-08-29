@@ -42,3 +42,11 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# claude code — settings.json is shared on purpose; the local override is not.
+# It accumulates approved command patterns, and those can carry a token inside
+# a curl allow-rule. This repo is public, so the rule belongs here rather than
+# only in a machine-local git ignore file.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@shared/lib/utils'
 import { useClientFlag } from '@shared/lib/client-env'
+import { Logo } from './Logo'
 
 const SHOWN_KEY = 'cartrack-splash-shown'
 /** Time on screen before the fade-out starts, and the fade itself. */
@@ -68,9 +69,7 @@ export function SplashScreen() {
       )}
     >
       <div className="flex flex-col items-center gap-3 animate-fade-in">
-        <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-lg">CT</span>
-        </div>
+        <Logo size={48} />
         <p className="text-sm font-medium text-muted-foreground">CarTrack</p>
         <div className="h-0.5 w-16 bg-muted rounded-full overflow-hidden mt-2">
           <div className="h-full w-full bg-primary rounded-full animate-pulse" />

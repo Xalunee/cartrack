@@ -83,6 +83,12 @@
   --sidebar-border: hsl(0 0% 89%);
   --sidebar-ring: hsl(0 0% 60%);
 
+  /* The brand mark's blue. Scoped to the logo — the interface itself stays
+     monochrome, so this is deliberately not exposed as a Tailwind utility.
+     The standalone SVG copies repeat the literal value; they have to render
+     outside the cascade. */
+  --brand-mark: #2383E2;
+
   /* Status colors — the ONLY colorful elements in the app */
   --status-ok: 142 71% 40%;
   --status-ok-bg: 142 71% 95%;

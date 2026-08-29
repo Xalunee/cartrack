@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
-import { ThemeToggle } from '@shared/ui'
+import { Logo, ThemeToggle } from '@shared/ui'
 import { signOut } from 'next-auth/react'
 import { NAV_SECTIONS, isSectionActive } from '../model/navigation'
 
@@ -20,9 +20,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-48 border-r border-border bg-background h-screen sticky top-0 p-3 gap-0.5">
       <div className="flex items-center gap-2 px-3 py-4 mb-2">
-        <div className="h-6 w-6 rounded-md bg-foreground flex items-center justify-center">
-          <span className="text-background font-bold text-[10px]">CT</span>
-        </div>
+        <Logo size={24} />
         <span className="text-sm font-semibold tracking-tight">CarTrack</span>
       </div>
       {NAV_SECTIONS.map((section) => {

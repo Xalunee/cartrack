@@ -19,7 +19,13 @@ export const metadata: Metadata = {
     title: 'CarTrack',
   },
   icons: {
-    icon: '/icons/icon-192.png',
+    // src/app/favicon.ico (16/32/48) is linked by Next's file convention on its
+    // own, so listing it here would only duplicate the tag. These two cover the
+    // clients that prefer a vector or a large bitmap over the .ico.
+    icon: [
+      { url: '/icons/icon.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-192.png', type: 'image/png', sizes: '192x192' },
+    ],
     apple: '/icons/icon-192.png',
   },
 }

@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Wrench,
 } from 'lucide-react'
-import { RotatingWord } from '@shared/ui'
+import { Logo, RotatingWord } from '@shared/ui'
 import {
   CarIllustration,
   WrenchIllustration,
@@ -26,9 +26,7 @@ function LandingNav() {
     <nav className="sticky top-0 z-50 border-b border-[#EFEEEC] bg-white/90 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#191918]">
-            <span className="text-[10px] font-bold text-white">CT</span>
-          </div>
+          <Logo size={24} />
           <span className="text-[15px] font-semibold text-[#191918]">CarTrack</span>
         </Link>
 
@@ -96,9 +94,7 @@ function ProductPreview() {
       {/* Sidebar */}
       <aside className="hidden flex-col gap-1 border-r border-[#EFEEEC] bg-white p-3 sm:flex">
         <div className="mb-3 flex items-center gap-2 px-2">
-          <div className="flex h-5 w-5 items-center justify-center rounded bg-[#191918]">
-            <span className="text-[8px] font-bold text-white">CT</span>
-          </div>
+          <Logo size={20} />
           <span className="text-[13px] font-semibold text-[#191918]">CarTrack</span>
         </div>
         {previewNav.map((item) => {
@@ -469,9 +465,7 @@ export function LandingPage() {
               <div className="rounded-2xl bg-[#EBF5FE] p-6">
                 <div className="space-y-3 rounded-xl bg-white p-4">
                   <div className="flex items-start gap-2">
-                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#191918]">
-                      <span className="text-[9px] font-bold text-white">CT</span>
-                    </div>
+                    <Logo size={24} className="flex-shrink-0" title="CarTrack" />
                     <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-[#F7F6F4] px-3 py-2 text-[13px] text-[#191918]">
                       🚗 Пора внести пробег! Текущий: 87 420 км
                     </div>
@@ -482,9 +476,7 @@ export function LandingPage() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#191918]">
-                      <span className="text-[9px] font-bold text-white">CT</span>
-                    </div>
+                    <Logo size={24} className="flex-shrink-0" title="CarTrack" />
                     <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-[#F7F6F4] px-3 py-2 text-[13px] leading-relaxed text-[#191918]">
                       ✅ Пробег обновлён! +230 км
                       <br />
@@ -567,9 +559,7 @@ export function LandingPage() {
           <div className="flex flex-col justify-between gap-8 md:flex-row">
             <div>
               <div className="mb-3 flex items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#191918]">
-                  <span className="text-[10px] font-bold text-white">CT</span>
-                </div>
+                <Logo size={24} />
                 <span className="text-[15px] font-semibold text-[#191918]">CarTrack</span>
               </div>
               <p className="max-w-xs text-sm text-[#6B6B6B]">
