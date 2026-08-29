@@ -9,6 +9,10 @@ import { recomputeCurrentMileage } from '@shared/lib/car-mileage'
 import { LIMITS } from '@shared/lib/validation/limits'
 import { parseMileageInput } from '@shared/lib/validation/mileage-input'
 import { TELEGRAM_FALLBACK_LABEL } from '@shared/config'
+import { handleTelegramWebhook } from '@shared/lib/telegram/webhook'
+import { appVersion, openTicket } from '@shared/lib/support/tickets'
+import { notifyAdminOfTicketMessage } from '@shared/lib/support/notify'
+import { supportMessageField } from '@shared/lib/validation/support'
 
 const token = process.env.TELEGRAM_BOT_TOKEN
 if (!token) throw new Error('TELEGRAM_BOT_TOKEN is not set')
@@ -47,6 +51,7 @@ function mainReplyKeyboard() {
     .text('📊 Статус')
     .row()
     .text('⚙️ Настройки')
+    .text('✍️ Поддержка')
     .resized()
     .persistent()
 }
@@ -427,6 +432,60 @@ bot.hears('⚙️ Настройки', async (ctx) => {
   )
 })
 
+// --- Support ---
+//
+// Deliberately a command with the text on the same line, not a two-step "now
+// send me your question". A prompt-then-answer flow needs to remember, between
+// two updates, that this chat is mid-question — and the only place to keep that
+// on serverless is a per-instance map that any redeploy or second instance
+// silently forgets, stranding whoever was halfway through.
+
+const SUPPORT_HINT =
+  'Напиши вопрос одним сообщением вместе с командой:\n\n' +
+  '/support не приходят напоминания\n\n' +
+  'Ответ придёт сюда же, в этот чат.'
+
+bot.hears('✍️ Поддержка', async (ctx) => {
+  await ctx.reply(SUPPORT_HINT)
+})
+
+bot.command('support', async (ctx) => {
+  const chatId = String(ctx.chat.id)
+  const user = await getUserByChatId(chatId)
+
+  if (!user) {
+    await ctx.reply('Сначала привяжи аккаунт. Нажми /start')
+    return
+  }
+
+  const parsed = supportMessageField().safeParse(ctx.match?.trim() ?? '')
+  if (!parsed.success) {
+    await ctx.reply(`${parsed.error.issues[0].message}\n\n${SUPPORT_HINT}`)
+    return
+  }
+
+  const context = { appVersion: appVersion(), hasCar: Boolean(user.car) }
+  const ticket = await openTicket({
+    userId: user.id,
+    text: parsed.data,
+    source: 'bot',
+    context,
+  })
+
+  await notifyAdminOfTicketMessage({
+    ticketId: ticket.id,
+    messageId: ticket.messages[0].id,
+    user: { id: user.id, name: user.name },
+    source: 'bot',
+    context,
+    text: parsed.data,
+  })
+
+  await ctx.reply(
+    '✅ Обращение отправлено. Ответ придёт сюда же — и он будет виден в разделе «Помощь» на сайте.'
+  )
+})
+
 /**
  * Every reading the bot is about to store goes through the same gate the web API
  * uses: the shared non-decreasing-odometer check, reported back in the same
@@ -570,34 +629,14 @@ bot.callbackQuery(/^confirm:mileage:(\d+)$/, async (ctx) => {
 })
 
 // --- Webhook handler ---
-function verifySecret(req: Request): boolean {
-  const secret = req.headers.get('x-telegram-bot-api-secret-token')
-  return secret === process.env.TELEGRAM_WEBHOOK_SECRET
-}
-
-let botInitialized = false
 
 export async function POST(req: Request) {
-  if (!verifySecret(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  try {
-    if (!botInitialized) {
-      await bot.init()
-      botInitialized = true
-    }
-    const body = await req.json()
-    await bot.handleUpdate(body)
-    return NextResponse.json({ ok: true })
-  } catch (error) {
-    // We answer 200 on purpose so Telegram stops retrying, which means this catch
-    // is where webhook failures used to disappear. Report before swallowing.
-    console.error('Telegram webhook error:', error)
-    Sentry.captureException(error, { tags: { area: 'telegram', step: 'webhook' } })
-    await Sentry.flush(2000).catch(() => {})
-    return NextResponse.json({ ok: true })
-  }
+  return handleTelegramWebhook({
+    req,
+    bot,
+    secret: process.env.TELEGRAM_WEBHOOK_SECRET,
+    area: 'telegram',
+  })
 }
 
 export async function GET() {

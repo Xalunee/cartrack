@@ -4,20 +4,7 @@ import { captureMisconfigurationOnce } from '@shared/lib/monitoring/capture-once
 import { db } from '@shared/lib/db'
 import { calculateDrivingPace, MILEAGE_LOGS_FOR_PACE } from '@shared/lib/calculations/mileage'
 import { formatAlerts } from '@shared/lib/formatting/maintenance-lines'
-
-const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`
-
-async function sendTelegramMessage(chatId: string, text: string) {
-  const res = await fetch(`${TELEGRAM_API}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text }),
-  })
-  if (!res.ok) {
-    const body = await res.text().catch(() => '')
-    throw new Error(`Telegram sendMessage ${res.status}: ${body}`)
-  }
-}
+import { sendMessage } from '@shared/lib/telegram/api'
 
 export async function GET(req: Request) {
   if (!process.env.CRON_SECRET) {
@@ -88,7 +75,7 @@ export async function GET(req: Request) {
     }
 
     try {
-      await sendTelegramMessage(user.telegramChatId, message)
+      await sendMessage(process.env.TELEGRAM_BOT_TOKEN, user.telegramChatId, message)
       sent++
     } catch (err) {
       Sentry.captureException(err, { tags: { area: 'cron', job: 'notify' }, extra: { userId: user.id } })

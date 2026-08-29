@@ -4,6 +4,7 @@ import { db } from '@shared/lib/db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { emailField, nameField, passwordField } from '@shared/lib/validation/limits'
+import { notifyAdminOfRegistration } from '@shared/lib/support/notify'
 
 const schema = z.object({
   email: emailField(),
@@ -37,6 +38,10 @@ export async function POST(req: Request) {
     const user = await db.user.create({
       data: { email, password: hashed, name },
     })
+
+    // A counter for me, not a step in signing up: it swallows its own failures,
+    // so an unreachable Telegram cannot cost someone their account.
+    await notifyAdminOfRegistration()
 
     return NextResponse.json(
       { id: user.id, email: user.email },

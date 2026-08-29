@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import Link from 'next/link'
-import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert, ExternalLink, ChevronLeft } from 'lucide-react'
+import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert, ExternalLink, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
 import { signOut } from 'next-auth/react'
 import { ExportButton } from '@features/export-pdf'
@@ -400,6 +400,18 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* A row rather than a card: it leads somewhere, it does not hold settings. */}
+      <Link
+        href="/help"
+        className="flex items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 transition-colors hover:bg-accent"
+      >
+        <span className="flex items-center gap-2 text-sm font-medium">
+          <HelpCircle className="h-4 w-4" />
+          Помощь и поддержка
+        </span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
 
       <Separator />
 

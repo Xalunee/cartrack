@@ -23,9 +23,52 @@ model User {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  car Car?
+  car            Car?
+  supportTickets SupportTicket[]
 
   @@map("users")
+}
+
+/// Обращение в поддержку: тред из сообщений пользователя и ответов администратора.
+/// Отдельного статуса нет — он выводится из автора последнего сообщения.
+model SupportTicket {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  source  String // 'web' | 'bot'
+  context Json? // технические данные, собранные молча в момент обращения
+
+  createdAt DateTime @default(now())
+
+  messages SupportMessage[]
+
+  @@index([userId])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id       String        @id @default(cuid())
+  ticketId String
+  ticket   SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  author SupportAuthor
+  text   String
+
+  /// id сообщения в админском чате Telegram. Есть у каждого сообщения, которое
+  /// там появилось — и у пересланного вопроса, и у ответа администратора: reply
+  /// на любое из них должен попасть в этот же тред.
+  adminMessageId String? @unique
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("support_messages")
+}
+
+enum SupportAuthor {
+  USER
+  ADMIN
 }
 
 model Car {
