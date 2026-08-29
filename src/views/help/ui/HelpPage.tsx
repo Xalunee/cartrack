@@ -20,12 +20,12 @@ export function HelpPage() {
 
   return (
     <div className="page-enter mx-auto max-w-2xl space-y-5 px-4 py-6 md:max-w-4xl lg:max-w-5xl">
-      {/* Same way back as on settings: installed as a PWA there is no browser
-          back button. */}
+      {/* Same way back as elsewhere: installed as a PWA there is no browser
+          back button. Service owns /help, so that is where back leads. */}
       <div className="mb-5 flex items-center gap-1">
         <Link
-          href="/settings"
-          aria-label="Назад к настройкам"
+          href="/service"
+          aria-label="Назад в сервис"
           className="text-muted-foreground hover:bg-accent hover:text-foreground -ml-2 flex h-9 w-9 items-center justify-center rounded-md transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />

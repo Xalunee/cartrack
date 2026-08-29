@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { NAV_SECTIONS, resolveActiveSection, isSectionActive } from './navigation'
+import { NAV_SECTIONS, resolveActiveSection, isSectionActive, isChildActive } from './navigation'
 
 describe('NAV_SECTIONS', () => {
   it('has exactly three tabs', () => {
@@ -21,13 +21,14 @@ describe('NAV_SECTIONS', () => {
 describe('resolveActiveSection', () => {
   it.each([
     ['/dashboard', '/dashboard'],
-    ['/mileage', '/dashboard'],
-    ['/maintenance', '/dashboard'],
-    ['/maintenance/abc123', '/dashboard'],
+    ['/mileage', '/service'],
+    ['/maintenance', '/service'],
+    ['/maintenance/abc123', '/service'],
     ['/onboarding', '/dashboard'],
     ['/service', '/service'],
     ['/events', '/service'],
     ['/fines', '/service'],
+    ['/help', '/service'],
     ['/profile', '/profile'],
     ['/settings', '/profile'],
   ])('maps %s to the %s tab', (pathname, expected) => {
@@ -45,10 +46,47 @@ describe('resolveActiveSection', () => {
   })
 })
 
+describe('section children', () => {
+  const children = NAV_SECTIONS.flatMap((section) =>
+    (section.children ?? []).map((child) => [section.href, child.href, child.label] as const)
+  )
+
+  it.each(children)('keeps %s owning its child %s (%s)', (sectionHref, childHref) => {
+    expect(resolveActiveSection(childHref)?.href).toBe(sectionHref)
+  })
+
+  it('names no route twice across the whole sidebar', () => {
+    const hrefs = children.map(([, childHref]) => childHref)
+    expect(new Set(hrefs).size).toBe(hrefs.length)
+  })
+
+  it('lists help under service', () => {
+    const service = NAV_SECTIONS.find((s) => s.href === '/service')
+    expect(service?.children?.map((c) => c.href)).toContain('/help')
+  })
+})
+
+describe('isChildActive', () => {
+  const maintenance = { href: '/maintenance', label: 'Обслуживание' }
+
+  it('matches the exact route', () => {
+    expect(isChildActive(maintenance, '/maintenance')).toBe(true)
+  })
+
+  it('matches a child route', () => {
+    expect(isChildActive(maintenance, '/maintenance/abc123')).toBe(true)
+  })
+
+  it('does not match a sibling or a shared prefix', () => {
+    expect(isChildActive(maintenance, '/mileage')).toBe(false)
+    expect(isChildActive(maintenance, '/maintenancelog')).toBe(false)
+  })
+})
+
 describe('isSectionActive', () => {
   it('highlights one tab at a time', () => {
     const active = NAV_SECTIONS.filter((s) => isSectionActive(s, '/maintenance/abc123'))
-    expect(active.map((s) => s.href)).toEqual(['/dashboard'])
+    expect(active.map((s) => s.href)).toEqual(['/service'])
   })
 
   it('highlights nothing for an unowned route', () => {
