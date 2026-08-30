@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -87,7 +87,7 @@
      monochrome, so this is deliberately not exposed as a Tailwind utility.
      The standalone SVG copies repeat the literal value; they have to render
      outside the cascade. */
-  --brand-mark: #2383E2;
+  --brand-mark: #2383e2;
 
   /* Status colors — the ONLY colorful elements in the app */
   --status-ok: 142 71% 40%;
@@ -187,13 +187,17 @@
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 8px 32px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 8px 32px rgba(0, 0, 0, 0.06);
 }
 
 .dark .glass {
   background: rgba(30, 30, 30, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* === Gradient mesh background === */
@@ -264,18 +268,36 @@
   animation: fadeIn 0.35s ease-out both;
 }
 
-.stagger-children > *:nth-child(1) { animation-delay: 0s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.04s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.08s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.12s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.16s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(7) { animation-delay: 0.24s; }
-.stagger-children > *:nth-child(8) { animation-delay: 0.28s; }
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0s;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.stagger-children > *:nth-child(7) {
+  animation-delay: 0.24s;
+}
+.stagger-children > *:nth-child(8) {
+  animation-delay: 0.28s;
+}
 
 /* === Smooth card hover === */
 .card-hover {
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .card-hover:hover {
@@ -284,8 +306,12 @@
 
 /* === Better skeleton === */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .skeleton {
@@ -313,8 +339,12 @@
    of sight on any screen and rolling into view within seconds. The crossing
    itself is stretched to 90s — scenery, not something asking to be watched. */
 @keyframes authDrive {
-  from { transform: translateX(-200px); }
-  to { transform: translateX(calc(100vw + 200px)); }
+  from {
+    transform: translateX(-200px);
+  }
+  to {
+    transform: translateX(calc(100vw + 200px));
+  }
 }
 
 /* The dash pattern is 28+22, so shifting by exactly 50 loops seamlessly. The
@@ -322,13 +352,17 @@
    backwards along the path, so the markings sweep right-to-left, the way the
    road passes a car that is driving to the right. */
 @keyframes authLane {
-  to { stroke-dashoffset: 50; }
+  to {
+    stroke-dashoffset: 50;
+  }
 }
 
 /* One turn per 3.2s is roughly what the car's own speed implies at this wheel
    size, so the tyres do not look like they are skidding or free-spinning. */
 @keyframes wheelSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .auth-drive {
@@ -347,11 +381,111 @@
   animation: wheelSpin 3.2s linear infinite;
 }
 
+/* Exhaust smoke. Four puffs leave the tailpipe, rise, drift back over the boot,
+   swell and fade out completely before the cycle restarts — fading to zero is
+   what keeps the loop from popping. Each puff gets its own drift vector and its
+   own duration so the plume never pulses in unison; the delays are deliberately
+   not multiples of one another for the same reason. This is the only thing
+   moving on an otherwise still page, so it is pitched quiet: ~9s per puff, and
+   the group it lives in is drawn at 7% opacity. */
+@keyframes authPuffA {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-24px, -30px) scale(2.4);
+  }
+}
+@keyframes authPuffB {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-30px, -24px) scale(2.8);
+  }
+}
+@keyframes authPuffC {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.55);
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-18px, -34px) scale(2.2);
+  }
+}
+@keyframes authPuffD {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.45);
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-27px, -27px) scale(3);
+  }
+}
+
+/* transform-box is pinned to the view box for the same reason as the wheels:
+   with the default the origin resolves against the circle's own bounding box in
+   a way that makes `scale` walk the puff sideways as it grows. Each puff's
+   origin is its own centre, so it swells in place while the translate carries
+   it. */
+.auth-puff {
+  transform-box: view-box;
+  opacity: 0;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+.auth-puff-1 {
+  transform-origin: 46px 44px;
+  animation-name: authPuffA;
+  animation-duration: 9s;
+}
+
+.auth-puff-2 {
+  transform-origin: 44px 42px;
+  animation-name: authPuffB;
+  animation-duration: 10.5s;
+  animation-delay: 2.3s;
+}
+
+.auth-puff-3 {
+  transform-origin: 47.5px 41.5px;
+  animation-name: authPuffC;
+  animation-duration: 8.4s;
+  animation-delay: 4.1s;
+}
+
+.auth-puff-4 {
+  transform-origin: 45px 43.5px;
+  animation-name: authPuffD;
+  animation-duration: 11s;
+  animation-delay: 6.6s;
+}
+
 /* === Reduce motion === */
 @media (prefers-reduced-motion: reduce) {
   .auth-drive,
   .auth-lane,
   .wheel-spin,
+  .auth-puff,
   .animate-fade-in,
   .animate-fade-in-delay-1,
   .animate-fade-in-delay-2,
@@ -362,5 +496,12 @@
   .skeleton {
     animation: none !important;
     transition: none !important;
+  }
+
+  /* `.auth-puff` rests at opacity 0 so the animation can fade it in; with the
+     animation switched off that would erase the smoke entirely, so the puffs
+     are held visible instead — a still wisp at the pipe, no movement. */
+  .auth-puff {
+    opacity: 0.55;
   }
 }

@@ -6,6 +6,12 @@ interface IllustrationProps {
    * under a parked car read as a glitch rather than as life.
    */
   spinningWheels?: boolean
+  /**
+   * Draw the tailpipe. Opt-in for the same reason as the wheels: the auth
+   * background needs somewhere for its smoke to come from, while the landing
+   * page wants the clean silhouette it was drawn with.
+   */
+  exhaust?: boolean
 }
 
 /**
@@ -14,7 +20,11 @@ interface IllustrationProps {
  * flatter, hand-drawn mark the landing page is built around: the two are not
  * interchangeable, and the landing must not shift when this one changes.
  */
-export function CarSideIllustration({ className, spinningWheels = false }: IllustrationProps) {
+export function CarSideIllustration({
+  className,
+  spinningWheels = false,
+  exhaust = false,
+}: IllustrationProps) {
   return (
     <svg
       viewBox="0 0 200 84"
@@ -44,6 +54,17 @@ export function CarSideIllustration({ className, spinningWheels = false }: Illus
       {/* lights */}
       <path d="M184 50 L189 50" />
       <path d="M15 48 L21 48" />
+
+      {/* exhaust: a stub of pipe poking out under the rear valance, drawn as two
+          near-parallel lines with an end cap so it reads as a tube rather than a
+          scratch. It sits clear of the rear wheel arch, which starts at x=38. */}
+      {exhaust && (
+        <>
+          <path d="M22 63 L12 66" />
+          <path d="M22.6 66 L12.6 69" />
+          <path d="M12 66 L12.6 69" />
+        </>
+      )}
 
       {/* Wheels. The tyre stays put and only the rim turns inside it — a rotating
           circle is invisible, and spinning the outline too would make the whole
