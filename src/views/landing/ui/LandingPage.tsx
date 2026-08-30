@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { Logo, RotatingWord } from '@shared/ui'
 import {
-  CarIllustration,
+  CarSideIllustration,
   WrenchIllustration,
   ChartIllustration,
   Underline,
@@ -272,7 +272,7 @@ export function LandingPage() {
       <main>
         {/* Hero */}
         <section className="mx-auto max-w-6xl px-6 pb-12 pt-16 text-center">
-          <CarIllustration className="mx-auto mb-6 h-auto w-20 text-[#191918]" />
+          <CarSideIllustration className="mx-auto mb-6 h-auto w-32 text-[#191918]" />
           <h1 className="mb-5 font-serif text-4xl leading-[1.05] tracking-tight text-[#191918] md:text-7xl">
             Знай свою машину.
             <br />
@@ -536,7 +536,7 @@ export function LandingPage() {
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <Reveal>
             <div className="relative overflow-hidden rounded-2xl bg-[#FEF9E7] px-8 py-16 text-center">
-              <CarIllustration className="pointer-events-none absolute -left-4 bottom-2 hidden h-auto w-32 text-[#191918] opacity-15 md:block" />
+              <CarSideIllustration className="pointer-events-none absolute -left-6 bottom-2 hidden h-auto w-48 text-[#191918] opacity-15 md:block" />
               <Sparkle className="pointer-events-none absolute right-10 top-8 h-5 w-5 text-[#B08A00] opacity-60" />
               <Sparkle className="pointer-events-none absolute right-24 top-20 h-3.5 w-3.5 text-[#B08A00] opacity-40" />
               <h2 className="relative mb-4 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">

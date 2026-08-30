@@ -1,7 +1,10 @@
+import { AuthBackground } from '@shared/ui'
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-background">
-      {children}
+    <div className="bg-background relative min-h-screen overflow-x-hidden">
+      <AuthBackground />
+      <div className="relative">{children}</div>
     </div>
   )
 }

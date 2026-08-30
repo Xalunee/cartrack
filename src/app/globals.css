@@ -305,8 +305,53 @@
   animation: fadeIn 0.3s ease-out both;
 }
 
+/* === Auth background motion === */
+/* The car starts one car-length past the left edge rather than a fraction of the
+   viewport: measured in vw the run-up was itself most of a minute on a phone, so
+   the first thing a visitor saw was an empty road. 200px covers the widest the
+   car renders (8rem at the desktop root size, plus slack), which puts it just out
+   of sight on any screen and rolling into view within seconds. The crossing
+   itself is stretched to 90s — scenery, not something asking to be watched. */
+@keyframes authDrive {
+  from { transform: translateX(-200px); }
+  to { transform: translateX(calc(100vw + 200px)); }
+}
+
+/* The dash pattern is 28+22, so shifting by exactly 50 loops seamlessly. The
+   offset grows rather than shrinks: a positive dashoffset walks the pattern
+   backwards along the path, so the markings sweep right-to-left, the way the
+   road passes a car that is driving to the right. */
+@keyframes authLane {
+  to { stroke-dashoffset: 50; }
+}
+
+/* One turn per 3.2s is roughly what the car's own speed implies at this wheel
+   size, so the tyres do not look like they are skidding or free-spinning. */
+@keyframes wheelSpin {
+  to { transform: rotate(360deg); }
+}
+
+.auth-drive {
+  animation: authDrive 90s linear infinite;
+  /* A negative delay applies to the first iteration only, so the page opens with
+     the car already part-way in from the left instead of making the visitor wait
+     out the off-screen run-up. Every later lap still starts fully out of sight. */
+  animation-delay: -12s;
+}
+
+.auth-lane {
+  animation: authLane 7s linear infinite;
+}
+
+.wheel-spin {
+  animation: wheelSpin 3.2s linear infinite;
+}
+
 /* === Reduce motion === */
 @media (prefers-reduced-motion: reduce) {
+  .auth-drive,
+  .auth-lane,
+  .wheel-spin,
   .animate-fade-in,
   .animate-fade-in-delay-1,
   .animate-fade-in-delay-2,

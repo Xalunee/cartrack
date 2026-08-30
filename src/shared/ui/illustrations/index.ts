@@ -1,4 +1,5 @@
 export { CarIllustration } from './CarIllustration'
+export { CarSideIllustration } from './CarSideIllustration'
 export { WrenchIllustration } from './WrenchIllustration'
 export { RouteIllustration } from './RouteIllustration'
 export { ChartIllustration } from './ChartIllustration'

@@ -17,8 +17,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Logo } from '@shared/ui'
 
 const schema = z.object({
   email: existingEmailField(),
@@ -34,6 +36,7 @@ export default function LoginPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
+    mode: 'onTouched',
     defaultValues: { email: '', password: '' },
   })
 
@@ -54,14 +57,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 page-enter">
-      <Card className="w-full max-w-sm glass">
+    <div className="page-enter flex min-h-screen items-center justify-center px-4">
+      <Card className="glass w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-center">CarTrack</CardTitle>
+          <CardTitle className="flex items-center justify-center gap-2">
+            <Logo size={22} />
+            CarTrack
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <FormField
                 control={form.control}
                 name="email"
@@ -69,7 +75,12 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -82,19 +93,23 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Пароль</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••" {...field} />
+                      <PasswordInput
+                        autoComplete="current-password"
+                        placeholder="••••••"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <p className="text-destructive text-sm">{error}</p>}
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? 'Вход...' : 'Войти'}
               </Button>
             </form>
           </Form>
-          <p className="text-sm text-muted-foreground text-center mt-4">
+          <p className="text-muted-foreground mt-4 text-center text-sm">
             Нет аккаунта?{' '}
             <Link href="/register" className="text-primary underline">
               Зарегистрироваться

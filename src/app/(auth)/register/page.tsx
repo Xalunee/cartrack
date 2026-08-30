@@ -17,15 +17,25 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Logo } from '@shared/ui'
 import { apiClient } from '@shared/api/client'
 
-const schema = z.object({
-  name: nameField('Введите имя'),
-  email: emailField(),
-  password: passwordField(),
-})
+const schema = z
+  .object({
+    name: nameField('Введите имя'),
+    email: emailField(),
+    password: passwordField(),
+    confirmPassword: z.string().min(1, 'Повторите пароль'),
+  })
+  // A typo in the password is otherwise invisible until the first login fails,
+  // by which point the account already exists with the wrong hash.
+  .refine((values) => values.password === values.confirmPassword, {
+    message: 'Пароли не совпадают',
+    path: ['confirmPassword'],
+  })
 
 type FormValues = z.infer<typeof schema>
 
@@ -36,7 +46,8 @@ export default function RegisterPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', email: '', password: '' },
+    mode: 'onTouched',
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   })
 
   async function onSubmit(values: FormValues) {
@@ -46,7 +57,13 @@ export default function RegisterPage() {
     try {
       await apiClient('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify(values),
+        // Only the three fields the route accepts — the confirmation never
+        // leaves the browser.
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+        }),
       })
 
       const result = await signIn('credentials', {
@@ -68,15 +85,18 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 page-enter">
-      <Card className="w-full max-w-sm glass">
+    <div className="page-enter flex min-h-screen items-center justify-center px-4">
+      <Card className="glass w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-center">CarTrack</CardTitle>
-          <p className="text-sm text-muted-foreground text-center">Создайте аккаунт</p>
+          <CardTitle className="flex items-center justify-center gap-2">
+            <Logo size={22} />
+            CarTrack
+          </CardTitle>
+          <p className="text-muted-foreground text-center text-sm">Создайте аккаунт</p>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <FormField
                 control={form.control}
                 name="name"
@@ -84,7 +104,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Имя</FormLabel>
                     <FormControl>
-                      <Input placeholder="Александр" {...field} />
+                      <Input autoComplete="name" placeholder="Александр" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -97,7 +117,12 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -106,23 +131,49 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="password"
+                // With a resolver, a field change only lifts that field's own
+                // error into form state, so fixing a typo here would leave
+                // "Пароли не совпадают" hanging under a confirmation that now
+                // matches. deps re-runs the other field too.
+                rules={{ deps: ['confirmPassword'] }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Пароль</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Минимум 6 символов" {...field} />
+                      <PasswordInput
+                        autoComplete="new-password"
+                        placeholder="Минимум 6 символов"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Повторите пароль</FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        autoComplete="new-password"
+                        placeholder="Ещё раз тот же пароль"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {error && <p className="text-destructive text-sm">{error}</p>}
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? 'Регистрация...' : 'Зарегистрироваться'}
               </Button>
             </form>
           </Form>
-          <p className="text-sm text-muted-foreground text-center mt-4">
+          <p className="text-muted-foreground mt-4 text-center text-sm">
             Уже есть аккаунт?{' '}
             <Link href="/login" className="text-primary underline">
               Войти
