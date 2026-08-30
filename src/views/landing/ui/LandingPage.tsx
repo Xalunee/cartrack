@@ -1,15 +1,5 @@
 import Link from 'next/link'
-import {
-  AlertTriangle,
-  BarChart3,
-  Check,
-  FileText,
-  Gauge,
-  LayoutDashboard,
-  Settings,
-  TrendingUp,
-  Wrench,
-} from 'lucide-react'
+import { Check, FileText } from 'lucide-react'
 import { Logo, RotatingWord } from '@shared/ui'
 import {
   CarSideIllustration,
@@ -20,6 +10,8 @@ import {
   Sparkle,
 } from '@shared/ui/illustrations'
 import { Reveal } from './Reveal'
+import { DesktopMockup } from './DesktopMockup'
+import { PhoneMockup } from './PhoneMockup'
 
 function LandingNav() {
   return (
@@ -31,10 +23,16 @@ function LandingNav() {
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
-          <a href="#features" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+          <a
+            href="#features"
+            className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+          >
             Возможности
           </a>
-          <a href="#telegram" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+          <a
+            href="#telegram"
+            className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+          >
             Telegram-бот
           </a>
           <a href="#how" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
@@ -43,7 +41,10 @@ function LandingNav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/login" className="hidden text-sm text-[#6B6B6B] transition-colors hover:text-[#191918] sm:block">
+          <Link
+            href="/login"
+            className="hidden text-sm text-[#6B6B6B] transition-colors hover:text-[#191918] sm:block"
+          >
             Войти
           </Link>
           <a
@@ -58,212 +59,6 @@ function LandingNav() {
   )
 }
 
-const previewNav = [
-  { label: 'Главная', icon: LayoutDashboard, active: true },
-  { label: 'Обслуживание', icon: Wrench, active: false },
-  { label: 'Пробег', icon: Gauge, active: false },
-  { label: 'События', icon: AlertTriangle, active: false },
-  { label: 'Настройки', icon: Settings, active: false },
-]
-
-const previewMaintenance = [
-  {
-    title: 'Замена масла',
-    meta: 'осталось 2 300 км',
-    status: 'Скоро',
-    badge: 'bg-[#FEF9E7] text-[#B08A00]',
-  },
-  {
-    title: 'Тормозные колодки',
-    meta: 'запас 12 100 км',
-    status: 'OK',
-    badge: 'bg-[#EDF7ED] text-[#2E7D32]',
-  },
-  {
-    title: 'Воздушный фильтр',
-    meta: 'просрочен на 420 км',
-    status: 'Критично',
-    badge: 'bg-[#FDEBEC] text-[#C62828]',
-  },
-]
-
-function ProductPreview() {
-  const chartPoints = '0,34 40,30 80,32 120,22 160,26 200,14 240,18 280,8'
-  return (
-    <div className="grid grid-cols-[168px_1fr] bg-[#FBFBFA] text-left">
-      {/* Sidebar */}
-      <aside className="hidden flex-col gap-1 border-r border-[#EFEEEC] bg-white p-3 sm:flex">
-        <div className="mb-3 flex items-center gap-2 px-2">
-          <Logo size={20} />
-          <span className="text-[13px] font-semibold text-[#191918]">CarTrack</span>
-        </div>
-        {previewNav.map((item) => {
-          const Icon = item.icon
-          return (
-            <div
-              key={item.label}
-              className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[12px] ${
-                item.active ? 'bg-[#F1F0EE] font-medium text-[#191918]' : 'text-[#6B6B6B]'
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {item.label}
-            </div>
-          )
-        })}
-      </aside>
-
-      {/* Main area */}
-      <div className="p-4 sm:p-5">
-        <div className="mb-4 flex items-end justify-between">
-          <div>
-            <p className="text-[12px] text-[#9B9A97]">Skoda Octavia · 2019</p>
-            <h3 className="text-[15px] font-semibold text-[#191918]">Личный кабинет</h3>
-          </div>
-          <span className="rounded-md bg-[#EDF7ED] px-2 py-0.5 text-[11px] font-medium text-[#2E7D32]">
-            Всё под контролем
-          </span>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {/* Mileage card */}
-          <div className="rounded-lg border border-[#EFEEEC] bg-white p-4">
-            <div className="mb-1 flex items-center gap-1.5 text-[11px] text-[#9B9A97]">
-              <Gauge className="h-3.5 w-3.5" />
-              Текущий пробег
-            </div>
-            <div className="flex items-end gap-1.5">
-              <span className="text-2xl font-semibold tracking-tight text-[#191918]">87 420</span>
-              <span className="pb-1 text-[12px] text-[#9B9A97]">км</span>
-            </div>
-            <svg viewBox="0 0 280 40" className="mt-3 h-9 w-full" preserveAspectRatio="none">
-              <polyline
-                points={chartPoints}
-                fill="none"
-                stroke="#2383E2"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <p className="mt-1 text-[11px] text-[#2E7D32]">+248 км за неделю</p>
-          </div>
-
-          {/* Spending card */}
-          <div className="rounded-lg border border-[#EFEEEC] bg-white p-4">
-            <div className="mb-1 flex items-center gap-1.5 text-[11px] text-[#9B9A97]">
-              <BarChart3 className="h-3.5 w-3.5" />
-              Расходы за год
-            </div>
-            <div className="flex items-end gap-1.5">
-              <span className="text-2xl font-semibold tracking-tight text-[#191918]">42 800</span>
-              <span className="pb-1 text-[12px] text-[#9B9A97]">₽</span>
-            </div>
-            <div className="mt-3 flex h-9 items-end gap-1.5">
-              {[40, 55, 38, 62, 48, 70].map((h, i) => (
-                <span
-                  key={i}
-                  className="w-full rounded-sm bg-[#EBF5FE]"
-                  style={{ height: `${h}%` }}
-                />
-              ))}
-            </div>
-            <p className="mt-1 text-[11px] text-[#9B9A97]">запчасти · ТО · топливо</p>
-          </div>
-        </div>
-
-        {/* Maintenance rows */}
-        <div className="mt-3 rounded-lg border border-[#EFEEEC] bg-white p-4">
-          <div className="mb-2 flex items-center gap-1.5 text-[11px] text-[#9B9A97]">
-            <Wrench className="h-3.5 w-3.5" />
-            Обслуживание
-          </div>
-          <div className="divide-y divide-[#F1F0EE]">
-            {previewMaintenance.map((item) => (
-              <div key={item.title} className="flex items-center justify-between py-2">
-                <div className="min-w-0">
-                  <p className="text-[13px] font-medium text-[#191918]">{item.title}</p>
-                  <p className="text-[11px] text-[#9B9A97]">{item.meta}</p>
-                </div>
-                <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${item.badge}`}>
-                  {item.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const phoneMaintenance = [
-  { title: 'Замена масла', status: 'Скоро', badge: 'bg-[#FEF9E7] text-[#B08A00]' },
-  { title: 'Тормозные колодки', status: 'OK', badge: 'bg-[#EDF7ED] text-[#2E7D32]' },
-  { title: 'Воздушный фильтр', status: 'Критично', badge: 'bg-[#FDEBEC] text-[#C62828]' },
-]
-
-const phoneNav = [LayoutDashboard, Wrench, TrendingUp, AlertTriangle, Settings]
-
-function PhoneMockup() {
-  return (
-    <div className="w-[240px] rounded-[36px] border border-[#EFEEEC] bg-white shadow-xl">
-      {/* Dynamic island */}
-      <div className="mx-auto mt-2 h-4 w-16 rounded-full bg-[#191918]" />
-
-      <div className="px-4 pt-3">
-        {/* Header */}
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[13px] font-semibold text-[#191918]">Skoda Octavia</p>
-            <p className="text-[11px] text-[#9B9A97]">87 420 км</p>
-          </div>
-          <span className="rounded-md bg-[#EDF7ED] px-2 py-0.5 text-[10px] font-medium text-[#2E7D32]">
-            OK
-          </span>
-        </div>
-
-        {/* Mileage big */}
-        <div className="mt-4 rounded-xl border border-[#EFEEEC] bg-[#FBFBFA] p-3">
-          <p className="text-[10px] text-[#9B9A97]">Текущий пробег</p>
-          <div className="flex items-end gap-1">
-            <span className="text-2xl font-semibold tracking-tight text-[#191918]">87 420</span>
-            <span className="pb-1 text-[11px] text-[#9B9A97]">км</span>
-          </div>
-        </div>
-
-        {/* Maintenance rows */}
-        <div className="mt-3 space-y-2">
-          {phoneMaintenance.map((item) => (
-            <div
-              key={item.title}
-              className="flex items-center justify-between rounded-lg border border-[#EFEEEC] px-3 py-2"
-            >
-              <span className="text-[12px] font-medium text-[#191918]">{item.title}</span>
-              <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${item.badge}`}>
-                {item.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom nav */}
-      <div className="mt-4 flex items-center justify-around border-t border-[#EFEEEC] px-2 py-2.5">
-        {phoneNav.map((Icon, i) => (
-          <Icon
-            key={i}
-            className={`h-4 w-4 ${i === 0 ? 'text-[#2383E2]' : 'text-[#C7C6C2]'}`}
-          />
-        ))}
-      </div>
-
-      {/* Home indicator */}
-      <div className="mx-auto mb-2 h-1 w-20 rounded-full bg-[#191918]/20" />
-    </div>
-  )
-}
-
 export function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-[#191918]">
@@ -271,15 +66,17 @@ export function LandingPage() {
 
       <main>
         {/* Hero */}
-        <section className="mx-auto max-w-6xl px-6 pb-12 pt-16 text-center">
+        <section className="mx-auto max-w-6xl px-6 pt-16 pb-12 text-center">
           <CarSideIllustration className="mx-auto mb-6 h-auto w-32 text-[#191918]" />
           <h1 className="mb-5 font-serif text-4xl leading-[1.05] tracking-tight text-[#191918] md:text-7xl">
             Знай свою машину.
             <br />
             Без{' '}
             <span className="relative inline-block">
-              <RotatingWord words={['таблиц', 'чеков в бардачке', 'забытых замен', 'лишних трат']} />
-              <Sparkle className="absolute -right-5 -top-3 h-4 w-4 text-[#2383E2] md:-right-7 md:-top-4 md:h-5 md:w-5" />
+              <RotatingWord
+                words={['таблиц', 'чеков в бардачке', 'забытых замен', 'лишних трат']}
+              />
+              <Sparkle className="absolute -top-3 -right-5 h-4 w-4 text-[#2383E2] md:-top-4 md:-right-7 md:h-5 md:w-5" />
             </span>
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-[#6B6B6B]">
@@ -320,10 +117,10 @@ export function LandingPage() {
                 <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
                 <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
               </div>
-              <ProductPreview />
+              <DesktopMockup />
             </div>
 
-            <div className="absolute -bottom-8 -right-4 rotate-[3deg]">
+            <div className="absolute right-0 -bottom-16 rotate-[3deg] xl:-right-6">
               <PhoneMockup />
             </div>
           </div>
@@ -332,7 +129,7 @@ export function LandingPage() {
         {/* Bento features */}
         <section id="features" className="mx-auto max-w-6xl px-6 py-20">
           <Reveal>
-            <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
+            <p className="mb-3 text-[13px] font-medium tracking-wider text-[#9B9A97] uppercase">
               Возможности
             </p>
             <h2 className="mb-12 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
@@ -345,7 +142,7 @@ export function LandingPage() {
             {/* Card A — Умный прогноз (soft blue, span 4) */}
             <Reveal className="md:col-span-4" delay={0}>
               <div className="relative h-full overflow-hidden rounded-2xl bg-[#EBF5FE] p-6">
-                <WrenchIllustration className="pointer-events-none absolute -right-4 -top-4 h-28 w-28 text-[#2383E2] opacity-10" />
+                <WrenchIllustration className="pointer-events-none absolute -top-4 -right-4 h-28 w-28 text-[#2383E2] opacity-10" />
                 <h3 className="text-lg font-semibold text-[#191918]">Умный прогноз</h3>
                 <p className="mt-1 text-sm text-[#6B6B6B]">
                   Считает по вашему темпу езды и заранее говорит, когда пора в сервис.
@@ -369,10 +166,14 @@ export function LandingPage() {
             <Reveal className="md:col-span-2" delay={80}>
               <div className="h-full rounded-2xl bg-[#FEF9E7] p-6">
                 <h3 className="text-lg font-semibold text-[#191918]">Трекинг пробега</h3>
-                <p className="mt-1 text-sm text-[#6B6B6B]">Вносите раз в неделю — остальное посчитаем.</p>
+                <p className="mt-1 text-sm text-[#6B6B6B]">
+                  Вносите раз в неделю — остальное посчитаем.
+                </p>
                 <div className="mt-5 rounded-lg bg-white p-4 shadow-sm">
                   <div className="flex items-end gap-1.5">
-                    <span className="text-2xl font-semibold tracking-tight text-[#191918]">87 420</span>
+                    <span className="text-2xl font-semibold tracking-tight text-[#191918]">
+                      87 420
+                    </span>
                     <span className="pb-1 text-[12px] text-[#9B9A97]">км</span>
                   </div>
                   <span className="mt-2 inline-block rounded-md bg-[#EDF7ED] px-2 py-0.5 text-[11px] font-medium text-[#2E7D32]">
@@ -385,7 +186,7 @@ export function LandingPage() {
             {/* Card C — Учёт расходов (soft green, span 2) */}
             <Reveal className="md:col-span-2" delay={0}>
               <div className="relative h-full overflow-hidden rounded-2xl bg-[#EDF7ED] p-6">
-                <ChartIllustration className="pointer-events-none absolute -right-3 -top-3 h-24 w-24 text-[#2E7D32] opacity-15" />
+                <ChartIllustration className="pointer-events-none absolute -top-3 -right-3 h-24 w-24 text-[#2E7D32] opacity-15" />
                 <h3 className="text-lg font-semibold text-[#191918]">Учёт расходов</h3>
                 <p className="mt-1 text-sm text-[#6B6B6B]">Запчасти, ТО и ремонт — по месяцам.</p>
                 <div className="mt-5 flex h-16 items-end gap-2 rounded-lg bg-white p-4 shadow-sm">
@@ -431,14 +232,15 @@ export function LandingPage() {
         {/* Telegram bot */}
         <section id="telegram" className="mx-auto max-w-6xl px-6 py-20">
           <div className="relative grid items-center gap-10 md:grid-cols-2">
-            <Arrow className="absolute left-1/2 top-1/2 z-10 hidden h-16 w-20 -translate-x-1/2 -translate-y-1/2 -rotate-6 text-[#2383E2] lg:block" />
+            <Arrow className="absolute top-1/2 left-1/2 z-10 hidden h-16 w-20 -translate-x-1/2 -translate-y-1/2 -rotate-6 text-[#2383E2] lg:block" />
             <Reveal>
-              <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
+              <p className="mb-3 text-[13px] font-medium tracking-wider text-[#9B9A97] uppercase">
                 Telegram-бот
               </p>
               <h2 className="mb-4 font-serif text-4xl tracking-tight text-[#191918]">
                 Вносите пробег,
-                <br />не открывая приложение
+                <br />
+                не открывая приложение
               </h2>
               <p className="mb-6 text-[#6B6B6B]">
                 Бот сам напомнит раз в неделю. Ответьте числом — и всё обновится: прогнозы, статусы,
@@ -492,7 +294,7 @@ export function LandingPage() {
         {/* How it works */}
         <section id="how" className="mx-auto max-w-6xl px-6 py-20">
           <Reveal>
-            <p className="mb-3 text-[13px] font-medium uppercase tracking-wider text-[#9B9A97]">
+            <p className="mb-3 text-[13px] font-medium tracking-wider text-[#9B9A97] uppercase">
               Как работает
             </p>
             <h2 className="mb-12 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
@@ -522,7 +324,7 @@ export function LandingPage() {
                 <div>
                   <p className="relative inline-block font-serif text-4xl text-[#2383E2]">
                     {step.n}
-                    <Sparkle className="absolute -right-4 -top-1 h-3.5 w-3.5 text-[#2383E2] opacity-70" />
+                    <Sparkle className="absolute -top-1 -right-4 h-3.5 w-3.5 text-[#2383E2] opacity-70" />
                   </p>
                   <h3 className="mt-3 text-lg font-semibold text-[#191918]">{step.title}</h3>
                   <p className="mt-1 text-sm text-[#6B6B6B]">{step.text}</p>
@@ -536,13 +338,15 @@ export function LandingPage() {
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <Reveal>
             <div className="relative overflow-hidden rounded-2xl bg-[#FEF9E7] px-8 py-16 text-center">
-              <CarSideIllustration className="pointer-events-none absolute -left-6 bottom-2 hidden h-auto w-48 text-[#191918] opacity-15 md:block" />
-              <Sparkle className="pointer-events-none absolute right-10 top-8 h-5 w-5 text-[#B08A00] opacity-60" />
-              <Sparkle className="pointer-events-none absolute right-24 top-20 h-3.5 w-3.5 text-[#B08A00] opacity-40" />
+              <CarSideIllustration className="pointer-events-none absolute bottom-2 -left-6 hidden h-auto w-48 text-[#191918] opacity-15 md:block" />
+              <Sparkle className="pointer-events-none absolute top-8 right-10 h-5 w-5 text-[#B08A00] opacity-60" />
+              <Sparkle className="pointer-events-none absolute top-20 right-24 h-3.5 w-3.5 text-[#B08A00] opacity-40" />
               <h2 className="relative mb-4 font-serif text-4xl tracking-tight text-[#191918] md:text-5xl">
                 Начните следить за машиной сегодня
               </h2>
-              <p className="mb-8 text-[#6B6B6B]">Бесплатно для одной машины. Без карты, без рекламы.</p>
+              <p className="mb-8 text-[#6B6B6B]">
+                Бесплатно для одной машины. Без карты, без рекламы.
+              </p>
               <a
                 href="/register"
                 className="rounded-lg border-2 border-[#191918] px-6 py-3 text-[15px] font-medium text-[#191918] transition-colors hover:bg-[#191918] hover:text-white"
@@ -569,22 +373,31 @@ export function LandingPage() {
 
             <div className="flex gap-12">
               <div>
-                <p className="mb-3 text-xs uppercase tracking-wider text-[#9B9A97]">Продукт</p>
+                <p className="mb-3 text-xs tracking-wider text-[#9B9A97] uppercase">Продукт</p>
                 <div className="flex flex-col gap-2">
-                  <a href="#features" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+                  <a
+                    href="#features"
+                    className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+                  >
                     Возможности
                   </a>
-                  <Link href="/register" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+                  <Link
+                    href="/register"
+                    className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+                  >
                     Регистрация
                   </Link>
-                  <Link href="/login" className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]">
+                  <Link
+                    href="/login"
+                    className="text-sm text-[#6B6B6B] transition-colors hover:text-[#191918]"
+                  >
                     Войти
                   </Link>
                 </div>
               </div>
 
               <div>
-                <p className="mb-3 text-xs uppercase tracking-wider text-[#9B9A97]">Поддержка</p>
+                <p className="mb-3 text-xs tracking-wider text-[#9B9A97] uppercase">Поддержка</p>
                 <div className="flex flex-col gap-2">
                   <a
                     href="https://t.me/cartrack_official_bot"
