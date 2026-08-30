@@ -1,4 +1,14 @@
-import { BarChart2, Moon, MoreHorizontal, Plus, RefreshCw, TrendingUp } from 'lucide-react'
+import {
+  BarChart2,
+  BatteryFull,
+  Moon,
+  MoreHorizontal,
+  Plus,
+  RefreshCw,
+  Signal,
+  TrendingUp,
+  Wifi,
+} from 'lucide-react'
 import { Logo } from '@shared/ui'
 import {
   chartColor,
@@ -38,11 +48,19 @@ function PeriodSwitcher() {
 export function PhoneMockup() {
   return (
     <div className="w-[260px] rounded-[36px] border border-[#EFEEEC] bg-white shadow-xl">
-      {/* Dynamic island */}
-      <div className="mx-auto mt-2 h-4 w-16 rounded-full bg-[#191918]" />
+      {/* Status bar: время слева, индикаторы справа, островок по центру */}
+      <div className="relative flex items-center justify-between px-5 pt-2">
+        <span className="text-[10px] font-semibold text-[#191918]">9:41</span>
+        <div className="absolute left-1/2 h-4 w-16 -translate-x-1/2 rounded-full bg-[#191918]" />
+        <div className="flex items-center gap-1 text-[#191918]">
+          <Signal className="h-2.5 w-2.5" />
+          <Wifi className="h-2.5 w-2.5" />
+          <BatteryFull className="h-3 w-3" />
+        </div>
+      </div>
 
       {/* Top bar */}
-      <div className="mt-1.5 flex items-center justify-between border-b border-[#EFEEEC] px-4 py-1.5">
+      <div className="mt-2 flex items-center justify-between border-b border-[#EFEEEC] px-4 py-1.5">
         <div className="flex items-center gap-1.5">
           <Logo size={18} />
           <span className="text-[12px] font-semibold text-[#191918]">CarTrack</span>

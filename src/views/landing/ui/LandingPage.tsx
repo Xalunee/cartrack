@@ -111,11 +111,11 @@ export function LandingPage() {
           {/* Desktop: browser frame with phone overlapping bottom-right */}
           <div className="relative hidden md:block">
             <div className="overflow-hidden rounded-xl border border-[#EFEEEC] bg-white shadow-[0_8px_40px_rgba(0,0,0,0.06)]">
-              {/* Browser chrome bar */}
+              {/* Browser chrome bar со «светофором» macOS */}
               <div className="flex items-center gap-1.5 border-b border-[#EFEEEC] bg-[#FBFBFA] px-4 py-2.5">
-                <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
-                <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
-                <div className="h-2.5 w-2.5 rounded-full bg-[#EFEEEC]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
               </div>
               <DesktopMockup />
             </div>
