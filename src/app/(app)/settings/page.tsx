@@ -22,6 +22,7 @@ import { signOut } from 'next-auth/react'
 import { ExportButton } from '@features/export-pdf'
 import { useCarQuery, useUpdateCarMutation } from '@entities/car'
 import { StsDialog } from '@features/set-sts'
+import { ChangePasswordCard } from '@features/change-password'
 import { useHydrated, useMediaQuery } from '@shared/lib/client-env'
 import { TELEGRAM_FALLBACK_LABEL } from '@shared/config'
 
@@ -400,6 +401,8 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ChangePasswordCard />
 
       {/* A row rather than a card: it leads somewhere, it does not hold settings. */}
       <Link
