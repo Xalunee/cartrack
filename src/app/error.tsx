@@ -21,7 +21,7 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 page-enter">
+    <div className="min-h-svh flex flex-col items-center justify-center px-4 page-enter">
       <Card className="glass w-full max-w-sm text-center">
         <CardContent className="pt-8 pb-6">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">

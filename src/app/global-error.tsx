@@ -21,7 +21,7 @@ export default function GlobalError({
   return (
     <html lang="ru">
       <body className="antialiased">
-        <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="min-h-svh flex flex-col items-center justify-center px-4">
           <div className="w-full max-w-sm text-center rounded-xl border p-8">
             <h1 className="text-lg font-semibold mb-2">Что-то пошло не так</h1>
             <p className="text-sm text-muted-foreground mb-6">

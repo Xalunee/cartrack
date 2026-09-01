@@ -209,7 +209,7 @@ function CreateMileageDialog({
   }
 
   const dialogContent = (
-    <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
+    <DialogContent className="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>Обновить пробег</DialogTitle>
       </DialogHeader>
@@ -450,7 +450,7 @@ function EditMileageDialog({
   }
 
   const dialogContent = (
-    <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
+    <DialogContent className="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>Редактировать запись</DialogTitle>
       </DialogHeader>

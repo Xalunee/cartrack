@@ -69,7 +69,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 page-enter">
+    <div className="min-h-svh flex items-center justify-center px-4 py-8 page-enter">
       <Card className="w-full max-w-md glass">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">

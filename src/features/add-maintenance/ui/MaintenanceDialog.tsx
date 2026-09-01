@@ -110,7 +110,7 @@ export function MaintenanceDialog({ item, trigger }: MaintenanceDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
+      <DialogContent className="sm:max-w-md" onClick={(event) => event.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Редактировать' : 'Добавить позицию обслуживания'}
