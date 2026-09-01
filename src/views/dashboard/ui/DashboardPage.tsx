@@ -19,14 +19,17 @@ import { Car, ChevronRight, Plus, RefreshCw } from 'lucide-react'
 // page and neither widget can draw anything until its query resolves, so the
 // library has no business being in the bundle that blocks first paint. The
 // loading states mirror each widget's own first render so the swap is silent.
-const MileageTracker = dynamic(
-  () => import('@widgets/mileage-tracker/ui/MileageTracker').then((m) => m.MileageTracker),
-  { ssr: false, loading: () => <MileageTrackerSkeleton /> }
-)
-const SpendingChart = dynamic(
-  () => import('@widgets/spending-chart/ui/SpendingChart').then((m) => m.SpendingChart),
-  { ssr: false, loading: () => <SpendingChartSkeleton /> }
-)
+//
+// Both imports go through ./lazy-charts so the two widgets share one chunk
+// group — see that file for what two groups did to Recharts' module registry.
+const MileageTracker = dynamic(() => import('./lazy-charts').then((m) => m.MileageTracker), {
+  ssr: false,
+  loading: () => <MileageTrackerSkeleton />,
+})
+const SpendingChart = dynamic(() => import('./lazy-charts').then((m) => m.SpendingChart), {
+  ssr: false,
+  loading: () => <SpendingChartSkeleton />,
+})
 
 export function DashboardPage() {
   const { data: car, isLoading } = useCarQuery()

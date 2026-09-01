@@ -7,7 +7,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  * is plain script served as-is, so the only way to test what actually ships is to
  * evaluate that file with the worker globals stubbed and drive its fetch handler.
  *
- * What is being defended: an API route that nobody remembered to list in
+ * What is being defended: a chunk that fails to load must fail as an error, not
+ * as an HTML page with status 200 — the browser executes such a body as
+ * JavaScript, every export of the module becomes undefined, and the crash
+ * surfaces far from here as a minified React #130 or a createSelector TypeError.
+ *
+ * And: an API route that nobody remembered to list in
  * CACHEABLE_API used to fall through to the cache-first branch meant for static
  * assets, which pinned its first response for that URL forever. /api/support
  * answered with an empty list before the user had written anything, and that
@@ -26,9 +31,10 @@ interface FetchEventStub {
   responded?: Promise<Response>
 }
 
-function loadServiceWorker() {
+function loadServiceWorker(fetchImpl?: () => Promise<Response>) {
   const store = new Map<string, Response>()
   const listeners = new Map<string, (event: unknown) => void>()
+  const messages: unknown[] = []
 
   const cacheStub = {
     put: async (request: Request | string, response: Response) => {
@@ -52,16 +58,20 @@ function loadServiceWorker() {
       listeners.set(type, handler)
     },
     skipWaiting: () => {},
-    clients: { claim: async () => {}, matchAll: async () => [] },
+    clients: {
+      claim: async () => {},
+      matchAll: async () => [{ postMessage: (message: unknown) => messages.push(message) }],
+    },
     location: { origin: ORIGIN },
   }
 
   const fetchMock = vi.fn(
-    async () =>
-      new Response(JSON.stringify([{ id: 'ticket_1' }]), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      })
+    fetchImpl ??
+      (async () =>
+        new Response(JSON.stringify([{ id: 'ticket_1' }]), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }))
   )
 
   // Deliberate: the shipped file is a classic worker script, and evaluating it is
@@ -83,7 +93,7 @@ function loadServiceWorker() {
     return event
   }
 
-  return { dispatch, fetchMock, store }
+  return { dispatch, fetchMock, store, messages }
 }
 
 describe('service worker fetch routing', () => {
@@ -145,5 +155,47 @@ describe('service worker fetch routing', () => {
 
     await expect((await event.responded!).text()).resolves.toBe('cached-bundle')
     expect(sw.fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('lets a failed chunk fetch fail instead of answering with an HTML page', async () => {
+    const offline = loadServiceWorker(async () => {
+      throw new TypeError('Failed to fetch')
+    })
+
+    const event = await offline.dispatch('/_next/static/chunks/new-after-deploy.js')
+
+    await expect(event.responded).rejects.toThrow('Failed to fetch')
+  })
+
+  it('passes a missing chunk through as a 404 and asks the page to reload once', async () => {
+    const gone = loadServiceWorker(async () => new Response('Not Found', { status: 404 }))
+
+    const event = await gone.dispatch('/_next/static/chunks/from-an-old-build.js')
+    const response = await event.responded!
+
+    expect(response.status).toBe(404)
+    expect(response.headers.get('Content-Type')).not.toContain('text/html')
+    await Promise.resolve()
+    expect(gone.messages).toContainEqual({ type: 'STALE_BUILD' })
+  })
+
+  it('does not cache a chunk response that is not ok', async () => {
+    const gone = loadServiceWorker(async () => new Response('Not Found', { status: 404 }))
+    const path = '/_next/static/chunks/from-an-old-build.js'
+
+    await (await gone.dispatch(path)).responded
+    await Promise.resolve()
+
+    expect(gone.store.has(`${ORIGIN}${path}`)).toBe(false)
+  })
+
+  it('lets a failed RSC payload fetch fail instead of answering with an HTML page', async () => {
+    const offline = loadServiceWorker(async () => {
+      throw new TypeError('Failed to fetch')
+    })
+
+    const event = await offline.dispatch('/_next/data/build/dashboard.json')
+
+    await expect(event.responded).rejects.toThrow('Failed to fetch')
   })
 })

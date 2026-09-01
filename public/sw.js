@@ -1,9 +1,13 @@
-// Bumped to v5 to drop caches poisoned by the bug fixed below: /api/support
-// fell through to the cache-first branch and its first (empty) response was
-// pinned in STATIC_CACHE forever. Renaming the caches is what evicts it from
-// browsers that already stored it.
-const CACHE_NAME = 'cartrack-v5'
-const STATIC_CACHE = 'cartrack-static-v5'
+// Bumped to v6 to drop the cached HTML shells from before the chunk-fallback
+// fix below: a shell stored by an older build points at chunk URLs that the
+// current deploy no longer serves, and those misses are exactly what used to
+// come back as HTML-executed-as-JavaScript. Renaming the caches is what evicts
+// them from browsers that already stored them.
+//
+// (v5 dropped caches poisoned by an earlier bug: /api/support fell through to
+// the cache-first branch and its first, empty response was pinned forever.)
+const CACHE_NAME = 'cartrack-v6'
+const STATIC_CACHE = 'cartrack-static-v6'
 const API_CACHE = 'cartrack-api-v4'
 const CURRENT_CACHES = [CACHE_NAME, STATIC_CACHE, API_CACHE]
 
@@ -37,6 +41,11 @@ const FALLBACK_HTML = `<!DOCTYPE html>
 </div>
 </body>
 </html>`
+
+async function notifyClients(message) {
+  const clients = await self.clients.matchAll({ type: 'window' })
+  clients.forEach((c) => c.postMessage(message))
+}
 
 function fallbackResponse() {
   return new Response(FALLBACK_HTML, {
@@ -73,8 +82,7 @@ self.addEventListener('activate', (event) => {
       )
       await self.clients.claim()
 
-      const clients = await self.clients.matchAll({ type: 'window' })
-      clients.forEach((c) => c.postMessage({ type: 'SW_UPDATED' }))
+      await notifyClients({ type: 'SW_UPDATED' })
     })()
   )
 })
@@ -86,28 +94,43 @@ self.addEventListener('fetch', (event) => {
   // Never intercept auth routes — CSRF tokens and session cookies must flow freely
   if (url.pathname.startsWith('/api/auth')) return
 
-  // Content-hashed Next.js static assets: safe to cache-first indefinitely
+  // Content-hashed Next.js static assets: safe to cache-first indefinitely.
+  //
+  // A failed chunk must fail loudly. This branch used to end in
+  // `.catch(() => fallbackResponse())`, which handed the module loader an HTML
+  // page with status 200; the browser then executed that HTML as JavaScript,
+  // hit `Unexpected token '<'`, and left every export of the chunk undefined.
+  // React rendered one of those undefined exports and threw the minified #130,
+  // and Recharts' internal reselect import turned into
+  // `(0,D.createSelector) is not a function` — both from a "successful"
+  // response. Letting the rejection through instead gives Turbopack a real
+  // ChunkLoadError, which the route's error boundary already handles.
   if (url.pathname.startsWith('/_next/static/')) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached
-        return fetch(event.request)
-          .then((response) => {
-            if (response.ok) {
-              const clone = response.clone()
-              caches.open(STATIC_CACHE).then((cache) => cache.put(event.request, clone))
-            }
-            return response
-          })
-          .catch(() => fallbackResponse())
+        return fetch(event.request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone()
+            caches.open(STATIC_CACHE).then((cache) => cache.put(event.request, clone))
+          } else if (response.status === 404) {
+            // The build these chunk URLs belong to is gone: the page was served
+            // from a stale cached shell. Ask the client to reload once so it
+            // picks up the current HTML instead of dying on missing chunks.
+            notifyClients({ type: 'STALE_BUILD' })
+          }
+          return response
+        })
       })
     )
     return
   }
 
-  // Everything else under /_next/ (data, RSC payloads) changes every deploy — network-first, never cached
+  // Everything else under /_next/ (data, RSC payloads) changes every deploy —
+  // network-first, never cached. No HTML fallback here either: nothing under
+  // /_next/ expects an HTML body, so a fake 200 only corrupts the consumer.
   if (url.pathname.startsWith('/_next/')) {
-    event.respondWith(fetch(event.request).catch(() => fallbackResponse()))
+    event.respondWith(fetch(event.request))
     return
   }
 
