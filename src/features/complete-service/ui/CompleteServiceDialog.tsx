@@ -1,10 +1,7 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState, type ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
-import { format } from 'date-fns'
-import { ru } from 'date-fns/locale'
+import dynamic from 'next/dynamic'
+import { useCallback, useState, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,18 +11,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { useCompleteServiceMutation } from '@entities/service-record'
-import { ApiError } from '@shared/api/client'
-import { createCompleteServiceSchema, type CompleteServiceFormValues } from '../model/schema'
+import { DialogFormSkeleton } from '@shared/ui/DialogFormSkeleton'
+
+// This dialog sits on every maintenance card on the dashboard, so its form graph
+// would otherwise be on the critical path for a page that shows no form at all.
+const CompleteServiceDialogForm = dynamic(
+  () => import('./CompleteServiceDialogForm').then((m) => m.CompleteServiceDialogForm),
+  { ssr: false, loading: () => <DialogFormSkeleton rows={4} /> }
+)
 
 interface CompleteServiceDialogProps {
   itemId: string
@@ -33,10 +26,6 @@ interface CompleteServiceDialogProps {
   prevMileage: number
   currentMileage: number
   trigger?: ReactNode
-}
-
-function todayIso() {
-  return new Date().toISOString().split('T')[0]
 }
 
 export function CompleteServiceDialog({
@@ -47,196 +36,21 @@ export function CompleteServiceDialog({
   trigger,
 }: CompleteServiceDialogProps) {
   const [open, setOpen] = useState(false)
-  const [confirmation, setConfirmation] = useState<{ text: string; closeAfterMs: number } | null>(
-    null
-  )
-
-  // The confirmation closes the dialog on a timer. Owning that timer in an effect
-  // ties it to the message it belongs to: clearing or replacing the confirmation,
-  // and unmounting, all cancel it. A loose setTimeout would survive a close and
-  // fire into a dialog the user had since reopened, shutting it over fresh input.
-  useEffect(() => {
-    if (!confirmation) return
-    const timer = setTimeout(() => setOpen(false), confirmation.closeAfterMs)
-    return () => clearTimeout(timer)
-  }, [confirmation])
-
-  const mutation = useCompleteServiceMutation(itemId)
-
-  const schema = createCompleteServiceSchema(prevMileage)
-  const form = useForm<CompleteServiceFormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      mileage: currentMileage,
-      date: todayIso(),
-      cost: undefined,
-      notes: '',
-    },
-  })
-
-  function onOpenChange(next: boolean) {
-    setConfirmation(null)
-    setOpen(next)
-    if (next) {
-      form.reset({
-        mileage: currentMileage,
-        date: todayIso(),
-        cost: undefined,
-        notes: '',
-      })
-    }
-  }
-
-  function onSubmit(values: CompleteServiceFormValues) {
-    mutation.mutate(
-      { ...values, date: new Date(values.date).toISOString() },
-      {
-        onSuccess: (updated) => {
-          const forecast = updated.resource.forecastDate
-            ? format(new Date(updated.resource.forecastDate), 'd MMM yyyy', { locale: ru })
-            : updated.resource.remainingKm !== null && updated.resource.remainingKm > 0
-              ? `через ${updated.resource.remainingKm.toLocaleString('ru')} км`
-              : null
-
-          const advanced = values.mileage > currentMileage
-          const advancedNote = advanced
-            ? `Текущий пробег обновлён: ${values.mileage.toLocaleString('ru')} км.`
-            : null
-
-          const base = [
-            'Записано.',
-            advancedNote,
-            forecast ? `Следующая замена ~${forecast}` : null,
-          ]
-            .filter(Boolean)
-            .join(' ')
-
-          setConfirmation({
-            text: updated.mileageLogWarning ? `${base}\n${updated.mileageLogWarning}` : base,
-            closeAfterMs: updated.mileageLogWarning ? 2400 : 1200,
-          })
-        },
-      }
-    )
-  }
+  const close = useCallback(() => setOpen(false), [])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger ?? <Button size="sm">Заменил</Button>}</DialogTrigger>
       <DialogContent className="sm:max-w-md" onClick={(event) => event.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Заменил: {itemName}</DialogTitle>
         </DialogHeader>
-        {confirmation ? (
-          <p className="text-sm py-4 whitespace-pre-line" style={{ color: 'hsl(var(--status-ok))' }}>
-            {confirmation.text}
-          </p>
-        ) : (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="mileage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Пробег замены (км)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        value={field.value ?? ''}
-                        onChange={(event) =>
-                          field.onChange(
-                            event.target.value ? Number(event.target.value) : undefined
-                          )
-                        }
-                      />
-                    </FormControl>
-                    <p className="text-xs text-muted-foreground">
-                      Пробег на момент замены
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Дата</FormLabel>
-                    <FormControl>
-                      <Input type="date" className="w-full min-w-0 text-sm" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="cost"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Стоимость (₽)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="4500"
-                        {...field}
-                        value={field.value ?? ''}
-                        onChange={(event) =>
-                          field.onChange(
-                            event.target.value ? Number(event.target.value) : undefined
-                          )
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Заметка</FormLabel>
-                    <FormControl>
-                      <textarea
-                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                        placeholder="Использовано масло 5W-30..."
-                        {...field}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                  Отмена
-                </Button>
-                <Button type="submit" disabled={mutation.isPending}>
-                  {mutation.isPending ? 'Сохранение...' : 'Заменил'}
-                </Button>
-              </div>
-
-              {mutation.error && (
-                <div className="text-sm text-destructive space-y-0.5">
-                  <p>{mutation.error.message ?? 'Ошибка'}</p>
-                  {mutation.error instanceof ApiError && mutation.error.suggestion && (
-                    <p className="text-xs">{mutation.error.suggestion}</p>
-                  )}
-                </div>
-              )}
-            </form>
-          </Form>
-        )}
+        <CompleteServiceDialogForm
+          itemId={itemId}
+          prevMileage={prevMileage}
+          currentMileage={currentMileage}
+          onDone={close}
+        />
       </DialogContent>
     </Dialog>
   )

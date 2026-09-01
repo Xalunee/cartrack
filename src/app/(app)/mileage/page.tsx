@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useCarQuery } from '@entities/car'
 import { useMileageQuery, useDeleteMileageLogMutation, type MileageLog } from '@entities/mileage-log'
 import { LogMileageDialog } from '@features/log-mileage'
@@ -24,11 +25,16 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
-import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
-} from 'recharts'
 import { format, formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
+
+// Recharts is the heaviest thing this page touches and the chart only appears
+// once there are two readings to join, so it loads after the page does. The
+// placeholder is the chart's own height, so the card does not resize under it.
+const MileageHistoryChart = dynamic(
+  () => import('./MileageHistoryChart').then((m) => m.MileageHistoryChart),
+  { ssr: false, loading: () => <div className="h-[220px] skeleton rounded-md" /> }
+)
 
 export default function MileagePage() {
   const { data: car } = useCarQuery()
@@ -122,39 +128,7 @@ export default function MileagePage() {
             <CardTitle className="text-base">Динамика пробега</CardTitle>
           </CardHeader>
           <CardContent className="select-none">
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-                  tickLine={false}
-                  axisLine={false}
-                  padding={{ left: 16, right: 16 }}
-                />
-                <YAxis hide domain={['dataMin - 200', 'dataMax + 200']} />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (!active || !payload?.length) return null
-                    const d = payload[0].payload
-                    return (
-                      <div className="bg-popover text-popover-foreground border rounded-lg px-3 py-2 text-xs shadow-md">
-                        <p className="font-medium">{d.mileage?.toLocaleString('ru')} км</p>
-                        <p className="text-muted-foreground">{d.fullDate}</p>
-                        {d.note && <p className="text-muted-foreground mt-0.5">{d.note}</p>}
-                      </div>
-                    )
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="mileage"
-                  stroke="hsl(var(--chart-line))"
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: 'hsl(var(--chart-line))', strokeWidth: 0 }}
-                  activeDot={{ r: 5, strokeWidth: 2, stroke: 'hsl(var(--card))' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <MileageHistoryChart data={chartData} />
           </CardContent>
         </Card>
       )}

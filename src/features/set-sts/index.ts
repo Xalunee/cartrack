@@ -1,2 +1,2 @@
 export { StsDialog } from './ui/StsDialog'
-export * from './model/schema'
+export type { StsFormValues } from './model/schema'

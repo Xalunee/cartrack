@@ -1,2 +1,2 @@
 export { EditServiceRecordDialog } from './ui/EditServiceRecordDialog'
-export * from './model/schema'
+export type { EditServiceRecordFormValues } from './model/schema'

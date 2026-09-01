@@ -1,18 +1,32 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCarQuery } from '@entities/car'
 import { StatusOverview } from '@widgets/status-overview'
-import { MileageTracker } from '@widgets/mileage-tracker'
-import { SpendingChart } from '@widgets/spending-chart'
+import { MileageTrackerSkeleton } from '@widgets/mileage-tracker/ui/MileageTrackerSkeleton'
+import { SpendingChartSkeleton } from '@widgets/spending-chart/ui/SpendingChartSkeleton'
 import { MaintenanceDialog } from '@features/add-maintenance'
 import { LogMileageDialog } from '@features/log-mileage'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@shared/lib/utils'
 import { Car, ChevronRight, Plus, RefreshCw } from 'lucide-react'
+
+// Both widgets are charts: Recharts is the single heaviest dependency on this
+// page and neither widget can draw anything until its query resolves, so the
+// library has no business being in the bundle that blocks first paint. The
+// loading states mirror each widget's own first render so the swap is silent.
+const MileageTracker = dynamic(
+  () => import('@widgets/mileage-tracker/ui/MileageTracker').then((m) => m.MileageTracker),
+  { ssr: false, loading: () => <MileageTrackerSkeleton /> }
+)
+const SpendingChart = dynamic(
+  () => import('@widgets/spending-chart/ui/SpendingChart').then((m) => m.SpendingChart),
+  { ssr: false, loading: () => <SpendingChartSkeleton /> }
+)
 
 export function DashboardPage() {
   const { data: car, isLoading } = useCarQuery()

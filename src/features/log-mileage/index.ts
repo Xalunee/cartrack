@@ -1,4 +1,8 @@
-export { LogMileageForm } from './ui/LogMileageForm'
 export { useLogMileageMutation } from './model/useMutation'
 export { LogMileageDialog } from './ui/LogMileageDialog'
-export * from './model/schema'
+// See add-maintenance: schema values stay behind the lazy form, types only here.
+export type {
+  LogMileageFormValues,
+  CurrentMileageFormValues,
+  HistoryMileageFormValues,
+} from './model/schema'

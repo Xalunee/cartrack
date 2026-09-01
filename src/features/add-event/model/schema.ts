@@ -1,14 +1,6 @@
 import { z } from 'zod'
 import { costField, nameField, optionalPastDateField, textField } from '@shared/lib/validation/limits'
 
-export const eventTypeLabels = {
-  ACCIDENT: 'Авария',
-  MALFUNCTION: 'Неисправность',
-  FINE: 'Штраф',
-  SERVICE: 'СТО',
-  NOTE: 'Заметка',
-} as const
-
 export const addEventSchema = z.object({
   type: z.enum(['ACCIDENT', 'MALFUNCTION', 'FINE', 'SERVICE', 'NOTE']),
   title: nameField('Введите название'),

@@ -1,2 +1,2 @@
 export { CompleteServiceDialog } from './ui/CompleteServiceDialog'
-export * from './model/schema'
+export type { CompleteServiceFormValues } from './model/schema'
