@@ -3,6 +3,7 @@ import { auth } from '@shared/lib/auth'
 import { db } from '@shared/lib/db'
 import { z } from 'zod'
 import { LIMITS, nameField, passwordField } from '@shared/lib/validation/limits'
+import { WRONG_PASSWORD_MESSAGE } from '@shared/config'
 import bcrypt from 'bcryptjs'
 
 const updateSchema = z.object({
@@ -57,7 +58,7 @@ export async function PATCH(req: Request) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const valid = await bcrypt.compare(currentPassword, user.password)
-    if (!valid) return NextResponse.json({ error: 'Неверный текущий пароль' }, { status: 400 })
+    if (!valid) return NextResponse.json({ error: WRONG_PASSWORD_MESSAGE }, { status: 400 })
 
     updateData.password = await bcrypt.hash(newPassword, 12)
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { licensePlateField, mileageField, nameField, yearField } from '@shared/lib/validation/limits'
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Car } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
+import { CarBrandInput, CarModelInput } from '@entities/car'
 
 const schema = z.object({
   brand: nameField('Введите марку'),
@@ -45,6 +46,10 @@ export default function OnboardingPage() {
       currentMileage: 0,
     },
   })
+
+  // The model list follows whatever is in the brand field right now, not what
+  // was there when the form mounted.
+  const brand = useWatch({ control: form.control, name: 'brand' })
 
   async function onSubmit(values: FormValues) {
     setIsPending(true)
@@ -82,11 +87,20 @@ export default function OnboardingPage() {
                 <FormField
                   control={form.control}
                   name="brand"
-                  render={({ field }) => (
+                  render={({ field: { onChange, ...field } }) => (
                     <FormItem>
                       <FormLabel>Марка</FormLabel>
                       <FormControl>
-                        <Input placeholder="Toyota" {...field} />
+                        <CarBrandInput
+                          {...field}
+                          onValueChange={(value) => {
+                            onChange(value)
+                            // The model list is keyed to the brand, so a model
+                            // picked for the old brand is no longer an answer to
+                            // anything — clearing beats leaving Camry under Kia.
+                            if (form.getValues('model')) form.setValue('model', '')
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -95,11 +109,15 @@ export default function OnboardingPage() {
                 <FormField
                   control={form.control}
                   name="model"
-                  render={({ field }) => (
+                  render={({ field: { onChange, ...field } }) => (
                     <FormItem>
                       <FormLabel>Модель</FormLabel>
                       <FormControl>
-                        <Input placeholder="Camry" {...field} />
+                        <CarModelInput
+                          {...field}
+                          brand={brand}
+                          onValueChange={onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

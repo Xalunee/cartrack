@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState, type ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { type Car, useUpdateCarMutation } from '@entities/car'
+import { CarBrandInput, CarModelInput, type Car, useUpdateCarMutation } from '@entities/car'
 import { updateCarSchema, type UpdateCarFormValues } from '../model/schema'
 
 interface UpdateCarDialogProps {
@@ -55,6 +55,10 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
     }
   }, [open, car, form])
 
+  // The model list follows whatever is in the brand field right now, not what
+  // the car was saved with.
+  const brand = useWatch({ control: form.control, name: 'brand' })
+
   function onSubmit(values: UpdateCarFormValues) {
     mutation.mutate(values, {
       onSuccess: () => setOpen(false),
@@ -76,11 +80,20 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
               <FormField
                 control={form.control}
                 name="brand"
-                render={({ field }) => (
+                render={({ field: { onChange, ...field } }) => (
                   <FormItem>
                     <FormLabel>Марка</FormLabel>
                     <FormControl>
-                      <Input placeholder="Toyota" {...field} />
+                      <CarBrandInput
+                        {...field}
+                        onValueChange={(value) => {
+                          onChange(value)
+                          // The model list is keyed to the brand, so a model
+                          // picked for the old brand is no longer an answer to
+                          // anything — clearing beats leaving Camry under Kia.
+                          if (form.getValues('model')) form.setValue('model', '')
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -89,11 +102,11 @@ export function UpdateCarDialog({ car, trigger }: UpdateCarDialogProps) {
               <FormField
                 control={form.control}
                 name="model"
-                render={({ field }) => (
+                render={({ field: { onChange, ...field } }) => (
                   <FormItem>
                     <FormLabel>Модель</FormLabel>
                     <FormControl>
-                      <Input placeholder="Camry" {...field} />
+                      <CarModelInput {...field} brand={brand} onValueChange={onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

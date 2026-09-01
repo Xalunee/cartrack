@@ -1,3 +1,5 @@
 export * from './model/types'
 export * from './api/carApi'
 export * from './api/useCarQuery'
+export { CarBrandInput } from './ui/CarBrandInput'
+export { CarModelInput } from './ui/CarModelInput'

@@ -19,3 +19,11 @@ export type MaintenanceStatus = (typeof MAINTENANCE_STATUS)[keyof typeof MAINTEN
  * for a heading that no longer exists.
  */
 export const TELEGRAM_FALLBACK_LABEL = 'Не открылся Telegram?'
+
+/**
+ * Rejection of the current password on a password change. The settings form puts
+ * this one failure on the field instead of above the form, and it recognises it
+ * by the message — so both sides read the wording from here, or a reword in the
+ * route silently moves the error away from the field it belongs to.
+ */
+export const WRONG_PASSWORD_MESSAGE = 'Неверный текущий пароль'

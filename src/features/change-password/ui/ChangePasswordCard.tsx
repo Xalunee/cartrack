@@ -17,10 +17,8 @@ import {
 } from '@/components/ui/form'
 import { PasswordInput } from '@/components/ui/password-input'
 import { useUpdateUserMutation } from '@entities/user'
+import { WRONG_PASSWORD_MESSAGE } from '@shared/config'
 import { changePasswordSchema, type ChangePasswordFormValues } from '../model/schema'
-
-/** The one message the route sends back that belongs on a field, not above the form. */
-const WRONG_CURRENT_PASSWORD = 'Неверный текущий пароль'
 
 const SAVED_NOTICE_MS = 2500
 
@@ -55,7 +53,7 @@ export function ChangePasswordCard() {
           const message = e instanceof Error ? e.message : 'Не удалось изменить пароль'
           // A wrong current password is the user's typo in a field that is still on
           // screen — say so on the field so the fix is where the mistake is.
-          if (message === WRONG_CURRENT_PASSWORD) {
+          if (message === WRONG_PASSWORD_MESSAGE) {
             form.setError('currentPassword', { message })
             form.setValue('currentPassword', '')
           } else {
