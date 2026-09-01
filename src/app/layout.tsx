@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Providers } from '@app/providers'
 import { OfflineBanner } from '@shared/ui/OfflineBanner'
-import { SplashScreen } from '@shared/ui/SplashScreen'
 import { ServiceWorkerRegister } from './sw-register'
 import './globals.css'
 
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>{children}</Providers>
         <ServiceWorkerRegister />
-        <SplashScreen />
         <OfflineBanner />
       </body>
     </html>
