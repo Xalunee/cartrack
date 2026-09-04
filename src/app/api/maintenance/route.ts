@@ -39,15 +39,26 @@ export async function GET() {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const result = await getCarAndPace(session.user.id)
+  // Items are filtered through the car relation instead of a carId this
+  // handler would first have to fetch, so the two queries travel together.
+  // This route is on the dashboard's critical path and used to spend two
+  // sequential database round trips before it could answer.
+  //
+  // The items query is deliberately speculative: a user with no car still
+  // issues it and still gets the 404 below. That one wasted query on an empty
+  // table is the price of not waiting for the car first — please do not
+  // "fix" it back into a sequence.
+  const [result, items] = await Promise.all([
+    getCarAndPace(session.user.id),
+    db.maintenanceItem.findMany({
+      where: { car: { userId: session.user.id } },
+      orderBy: { createdAt: 'asc' },
+      include: { serviceRecords: { select: { id: true, date: true, cost: true } } },
+    }),
+  ])
   if (!result) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
 
   const { car, pace } = result
-  const items = await db.maintenanceItem.findMany({
-    where: { carId: car.id },
-    orderBy: { createdAt: 'asc' },
-    include: { serviceRecords: { select: { id: true, date: true, cost: true } } },
-  })
 
   const withStatus = items.map(({ serviceRecords, ...item }: MaintenanceItem & { serviceRecords: { id: string; date: Date; cost: number | null }[] }) => ({
     ...item,

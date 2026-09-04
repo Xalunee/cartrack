@@ -17,13 +17,18 @@ export async function GET() {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const car = await db.car.findUnique({ where: { userId: session.user.id } })
+  // The logs are reached through the car relation rather than through a carId
+  // this handler first has to go and fetch, which lets both queries leave at
+  // once. Sequentially it was two round trips to the database before anything
+  // could be returned, and the dashboard waits on this route.
+  const [car, logs] = await Promise.all([
+    db.car.findUnique({ where: { userId: session.user.id } }),
+    db.mileageLog.findMany({
+      where: { car: { userId: session.user.id } },
+      orderBy: { recordedAt: 'desc' },
+    }),
+  ])
   if (!car) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
-
-  const logs = await db.mileageLog.findMany({
-    where: { carId: car.id },
-    orderBy: { recordedAt: 'desc' },
-  })
 
   const pace = calculateDrivingPace(logs)
   return NextResponse.json({ logs, pace })
