@@ -6,7 +6,15 @@
  * build`.
  */
 import sharp from 'sharp'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  LAUNCH_BACKGROUNDS,
+  LAUNCH_DEVICES,
+  LAUNCH_MARK_SHARE,
+  LAUNCH_SCHEMES,
+  launchImagePath,
+  type LaunchScheme,
+} from '../src/shared/config/launch-images'
 
 const SOURCE = 'public/icons/icon.svg'
 
@@ -21,6 +29,7 @@ const FAVICON_SIZES = [16, 32, 48] as const
 
 /** App Router file-convention icon (src/app/icon.png). */
 const APP_ICON_SIZE = 512
+
 
 const svg = readFileSync(SOURCE)
 
@@ -67,6 +76,24 @@ function buildIco(images: { size: number; data: Buffer }[]): Buffer {
   return Buffer.concat([header, ...entries, ...images.map((image) => image.data)])
 }
 
+/**
+ * One launch image: the flat app background with the mark centred on it.
+ *
+ * Centring is left to `gravity: 'centre'` rather than computed offsets, so an
+ * odd pixel difference lands wherever sharp puts it instead of one pixel off in
+ * a direction that depends on the device.
+ */
+async function renderLaunchImage(pixelWidth: number, pixelHeight: number, background: string) {
+  const markSize = Math.round(Math.min(pixelWidth, pixelHeight) * LAUNCH_MARK_SHARE)
+  const mark = await render(markSize).toBuffer()
+
+  return sharp({
+    create: { width: pixelWidth, height: pixelHeight, channels: 4, background },
+  })
+    .composite([{ input: mark, gravity: 'centre' }])
+    .png({ compressionLevel: 9 })
+}
+
 async function generate() {
   for (const size of MANIFEST_SIZES) {
     const out = `public/icons/icon-${size}.png`
@@ -82,6 +109,22 @@ async function generate() {
   )
   writeFileSync('src/app/favicon.ico', buildIco(frames))
   console.log(`✓ src/app/favicon.ico (${FAVICON_SIZES.join(', ')}px)`)
+
+  mkdirSync('public/icons/startup', { recursive: true })
+  for (const device of LAUNCH_DEVICES) {
+    for (const scheme of LAUNCH_SCHEMES as readonly LaunchScheme[]) {
+      // The path comes from the shared table so the file the link claims and
+      // the file written here cannot drift apart.
+      const out = `public${launchImagePath(device, scheme)}`
+      const image = await renderLaunchImage(
+        device.width * device.ratio,
+        device.height * device.ratio,
+        LAUNCH_BACKGROUNDS[scheme]
+      )
+      await image.toFile(out)
+      console.log(`✓ ${out}`)
+    }
+  }
 }
 
 generate().catch((error) => {
