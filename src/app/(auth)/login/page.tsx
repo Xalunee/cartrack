@@ -1,6 +1,7 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
+import { useResetQueryCache } from '@shared/lib/use-reset-query-cache'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -31,6 +32,7 @@ type FormValues = z.infer<typeof schema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const resetQueryCache = useResetQueryCache()
   const [error, setError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
 
@@ -52,6 +54,10 @@ export default function LoginPage() {
     if (result?.error) {
       setError('Неверный email или пароль')
     } else {
+      // Whoever was signed in here before may still be in the persisted cache —
+      // a lapsed session lands on this page without ever passing through
+      // sign-out. Cleared before the dashboard can restore it.
+      await resetQueryCache()
       router.push('/dashboard')
     }
   }

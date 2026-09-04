@@ -1,6 +1,7 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
+import { useResetQueryCache } from '@shared/lib/use-reset-query-cache'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -41,6 +42,7 @@ type FormValues = z.infer<typeof schema>
 
 export default function RegisterPage() {
   const router = useRouter()
+  const resetQueryCache = useResetQueryCache()
   const [error, setError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
 
@@ -75,6 +77,9 @@ export default function RegisterPage() {
       if (result?.error) {
         setError('Регистрация успешна, но не удалось войти. Попробуйте войти вручную.')
       } else {
+        // A fresh account must not inherit whatever the previous user of this
+        // device left in the persisted cache.
+        await resetQueryCache()
         router.push('/onboarding')
       }
     } catch (e: unknown) {

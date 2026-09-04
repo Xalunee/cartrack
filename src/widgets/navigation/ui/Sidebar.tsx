@@ -1,21 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 import { Logo, ThemeToggle } from '@shared/ui'
-import { signOut } from 'next-auth/react'
+import { useSignOut } from '@shared/lib/use-sign-out'
 import { NAV_SECTIONS, isSectionActive, isChildActive } from '../model/navigation'
 
 export function Sidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-
-  async function handleLogout() {
-    await signOut({ redirect: false })
-    router.push('/login')
-  }
+  const handleLogout = useSignOut()
 
   return (
     <aside className="border-border bg-background sticky top-0 hidden h-screen w-56 flex-col border-r p-3 md:flex">

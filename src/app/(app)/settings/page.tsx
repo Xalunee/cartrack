@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -18,7 +17,7 @@ import {
 import Link from 'next/link'
 import { MessageCircle, Copy, Check, Unlink, LogOut, Download, Share, Menu, FileText, ShieldAlert, ExternalLink, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react'
 import { apiClient } from '@shared/api/client'
-import { signOut } from 'next-auth/react'
+import { useSignOut } from '@shared/lib/use-sign-out'
 import { ExportButton } from '@features/export-pdf'
 import { useCarQuery, useUpdateCarMutation } from '@entities/car'
 import { StsDialog } from '@features/set-sts'
@@ -50,7 +49,7 @@ const LINK_POLL_TIMEOUT_MS = 2 * 60 * 1000
 type LinkStatus = 'idle' | 'waiting' | 'timedout'
 
 export default function SettingsPage() {
-  const router = useRouter()
+  const handleSignOut = useSignOut()
   const [user, setUser] = useState<UserInfo | null>(null)
   const [link, setLink] = useState<TelegramLink | null>(null)
   const [linkError, setLinkError] = useState<string | null>(null)
@@ -421,7 +420,7 @@ export default function SettingsPage() {
       <Button
         variant="outline"
         className="w-full"
-        onClick={async () => { await signOut({ redirect: false }); router.push('/login') }}
+        onClick={handleSignOut}
       >
         <LogOut className="h-4 w-4 mr-2" />
         Выйти
