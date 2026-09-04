@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import * as Sentry from '@sentry/nextjs'
 import './globals.css'
 
 export default function GlobalError({
@@ -15,7 +14,21 @@ export default function GlobalError({
     console.error(error)
     // A digest means the error came from the server, where `onRequestError`
     // already reported it with the real stack — this copy carries none.
-    if (!error.digest) Sentry.captureException(error)
+    //
+    // Imported here rather than at the top of the file: Next ships a segment's
+    // error boundary inside that segment's client bundle, so a static import
+    // would pull the whole 146 KiB SDK back onto the start-up path that
+    // instrumentation-client.ts just cleared it from. Nothing needs it until
+    // something has already gone wrong.
+    if (!error.digest) {
+      // The .catch matters after a redeploy: this page may be running against
+      // chunk URLs that no longer exist, and by then instrumentation-client has
+      // already dropped its own unhandledrejection listener — a failed import
+      // would have nowhere to land but on top of the error already on screen.
+      import('@sentry/nextjs')
+        .then((Sentry) => Sentry.captureException(error))
+        .catch(() => {})
+    }
   }, [error])
 
   return (
