@@ -33,5 +33,12 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // Static files under public/ are excluded by name and extension, not just by
+  // the /_next/ prefix: every path this pattern lets through runs the edge
+  // function and decodes a JWT, and /manifest.json, /sw.js, the icons and the
+  // PDF fonts have no session to decode. The manifest and the worker matter
+  // most — both are requested on the launch path of the installed PWA.
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|manifest.json|sw.js|icons/|fonts/).*)',
+  ],
 }

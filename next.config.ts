@@ -2,7 +2,19 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async headers() {
+    return [
+      {
+        // public/sw.js is now a tombstone whose only job is to unregister the
+        // service worker we used to ship. A client only runs it once the
+        // browser fetches a *new* script at this URL, so the file must never be
+        // answered from a cache — that would leave the old worker, and its
+        // network-first navigation handler, in charge for another day.
+        source: '/sw.js',
+        headers: [{ key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' }],
+      },
+    ]
+  },
 };
 
 export default withSentryConfig(nextConfig, {
