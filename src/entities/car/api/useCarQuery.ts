@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { isClientError } from '@shared/api/client'
 import { carApi } from './carApi'
 import { UpdateCarDto } from '../model/types'
 
@@ -8,10 +9,9 @@ export function useCarQuery() {
   return useQuery({
     queryKey: CAR_QUERY_KEY,
     queryFn: carApi.get,
-    retry: (failureCount, error) => {
-      if (error instanceof Error && error.message.includes('404')) return false
-      return failureCount < 2
-    },
+    // A user with no car yet gets a 404, and no number of retries will
+    // conjure one — they should see the "add a car" card at once.
+    retry: (failureCount, error) => (isClientError(error) ? false : failureCount < 2),
   })
 }
 

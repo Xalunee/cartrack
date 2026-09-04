@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { isClientError } from '@shared/api/client'
 import { maintenanceApi } from './maintenanceApi'
 import { CreateMaintenanceItemDto, UpdateMaintenanceItemDto } from '../model/types'
 
@@ -8,6 +9,10 @@ export function useMaintenanceQuery() {
   return useQuery({
     queryKey: MAINTENANCE_QUERY_KEY,
     queryFn: maintenanceApi.getAll,
+    // Both dashboard widgets now mount before the car is known, so a user
+    // without one reaches this route and gets a 404. Retrying it only doubles
+    // the requests behind an answer that will not change.
+    retry: (failureCount, error) => (isClientError(error) ? false : failureCount < 1),
   })
 }
 

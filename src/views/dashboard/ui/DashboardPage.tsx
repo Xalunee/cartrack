@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCarQuery } from '@entities/car'
+import { useMileageQuery } from '@entities/mileage-log'
 import { StatusOverview } from '@widgets/status-overview'
 import { MileageTrackerSkeleton } from '@widgets/mileage-tracker/ui/MileageTrackerSkeleton'
 import { SpendingChartSkeleton } from '@widgets/spending-chart/ui/SpendingChartSkeleton'
@@ -33,6 +34,13 @@ const SpendingChart = dynamic(() => import('./lazy-charts').then((m) => m.Spendi
 
 export function DashboardPage() {
   const { data: car, isLoading } = useCarQuery()
+  // Started here rather than left to the widget that needs it. MileageTracker
+  // is the only reader of this query, and it travels inside the lazy Recharts
+  // chunk — so asking from in there put a whole round trip *behind* 340 KiB of
+  // download. StatusOverview already pulls /api/maintenance at hydration
+  // because it is imported statically; this puts /api/mileage on the same
+  // footing. React Query dedupes against the widget's own call by key.
+  useMileageQuery()
   const queryClient = useQueryClient()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -42,28 +50,17 @@ export function DashboardPage() {
     setTimeout(() => setRefreshing(false), 500)
   }
 
-  if (isLoading) {
-    return (
-      <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-6 page-enter">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="h-6 w-40 skeleton mb-2" />
-            <div className="h-4 w-24 skeleton" />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="h-48 skeleton rounded-xl" />
-          <div className="h-48 skeleton rounded-xl" />
-        </div>
-        <div className="space-y-3">
-          <div className="h-24 skeleton rounded-xl" />
-          <div className="h-24 skeleton rounded-xl" />
-        </div>
-      </div>
-    )
-  }
-
-  if (!car) {
+  // The car query deliberately does not gate this page. Returning a bare
+  // skeleton here left both charts unmounted, and an unmounted `next/dynamic`
+  // never starts fetching — so the Recharts chunk queued up *behind* the
+  // /api/car response instead of travelling alongside it, and the widgets it
+  // draws arrived a whole network round trip late. Rendering the frame
+  // immediately lets the chunk, /api/maintenance and /api/mileage all leave at
+  // once; each widget owns its own loading state.
+  //
+  // `isLoading` still guards the empty state below: without it the "add a car"
+  // card would flash on every load, before the query that disproves it lands.
+  if (!isLoading && !car) {
     return (
       <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-sm text-center">
@@ -90,12 +87,22 @@ export function DashboardPage() {
     <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-5 page-enter">
       <div className="flex items-center justify-between mb-5 animate-fade-in">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">
-            {car.brand} {car.model}
-          </h1>
-          <p className="text-sm text-muted-foreground tabular-nums">
-            {car.year} · {car.currentMileage.toLocaleString('ru')} км
-          </p>
+          {car ? (
+            <>
+              <h1 className="text-lg font-semibold tracking-tight">
+                {car.brand} {car.model}
+              </h1>
+              <p className="text-sm text-muted-foreground tabular-nums">
+                {car.year} · {car.currentMileage.toLocaleString('ru')} км
+              </p>
+            </>
+          ) : (
+            // Same box as the real heading, so nothing shifts when it arrives.
+            <>
+              <div className="h-6 w-40 skeleton mb-2" />
+              <div className="h-4 w-24 skeleton" />
+            </>
+          )}
         </div>
         <div className="flex gap-2">
           <Button
@@ -107,14 +114,20 @@ export function DashboardPage() {
           >
             <RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
           </Button>
-          <LogMileageDialog
-            currentMileage={car.currentMileage}
-            trigger={
-              <Button size="sm" variant="outline">
-                Пробег
-              </Button>
-            }
-          />
+          {car ? (
+            <LogMileageDialog
+              currentMileage={car.currentMileage}
+              trigger={
+                <Button size="sm" variant="outline">
+                  Пробег
+                </Button>
+              }
+            />
+          ) : (
+            <Button size="sm" variant="outline" disabled>
+              Пробег
+            </Button>
+          )}
           <MaintenanceDialog trigger={
             <Button size="sm">
               <Plus className="h-4 w-4 mr-1" /> Позиция
