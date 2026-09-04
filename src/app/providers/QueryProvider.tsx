@@ -3,6 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useState } from 'react'
 
+// The devtools package resolves to a no-op in production builds, so this guard
+// buys no bytes — it says out loud that the panel is a development tool, which
+// a bundle audit otherwise has to rediscover by grepping the output chunks.
+const SHOW_DEVTOOLS = process.env.NODE_ENV !== 'production'
+
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -18,7 +23,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {SHOW_DEVTOOLS && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )
 }
