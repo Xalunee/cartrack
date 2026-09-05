@@ -43,6 +43,9 @@ import { useRouter } from 'next/navigation'
 /** How long Recharts spends drawing the line; the dots fade in along the way. */
 const LINE_DRAW_MS = 700
 
+/** Past this the card is 140px tall and the dots start colliding. */
+const MAX_POINTS = 10
+
 export function MileageTracker() {
   const router = useRouter()
   const { data: car } = useCarQuery()
@@ -64,21 +67,29 @@ export function MileageTracker() {
   // render — selecting a history row, opening a dialog, a refetch on focus — so
   // it is held stable and only rebuilt when the logs or the period actually move.
   const logs = data?.logs
+
+  // getPeriodStart reads the clock, so the boundary has to be its own dependency.
+  // On [logs, period] alone an app left open across the 1st keeps last month's
+  // start and silently widens the window by a whole month — the installed PWA
+  // sits backgrounded for days at a time, and an unchanged refetch hands back the
+  // same logs reference, so nothing else would ever invalidate it. A timestamp
+  // compares equal all month, which leaves the memo, and the animation that
+  // depends on its reference, alone until the boundary really moves.
+  const periodStartMs = getPeriodStart(period).getTime()
+
   const chartData = useMemo(() => {
     if (!logs) return undefined
-    const periodStart = getPeriodStart(period)
     return logs
-      .filter((log) => new Date(log.recordedAt) >= periodStart)
-      .slice()
+      .filter((log) => new Date(log.recordedAt).getTime() >= periodStartMs)
+      .slice(0, MAX_POINTS)
       .reverse()
-      .slice(-10)
       .map((log) => ({
         id: log.id,
         date: format(new Date(log.recordedAt), 'd MMM', { locale: ru }),
         mileage: log.mileage,
         note: log.note || null,
       }))
-  }, [logs, period])
+  }, [logs, periodStartMs])
 
   // Each dot lands roughly where the drawing line has reached, so the two read
   // as one motion instead of a line finishing and dots appearing after it.
@@ -217,7 +228,7 @@ export function MileageTracker() {
               </ResponsiveContainer>
             </div>
           )}
-          {chartData && chartData.length === 0 && (
+          {chartData?.length === 0 && (
             <p className="text-xs text-muted-foreground text-center py-8">
               Нет данных за период
             </p>
