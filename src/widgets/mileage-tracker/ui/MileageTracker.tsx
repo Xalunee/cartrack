@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMileageQuery, useDeleteMileageLogMutation, type MileageLog } from '@entities/mileage-log'
 import { useCarQuery } from '@entities/car'
 import { LogMileageDialog } from '@features/log-mileage'
@@ -40,6 +40,9 @@ import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { useRouter } from 'next/navigation'
 
+/** How long Recharts spends drawing the line; the dots fade in along the way. */
+const LINE_DRAW_MS = 700
+
 export function MileageTracker() {
   const router = useRouter()
   const { data: car } = useCarQuery()
@@ -51,22 +54,37 @@ export function MileageTracker() {
   const [deletingLog, setDeletingLog] = useState<MileageLog | null>(null)
   const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD)
 
-  const periodStart = getPeriodStart(period)
-
   function openMileagePage() {
     router.push('/mileage')
   }
 
-  const chartData = data?.logs
-    .filter((log) => new Date(log.recordedAt) >= periodStart)
-    .slice()
-    .reverse()
-    .slice(-10)
-    .map((log) => ({
-      date: format(new Date(log.recordedAt), 'd MMM', { locale: ru }),
-      mileage: log.mileage,
-      note: log.note || null,
-    }))
+  // Recharts compares the `data` prop by reference and remounts its animation
+  // subtree whenever that reference changes, replaying the line draw and the dot
+  // entrance from zero. Rebuilding this array inline would do that on every
+  // render — selecting a history row, opening a dialog, a refetch on focus — so
+  // it is held stable and only rebuilt when the logs or the period actually move.
+  const logs = data?.logs
+  const chartData = useMemo(() => {
+    if (!logs) return undefined
+    const periodStart = getPeriodStart(period)
+    return logs
+      .filter((log) => new Date(log.recordedAt) >= periodStart)
+      .slice()
+      .reverse()
+      .slice(-10)
+      .map((log) => ({
+        id: log.id,
+        date: format(new Date(log.recordedAt), 'd MMM', { locale: ru }),
+        mileage: log.mileage,
+        note: log.note || null,
+      }))
+  }, [logs, period])
+
+  // Each dot lands roughly where the drawing line has reached, so the two read
+  // as one motion instead of a line finishing and dots appearing after it.
+  const dotCount = chartData?.length ?? 0
+  const dotDelayMs = (index: number) =>
+    dotCount < 2 ? 0 : Math.round((index / (dotCount - 1)) * LINE_DRAW_MS)
 
   return (
     <>
@@ -96,7 +114,15 @@ export function MileageTracker() {
               Пробег
             </CardTitle>
             <div className="flex items-center gap-2">
-              <PeriodSwitcher value={period} onChange={setPeriod} />
+              <PeriodSwitcher
+                value={period}
+                onChange={(next) => {
+                  // Indexes point into the previous period's points, so a stale
+                  // one would highlight an unrelated dot in the new range.
+                  setActiveIndex(null)
+                  setPeriod(next)
+                }}
+              />
               {car && (
                 <LogMileageDialog
                   currentMileage={car.currentMileage}
@@ -126,7 +152,7 @@ export function MileageTracker() {
             </div>
           )}
           {isPending && <div className="h-32 skeleton" />}
-          {chartData && chartData.length >= 2 && (
+          {chartData && chartData.length > 0 && (
             <div
               data-card-interactive
               className="select-none outline-none [-webkit-tap-highlight-color:transparent]"
@@ -167,6 +193,7 @@ export function MileageTracker() {
                     dataKey="mileage"
                     stroke="hsl(var(--chart-line))"
                     strokeWidth={2}
+                    animationDuration={LINE_DRAW_MS}
                     dot={(props: { cx?: number; cy?: number; index?: number }) => {
                       const { cx, cy, index } = props
                       const isActive = index === activeIndex
@@ -179,7 +206,8 @@ export function MileageTracker() {
                           fill="hsl(var(--chart-line))"
                           stroke={isActive ? 'hsl(var(--card))' : 'none'}
                           strokeWidth={isActive ? 2 : 0}
-                          className="transition-all duration-200"
+                          className="chart-dot transition-[r,stroke-width] duration-200"
+                          style={{ animationDelay: `${dotDelayMs(index ?? 0)}ms` }}
                         />
                       )
                     }}
@@ -189,7 +217,7 @@ export function MileageTracker() {
               </ResponsiveContainer>
             </div>
           )}
-          {chartData && chartData.length < 2 && (
+          {chartData && chartData.length === 0 && (
             <p className="text-xs text-muted-foreground text-center py-8">
               Нет данных за период
             </p>
@@ -198,9 +226,13 @@ export function MileageTracker() {
             <div className="mt-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">История</p>
               {data.logs.slice(0, 3).map((log) => {
-                const chartIndex = chartData
-                  ? chartData.findIndex((d) => d.mileage === log.mileage)
-                  : -1
+                // History always shows the three newest logs, but the chart only
+                // holds the ones inside the period, so a row may have no point to
+                // pair with. Matching on id keeps two equal readings apart, and the
+                // explicit -1 check stops every unpaired row from lighting up at
+                // once when nothing is selected.
+                const chartIndex = chartData?.findIndex((d) => d.id === log.id) ?? -1
+                const onChart = chartIndex !== -1
 
                 return (
                   <div
@@ -208,12 +240,15 @@ export function MileageTracker() {
                     data-card-interactive
                     className={cn(
                       'flex items-center justify-between py-2 border-b border-border last:border-0 rounded px-1 -mx-1 transition-colors',
-                      activeIndex === chartIndex && 'bg-accent'
+                      onChart && activeIndex === chartIndex && 'bg-accent'
                     )}
                   >
                     <div
-                      className="flex-1 cursor-pointer min-w-0"
-                      onClick={() => setActiveIndex(chartIndex === activeIndex ? null : chartIndex)}
+                      className={cn('flex-1 min-w-0', onChart && 'cursor-pointer')}
+                      onClick={() => {
+                        if (!onChart) return
+                        setActiveIndex(chartIndex === activeIndex ? null : chartIndex)
+                      }}
                     >
                       <span className="text-sm tabular-nums">{log.mileage.toLocaleString('ru')} км</span>
                       <span className="text-xs text-muted-foreground ml-2">
