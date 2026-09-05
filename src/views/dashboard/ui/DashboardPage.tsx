@@ -33,7 +33,7 @@ const SpendingChart = dynamic(() => import('./lazy-charts').then((m) => m.Spendi
 })
 
 export function DashboardPage() {
-  const { data: car, isLoading } = useCarQuery()
+  const { data: car, isPending } = useCarQuery()
   // Started here rather than left to the widget that needs it. MileageTracker
   // is the only reader of this query, and it travels inside the lazy Recharts
   // chunk — so asking from in there put a whole round trip *behind* 340 KiB of
@@ -58,9 +58,17 @@ export function DashboardPage() {
   // immediately lets the chunk, /api/maintenance and /api/mileage all leave at
   // once; each widget owns its own loading state.
   //
-  // `isLoading` still guards the empty state below: without it the "add a car"
-  // card would flash on every load, before the query that disproves it lands.
-  if (!isLoading && !car) {
+  // `isPending` guards the empty state below: without it the "add a car" card
+  // would flash on every load, before the query that disproves it lands.
+  //
+  // It has to be `isPending`, not `isLoading`. `isLoading` is `isPending &&
+  // isFetching`, and while the persisted cache is being restored the observer
+  // is deliberately held back — fetchStatus is forced to 'idle' — so `isLoading`
+  // reads false with no data in hand. That window covers the very first render,
+  // prerender included, which baked this card into the static HTML and put it on
+  // screen ahead of everything else. `isPending` is true whenever there is
+  // neither data nor an error, which is the question actually being asked here.
+  if (!isPending && !car) {
     return (
       <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-sm text-center">

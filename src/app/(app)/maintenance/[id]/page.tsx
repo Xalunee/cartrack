@@ -21,7 +21,7 @@ export default function MaintenanceDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const deleteMutation = useDeleteMaintenanceMutation()
 
-  const { data: item, isLoading } = useQuery({
+  const { data: item, isPending } = useQuery({
     queryKey: ['maintenance', id],
     queryFn: () => apiClient<MaintenanceItemWithStatus>(`/api/maintenance/${id}`),
   })
@@ -37,7 +37,7 @@ export default function MaintenanceDetailPage() {
     })
   }
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-4 page-enter">
         <div className="h-8 w-48 skeleton" />

@@ -38,7 +38,7 @@ const MileageHistoryChart = dynamic(
 
 export default function MileagePage() {
   const { data: car } = useCarQuery()
-  const { data, isLoading } = useMileageQuery()
+  const { data, isPending } = useMileageQuery()
   const deleteMutation = useDeleteMileageLogMutation()
   const [editingLog, setEditingLog] = useState<MileageLog | null>(null)
   const [deletingLog, setDeletingLog] = useState<MileageLog | null>(null)
@@ -57,7 +57,7 @@ export default function MileagePage() {
   const totalLogs = logs.length
   const lastLog = logs[0]
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-6 page-enter">
         <div className="h-7 w-32 skeleton" />

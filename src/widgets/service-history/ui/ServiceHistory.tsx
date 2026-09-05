@@ -13,11 +13,11 @@ import { History, ChevronDown, ChevronUp } from 'lucide-react'
 const COLLAPSE_THRESHOLD = 5
 
 export function ServiceHistory() {
-  const { data: records, isLoading } = useAllServiceRecordsQuery()
+  const { data: records, isPending } = useAllServiceRecordsQuery()
   const { data: items } = useMaintenanceQuery()
   const [expanded, setExpanded] = useState(false)
 
-  if (isLoading) {
+  if (isPending) {
     return <div className="h-16 rounded-xl skeleton" />
   }
 

@@ -12,10 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Settings } from 'lucide-react'
 
 export function ProfilePage() {
-  const { data: user, isLoading: userLoading } = useUserQuery()
-  const { data: car, isLoading: carLoading } = useCarQuery()
-  const { data: mileage, isLoading: mileageLoading } = useMileageQuery()
-  const { data: items, isLoading: itemsLoading } = useMaintenanceQuery()
+  const { data: user, isPending: userLoading } = useUserQuery()
+  const { data: car, isPending: carLoading } = useCarQuery()
+  const { data: mileage, isPending: mileageLoading } = useMileageQuery()
+  const { data: items, isPending: itemsLoading } = useMaintenanceQuery()
 
   const stats = calculateProfileStats({
     logs: mileage?.logs ?? [],

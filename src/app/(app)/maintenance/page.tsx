@@ -11,7 +11,7 @@ import { Plus } from 'lucide-react'
 
 export default function MaintenancePage() {
   const { data: car } = useCarQuery()
-  const { data: items, isLoading } = useMaintenanceQuery()
+  const { data: items, isPending } = useMaintenanceQuery()
 
   const totalItems = items?.length ?? 0
   const criticalCount = items?.filter((i) => i.resource.status === 'critical').length ?? 0
@@ -19,7 +19,7 @@ export default function MaintenancePage() {
   const okCount = items?.filter((i) => i.resource.status === 'ok').length ?? 0
   const totalSpent = items?.reduce((sum, i) => sum + i.totalSpent, 0) ?? 0
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 space-y-6 page-enter">
         <div className="h-7 w-40 skeleton" />

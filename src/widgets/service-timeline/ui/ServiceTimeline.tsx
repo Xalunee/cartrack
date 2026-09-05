@@ -114,7 +114,7 @@ const NOTICE_MS = 4000
 const SHORT_NOTICE_MS = 2000
 
 export function ServiceTimeline({ itemId, item }: ServiceTimelineProps) {
-  const { data: records, isLoading } = useServiceRecordsQuery(itemId)
+  const { data: records, isPending } = useServiceRecordsQuery(itemId)
 
   // The outcome of a deletion is shown here rather than in the dialog: deleting a
   // record unmounts its row, and the dialog with it, before anything inside could
@@ -138,7 +138,7 @@ export function ServiceTimeline({ itemId, item }: ServiceTimelineProps) {
     </p>
   ) : null
 
-  if (isLoading) {
+  if (isPending) {
     return <div className="h-40 rounded-xl skeleton" />
   }
 

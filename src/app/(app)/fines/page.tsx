@@ -199,7 +199,7 @@ function FinesContent() {
 }
 
 export default function FinesPage() {
-  const { data: car, isLoading: carLoading } = useCarQuery()
+  const { data: car, isPending: carLoading } = useCarQuery()
 
   if (carLoading) {
     return (

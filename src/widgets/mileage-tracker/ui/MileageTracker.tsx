@@ -43,7 +43,7 @@ import { useRouter } from 'next/navigation'
 export function MileageTracker() {
   const router = useRouter()
   const { data: car } = useCarQuery()
-  const { data, isLoading } = useMileageQuery()
+  const { data, isPending } = useMileageQuery()
   const deleteMutation = useDeleteMileageLogMutation()
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
@@ -125,7 +125,7 @@ export function MileageTracker() {
               )}
             </div>
           )}
-          {isLoading && <div className="h-32 skeleton" />}
+          {isPending && <div className="h-32 skeleton" />}
           {chartData && chartData.length >= 2 && (
             <div
               data-card-interactive

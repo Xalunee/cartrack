@@ -24,7 +24,7 @@ interface EventLogProps {
 }
 
 export function EventLog({ filter }: EventLogProps) {
-  const { data: events, isLoading } = useEventsQuery()
+  const { data: events, isPending } = useEventsQuery()
   const deleteMutation = useDeleteEventMutation()
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const filteredEvents = filter
@@ -42,7 +42,7 @@ export function EventLog({ filter }: EventLogProps) {
     }
   }
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="space-y-3 stagger-children">
         {[1, 2, 3].map((i) => (

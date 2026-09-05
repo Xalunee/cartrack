@@ -15,10 +15,10 @@ import { useRouter } from 'next/navigation'
 
 export function StatusOverview() {
   const router = useRouter()
-  const { data: items, isLoading } = useMaintenanceQuery()
+  const { data: items, isPending } = useMaintenanceQuery()
   const { data: car } = useCarQuery()
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="space-y-3 stagger-children">
         {[1, 2, 3].map((i) => (

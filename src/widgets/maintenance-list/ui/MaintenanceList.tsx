@@ -2,9 +2,9 @@
 import { useMaintenanceQuery, MaintenanceCard } from '@entities/maintenance-item'
 
 export function MaintenanceList() {
-  const { data: items = [], isLoading } = useMaintenanceQuery()
+  const { data: items = [], isPending } = useMaintenanceQuery()
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">Загрузка...</p>
+  if (isPending) return <p className="text-sm text-muted-foreground">Загрузка...</p>
 
   return (
     <div className="grid gap-3">
