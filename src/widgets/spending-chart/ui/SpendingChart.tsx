@@ -5,7 +5,10 @@ import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PeriodSwitcher, type Period } from '@shared/ui'
 import { getPeriodStart, DEFAULT_PERIOD } from '@shared/lib/period'
+import { cn } from '@shared/lib/utils'
 import { BarChart2 } from 'lucide-react'
+import { format } from 'date-fns'
+import { ru } from 'date-fns/locale'
 import {
   BarChart,
   Bar,
@@ -20,6 +23,9 @@ const PERIOD_LABEL: Record<Period, string> = {
   halfyear: 'полгода',
   year: 'год',
 }
+
+/** Matches the mileage card, so the two read the same way down the dashboard. */
+const HISTORY_LIMIT = 3
 
 export function SpendingChart() {
   const { data: items } = useMaintenanceQuery()
@@ -48,6 +54,18 @@ export function SpendingChart() {
     cost: item.spentInPeriod,
   }))
 
+  // The chart and the list above it answer «на что уходит за период» — they are
+  // the same five numbers, one the legend of the other, and both empty out when
+  // the period holds nothing. This answers «что было последним» instead, so it
+  // ignores the period the way the mileage card's history does: an empty month
+  // should still show that something was serviced in July.
+  const recentRecords = items
+    ?.flatMap((item) => item.serviceRecords.map((record) => ({ ...record, itemName: item.name })))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, HISTORY_LIMIT)
+
+  const hasHistory = Boolean(recentRecords?.length)
+
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
@@ -70,7 +88,7 @@ export function SpendingChart() {
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
-        {chartData && chartData.length >= 2 ? (
+        {chartData && chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%" minHeight={180} className="flex-1 select-none [-webkit-tap-highlight-color:transparent]">
             <BarChart data={chartData} barSize={28}>
               <XAxis
@@ -109,9 +127,38 @@ export function SpendingChart() {
             ))}
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-1.5 py-8">
+          // Without history below, the empty state takes the slack so the card
+          // keeps its height next to the mileage one. With history below there is
+          // something to sit under, and stretching would push it off the fold.
+          <div
+            className={cn(
+              'flex flex-col items-center justify-center gap-1.5 py-8',
+              !hasHistory && 'flex-1'
+            )}
+          >
             <BarChart2 className="h-6 w-6 text-muted-foreground" />
             <p className="text-xs text-muted-foreground">Нет данных за период</p>
+          </div>
+        )}
+        {hasHistory && recentRecords && (
+          <div className="mt-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">История</p>
+            {recentRecords.map((record) => (
+              <div
+                key={record.id}
+                className="flex items-center justify-between gap-2 py-2 border-b border-border last:border-0"
+              >
+                <div className="min-w-0">
+                  <span className="text-sm tabular-nums">
+                    {record.cost === null ? 'Без суммы' : `${record.cost.toLocaleString('ru')} ₽`}
+                  </span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    {format(new Date(record.date), 'd MMM', { locale: ru })}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground truncate">{record.itemName}</span>
+              </div>
+            ))}
           </div>
         )}
       </CardContent>
