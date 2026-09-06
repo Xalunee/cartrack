@@ -22,6 +22,8 @@ describe('resolveActiveSection', () => {
   it.each([
     ['/dashboard', '/dashboard'],
     ['/mileage', '/service'],
+    ['/fuel', '/service'],
+    ['/fuel/abc123', '/service'],
     ['/maintenance', '/service'],
     ['/maintenance/abc123', '/service'],
     ['/onboarding', '/dashboard'],

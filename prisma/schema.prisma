@@ -91,6 +91,7 @@ model Car {
   mileageLogs      MileageLog[]
   events           CarEvent[]
   fines            Fine[]
+  fuelEntries      FuelEntry[]
 
   @@map("cars")
 }
@@ -149,6 +150,44 @@ model ServiceRecord {
 
   @@index([maintenanceItemId])
   @@map("service_records")
+}
+
+/// Заправка. Расход считается только между двумя подряд идущими заправками
+/// «до полного» — см. src/shared/lib/calculations/fuel.ts.
+model FuelEntry {
+  id    String @id @default(cuid())
+  carId String
+  car   Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  /// Одометр на момент заправки. Nullable намеренно: если на одометр не
+  /// посмотрели, требование числа заставит его выдумать — а выдуманный пробег
+  /// хуже пропуска. Заправка без пробега всё равно идёт в расходы, но в расчёте
+  /// потребления не участвует.
+  mileage Int?
+  date    DateTime
+  liters  Float
+  /// Заплаченная сумма. Цена за литр НЕ хранится: это totalCost / liters, а
+  /// третье поле — ещё одна величина, способная разойтись с двумя другими.
+  totalCost Float
+
+  /// Заправка «до полного».
+  isFullTank Boolean @default(true)
+  /// «Была заправка, которую я не записал» — отрезок с таким признаком
+  /// исключается из расчёта, вместо того чтобы показать заниженное число.
+  hasMissedEntry Boolean @default(false)
+
+  station  String?
+  fuelType String?
+  /// Пока не используется: файловое хранилище сознательно не строим, но колонка
+  /// есть, чтобы добавление фото не стало миграцией по живым данным.
+  receiptPhotoUrl String?
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([carId, date])
+  @@map("fuel_entries")
 }
 
 model MileageLog {

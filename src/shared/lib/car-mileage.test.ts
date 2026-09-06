@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   projectMileageAfterRemoval,
-  resolveServiceLogSync,
+  FUEL_MILEAGE_LOG_NOTE,
+  resolvePairedLogSync,
   selectPairedMileageLog,
   serviceMileageLogNote,
 } from './car-mileage'
@@ -47,11 +48,11 @@ describe('selectPairedMileageLog', () => {
   })
 })
 
-describe('resolveServiceLogSync', () => {
+describe('resolvePairedLogSync', () => {
   const record = { mileage: 100_000, date: RECORD_DATE }
 
   it('reports nothing to sync when neither field was sent', () => {
-    expect(resolveServiceLogSync(record, {})).toEqual({
+    expect(resolvePairedLogSync(record, {})).toEqual({
       mileageChanged: false,
       dateChanged: false,
       pointChanged: false,
@@ -59,7 +60,7 @@ describe('resolveServiceLogSync', () => {
   })
 
   it('reports nothing to sync when the sent values match what is stored', () => {
-    const sync = resolveServiceLogSync(record, {
+    const sync = resolvePairedLogSync(record, {
       mileage: 100_000,
       date: new Date(RECORD_DATE),
     })
@@ -69,17 +70,17 @@ describe('resolveServiceLogSync', () => {
   it('treats an unsent date as unchanged even when the mileage moves', () => {
     // The regression: the paired log's own date may have been corrected
     // separately, and a mileage-only edit must leave that correction alone.
-    const sync = resolveServiceLogSync(record, { mileage: 95_000 })
+    const sync = resolvePairedLogSync(record, { mileage: 95_000 })
     expect(sync).toEqual({ mileageChanged: true, dateChanged: false, pointChanged: true })
   })
 
   it('treats an unsent mileage as unchanged even when the date moves', () => {
-    const sync = resolveServiceLogSync(record, { date: new Date('2026-03-05T00:00:00.000Z') })
+    const sync = resolvePairedLogSync(record, { date: new Date('2026-03-05T00:00:00.000Z') })
     expect(sync).toEqual({ mileageChanged: false, dateChanged: true, pointChanged: true })
   })
 
   it('reports both when both actually moved', () => {
-    const sync = resolveServiceLogSync(record, {
+    const sync = resolvePairedLogSync(record, {
       mileage: 95_000,
       date: new Date('2026-03-05T00:00:00.000Z'),
     })
@@ -87,7 +88,7 @@ describe('resolveServiceLogSync', () => {
   })
 
   it('compares dates by value, not identity', () => {
-    const sync = resolveServiceLogSync(record, { date: new Date(RECORD_DATE.getTime()) })
+    const sync = resolvePairedLogSync(record, { date: new Date(RECORD_DATE.getTime()) })
     expect(sync.dateChanged).toBe(false)
   })
 })
@@ -115,5 +116,17 @@ describe('projectMileageAfterRemoval', () => {
       mileage: 142_500,
       changed: false,
     })
+  })
+})
+
+describe('FUEL_MILEAGE_LOG_NOTE', () => {
+  // Editing and deleting a fuel entry find its mileage point by this exact text.
+  // Changing it orphans every log already written, so it is pinned here.
+  it('is the note every fuel-written mileage log carries', () => {
+    expect(FUEL_MILEAGE_LOG_NOTE).toBe('Заправка')
+  })
+
+  it('cannot collide with a service note', () => {
+    expect(serviceMileageLogNote('Заправка')).not.toBe(FUEL_MILEAGE_LOG_NOTE)
   })
 })

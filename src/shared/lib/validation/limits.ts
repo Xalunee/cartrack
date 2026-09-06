@@ -26,6 +26,13 @@ export const LIMITS = {
    * 10 000 000 ₽ is more than a private car is worth, let alone one service.
    */
   cost: 10_000_000,
+  /**
+   * One fill-up. A passenger tank holds 40–80 L and the biggest truck tanks run
+   * to a few hundred, so 1 000 L is far past anything a single receipt can show
+   * while keeping a fat-fingered 100000 out of the consumption maths, where it
+   * would flatten the car's median for months.
+   */
+  liters: 1_000,
   /** No real service interval approaches this; it only has to stay inside Int4. */
   intervalKm: 1_000_000,
   /** 100 years. Anything longer is not a maintenance interval. */
@@ -97,6 +104,14 @@ export function costField() {
     .max(LIMITS.cost, `Стоимость не может быть больше ${LIMITS.cost.toLocaleString('ru')} ₽`)
 }
 
+/** Litres in one fill-up. */
+export function litersField() {
+  return z
+    .number({ error: 'Введите число' })
+    .positive('Объём должен быть больше нуля')
+    .max(LIMITS.liters, `Не больше ${LIMITS.liters.toLocaleString('ru')} л за одну заправку`)
+}
+
 export function intervalKmField() {
   return z
     .number({ error: 'Введите число' })
@@ -132,6 +147,16 @@ export function nameField(requiredMessage: string) {
     .string()
     .min(1, requiredMessage)
     .max(LIMITS.nameLength, `Не больше ${LIMITS.nameLength} символов`)
+}
+
+/**
+ * A label the user may leave blank — a station name, a fuel grade. A text input
+ * holds `''`, not `undefined`, when it is untouched, so `nameField().optional()`
+ * would reject the resting state of every optional label in a form. The routes
+ * turn `''` into `null` themselves.
+ */
+export function optionalNameField() {
+  return z.string().max(LIMITS.nameLength, `Не больше ${LIMITS.nameLength} символов`).optional()
 }
 
 export function licensePlateField() {

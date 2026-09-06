@@ -6,6 +6,7 @@ import { cn } from '@shared/lib/utils'
 import {
   AlertTriangle,
   ChevronRight,
+  Fuel,
   Gauge,
   HelpCircle,
   Receipt,
@@ -44,6 +45,12 @@ const linkTiles: (TileBodyProps & { href: string })[] = [
     description: 'Показания одометра и история записей',
   },
   {
+    href: '/fuel',
+    icon: Fuel,
+    title: 'Топливо',
+    description: 'Сколько уходит на бензин и какой у машины расход',
+  },
+  {
     href: '/maintenance',
     icon: Wrench,
     title: 'Обслуживание',
@@ -69,7 +76,7 @@ export function ServicePage() {
       <div className="mb-5">
         <h1 className="text-lg font-semibold tracking-tight">Сервис</h1>
         <p className="text-muted-foreground text-sm">
-          Пробег, обслуживание, события и штрафы по машине
+          Пробег, топливо, обслуживание, события и штрафы по машине
         </p>
       </div>
 

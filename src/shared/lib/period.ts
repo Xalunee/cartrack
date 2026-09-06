@@ -3,6 +3,17 @@ import type { Period } from '@shared/ui/PeriodSwitcher'
 
 export const DEFAULT_PERIOD: Period = 'month'
 
+/**
+ * The period named as it reads inside a sentence — «За месяц», «Расход за год».
+ * Shared so two cards side by side can never label the same switcher
+ * differently.
+ */
+export const PERIOD_LABEL: Record<Period, string> = {
+  month: 'месяц',
+  halfyear: 'полгода',
+  year: 'год',
+}
+
 /** How many calendar months, counting the current one, each period covers. */
 const MONTHS: Record<Period, number> = {
   month: 1,

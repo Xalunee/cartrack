@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useMaintenanceQuery } from '@entities/maintenance-item'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PeriodSwitcher, type Period } from '@shared/ui'
-import { getPeriodStart, DEFAULT_PERIOD } from '@shared/lib/period'
+import { getPeriodStart, DEFAULT_PERIOD, PERIOD_LABEL } from '@shared/lib/period'
 import { cn } from '@shared/lib/utils'
 import { BarChart2 } from 'lucide-react'
 import { format } from 'date-fns'
@@ -17,12 +17,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-
-const PERIOD_LABEL: Record<Period, string> = {
-  month: 'месяц',
-  halfyear: 'полгода',
-  year: 'год',
-}
 
 /** Matches the mileage card, so the two read the same way down the dashboard. */
 const HISTORY_LIMIT = 3

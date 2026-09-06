@@ -7,7 +7,7 @@ import { validateMileagePoint } from '@shared/lib/calculations/mileage-validatio
 import {
   findPairedServiceLog,
   recomputeCurrentMileage,
-  resolveServiceLogSync,
+  resolvePairedLogSync,
 } from '@shared/lib/car-mileage'
 
 const updateSchema = z.object({
@@ -70,7 +70,7 @@ export async function PATCH(
   // same car, the record's *old* mileage, and the note that route stamps.
   const carId = record.maintenanceItem.carId
   const newMileage = mileage ?? record.mileage
-  const sync = resolveServiceLogSync(record, { mileage, date })
+  const sync = resolvePairedLogSync(record, { mileage, date })
 
   let pairedLog: { id: string; recordedAt: Date } | null = null
   let mileageLogWarning: string | null = null

@@ -37,6 +37,14 @@ export function serviceMileageLogNote(itemName: string): string {
   return `Обслуживание: ${itemName}`
 }
 
+/**
+ * The note `/api/fuel` stamps on the MileageLog it creates alongside a FuelEntry.
+ * A fill-up has no item name to vary by, so it is a constant rather than a
+ * builder — but it lives here beside the service note for the same reason:
+ * editing and deleting have to find the log again by exactly this text.
+ */
+export const FUEL_MILEAGE_LOG_NOTE = 'Заправка'
+
 interface PairCandidate {
   id: string
   recordedAt: Date
@@ -64,12 +72,12 @@ export function selectPairedMileageLog<T extends PairCandidate>(
   return sameDate.length === 1 ? sameDate[0] : null
 }
 
-interface ServiceRecordPoint {
+interface PairedPoint {
   mileage: number
   date: Date
 }
 
-export interface ServiceLogSync {
+export interface PairedLogSync {
   mileageChanged: boolean
   dateChanged: boolean
   /** True when the paired log has to be looked at at all. */
@@ -77,17 +85,18 @@ export interface ServiceLogSync {
 }
 
 /**
- * What editing a ServiceRecord means for the MileageLog paired with it.
+ * What editing a record means for the MileageLog paired with it — a service
+ * record or a fuel entry alike, since both pair the same way.
  *
  * The rule that is easy to get backwards: a field the request did not carry is
  * not a change. A log's date can be corrected on its own in the mileage history,
  * and syncing a record whose date nobody touched must not roll that correction
  * back — so `patch` holds only what the request actually sent.
  */
-export function resolveServiceLogSync(
-  record: ServiceRecordPoint,
+export function resolvePairedLogSync(
+  record: PairedPoint,
   patch: { mileage?: number; date?: Date }
-): ServiceLogSync {
+): PairedLogSync {
   const mileageChanged = patch.mileage !== undefined && patch.mileage !== record.mileage
   const dateChanged = patch.date !== undefined && patch.date.getTime() !== record.date.getTime()
 
@@ -96,8 +105,8 @@ export function resolveServiceLogSync(
 
 interface PairLookup {
   carId: string
-  /** The maintenance item's name, which the note was built from. */
-  itemName: string
+  /** The note the writing route stamped on the log. */
+  note: string
   /** The record's mileage and date as they stand in the database. */
   recordMileage: number
   recordDate: Date
@@ -110,20 +119,47 @@ export interface PairedServiceLog {
 }
 
 /**
- * Finds the MileageLog paired with a ServiceRecord. Every route that touches the
- * pair goes through here, so an edit and a delete can never disagree about which
- * row is the partner.
+ * Finds the MileageLog paired with a record that wrote one. Every route that
+ * touches a pair goes through here, so an edit and a delete can never disagree
+ * about which row is the partner — and fuel entries pair by exactly the same
+ * rule as services rather than inventing a second scheme.
  */
-export async function findPairedServiceLog(
+export async function findPairedLog(
   tx: DbClient,
-  { carId, itemName, recordMileage, recordDate }: PairLookup
+  { carId, note, recordMileage, recordDate }: PairLookup
 ): Promise<PairedServiceLog> {
   const candidates = await tx.mileageLog.findMany({
-    where: { carId, mileage: recordMileage, note: serviceMileageLogNote(itemName) },
+    where: { carId, mileage: recordMileage, note },
   })
 
   const log = selectPairedMileageLog(candidates, recordDate)
   return { log, ambiguous: log === null && candidates.length > 1 }
+}
+
+/** The service flavour of {@link findPairedLog}: the note carries the item name. */
+export function findPairedServiceLog(
+  tx: DbClient,
+  {
+    carId,
+    itemName,
+    recordMileage,
+    recordDate,
+  }: { carId: string; itemName: string; recordMileage: number; recordDate: Date }
+): Promise<PairedServiceLog> {
+  return findPairedLog(tx, {
+    carId,
+    note: serviceMileageLogNote(itemName),
+    recordMileage,
+    recordDate,
+  })
+}
+
+/** The fuel flavour: one fixed note, since a fill-up has no item to name. */
+export function findPairedFuelLog(
+  tx: DbClient,
+  { carId, recordMileage, recordDate }: { carId: string; recordMileage: number; recordDate: Date }
+): Promise<PairedServiceLog> {
+  return findPairedLog(tx, { carId, note: FUEL_MILEAGE_LOG_NOTE, recordMileage, recordDate })
 }
 
 /**

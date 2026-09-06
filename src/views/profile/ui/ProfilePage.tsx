@@ -7,7 +7,9 @@ import { useUserQuery } from '@entities/user'
 import { useCarQuery } from '@entities/car'
 import { useMileageQuery } from '@entities/mileage-log'
 import { useMaintenanceQuery } from '@entities/maintenance-item'
+import { useFuelEntriesQuery } from '@entities/fuel-entry'
 import { calculateProfileStats } from '@shared/lib/calculations/profile-stats'
+import { calculateCostPerKm, totalFuelSpent } from '@shared/lib/calculations/fuel-stats'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Settings } from 'lucide-react'
 
@@ -16,6 +18,7 @@ export function ProfilePage() {
   const { data: car, isPending: carLoading } = useCarQuery()
   const { data: mileage, isPending: mileageLoading } = useMileageQuery()
   const { data: items, isPending: itemsLoading } = useMaintenanceQuery()
+  const { data: fuel, isPending: fuelLoading } = useFuelEntriesQuery()
 
   const stats = calculateProfileStats({
     logs: mileage?.logs ?? [],
@@ -24,9 +27,31 @@ export function ProfilePage() {
     now: new Date(),
   })
 
-  // Every figure is derived from the four queries above, so the numbers only
-  // stand still once all of them have answered.
-  const statsLoading = carLoading || mileageLoading || itemsLoading
+  const fuelEntries = (fuel?.entries ?? []).map((entry) => ({
+    id: entry.id,
+    date: new Date(entry.date),
+    mileage: entry.mileage,
+    liters: entry.liters,
+    totalCost: entry.totalCost,
+    station: entry.station,
+  }))
+
+  // Обе цифры — за всё время, как и остальные плитки здесь: страница отвечает
+  // на «сколько всего», а не «сколько за месяц».
+  //
+  // Почему именно эти две из всей топливной статистики. «Потрачено на топливо»
+  // встаёт рядом с «Потрачено на сервис» — вместе они и есть стоимость владения,
+  // порознь каждая половина обманчива. «₽ за километр» — единственное число,
+  // которое можно с чем-то сравнить, не зная ни пробега, ни цен. Средний расход
+  // сюда не поехал намеренно: без тренда, сезонной оговорки и наблюдения о
+  // росте — всего того, что живёт на /fuel, — это голое число, по которому
+  // нельзя понять, много это или нормально.
+  const fuelSpent = totalFuelSpent(fuelEntries)
+  const costPerKm = calculateCostPerKm(fuelEntries)
+
+  // Every figure is derived from the queries above, so the numbers only stand
+  // still once all of them have answered.
+  const statsLoading = carLoading || mileageLoading || itemsLoading || fuelLoading
 
   const tiles = [
     {
@@ -40,6 +65,17 @@ export function ProfilePage() {
     {
       label: 'Потрачено на сервис',
       value: `${stats.totalSpent.toLocaleString('ru')} ₽`,
+    },
+    {
+      label: 'Потрачено на топливо',
+      value: `${Math.round(fuelSpent).toLocaleString('ru')} ₽`,
+    },
+    {
+      label: '₽ за километр',
+      value:
+        costPerKm === null
+          ? '—'
+          : `${costPerKm.costPerKm.toLocaleString('ru', { maximumFractionDigits: 2 })} ₽`,
     },
     {
       label: 'Ведём учёт',
@@ -58,7 +94,7 @@ export function ProfilePage() {
         <div className="h-7 w-32 skeleton" />
         <div className="h-28 skeleton rounded-xl" />
         <div className="grid grid-cols-2 gap-3">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="h-20 skeleton rounded-xl" />)}
+          {tiles.map((tile) => <div key={tile.label} className="h-20 skeleton rounded-xl" />)}
         </div>
       </div>
     )
@@ -101,11 +137,11 @@ export function ProfilePage() {
           Статистика
         </h2>
         {statsLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => <div key={i} className="h-20 skeleton rounded-xl" />)}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {tiles.map((tile) => <div key={tile.label} className="h-20 skeleton rounded-xl" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {tiles.map((tile) => (
               <Card key={tile.label}>
                 <CardContent className="p-3">

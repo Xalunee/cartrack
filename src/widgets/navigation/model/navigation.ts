@@ -45,9 +45,10 @@ export const NAV_SECTIONS: NavSection[] = [
     // Mileage and maintenance are tiles on this page, so the tab they light up
     // has to be this one even though the dashboard links to them too. Order
     // matches the tiles: what you touch most often comes first.
-    roots: ['/service', '/mileage', '/maintenance', '/events', '/fines', '/help'],
+    roots: ['/service', '/mileage', '/fuel', '/maintenance', '/events', '/fines', '/help'],
     children: [
       { href: '/mileage', label: 'Пробег' },
+      { href: '/fuel', label: 'Топливо' },
       { href: '/maintenance', label: 'Обслуживание' },
       { href: '/events', label: 'События' },
       { href: '/fines', label: 'Штрафы' },

@@ -21,13 +21,14 @@ import { Car, ChevronRight, Plus, RefreshCw } from 'lucide-react'
 // library has no business being in the bundle that blocks first paint. The
 // loading states mirror each widget's own first render so the swap is silent.
 //
-// Both imports go through ./lazy-charts so the two widgets share one chunk
-// group — see that file for what two groups did to Recharts' module registry.
-const MileageTracker = dynamic(() => import('./lazy-charts').then((m) => m.MileageTracker), {
-  ssr: false,
-  loading: () => <MileageTrackerSkeleton />,
-})
-const SpendingChart = dynamic(() => import('./lazy-charts').then((m) => m.SpendingChart), {
+// Both imports go through @widgets/lazy-charts so every chart in the app shares
+// one chunk group — see that file for what two groups did to Recharts' module
+// registry.
+const MileageTracker = dynamic(
+  () => import('@widgets/lazy-charts').then((m) => m.MileageTracker),
+  { ssr: false, loading: () => <MileageTrackerSkeleton /> }
+)
+const SpendingChart = dynamic(() => import('@widgets/lazy-charts').then((m) => m.SpendingChart), {
   ssr: false,
   loading: () => <SpendingChartSkeleton />,
 })
